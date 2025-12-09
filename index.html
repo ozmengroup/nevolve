@@ -3,282 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai † - Hukuki Strateji</title>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>nevolve.ai</title>
     <style>
-        :root {
-            --bg: #0a0a0a;
-            --surface: #141414;
-            --surface-2: #1a1a1a;
-            --text: #fafafa;
-            --text-dim: #888;
-            --accent: #f4d03f;
-            --accent-dim: rgba(244, 208, 63, 0.15);
-            --success: #4ade80;
-            --border: #2a2a2a;
-        }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        :root {
+            --bg: #FAFAFA;
+            --card: #FFFFFF;
+            --text: #1D1D1F;
+            --text-secondary: #86868B;
+            --border: #E5E5E7;
+            --accent: #0071E3;
+            --accent-hover: #0077ED;
+        }
+        
         body {
-            font-family: 'Space Mono', monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        /* Subtle grain texture */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 1000;
+            -webkit-font-smoothing: antialiased;
         }
         
         .container {
-            max-width: 700px;
+            max-width: 680px;
             margin: 0 auto;
-            padding: 40px 24px;
+            padding: 60px 24px;
         }
         
         /* Header */
         .header {
             text-align: center;
             margin-bottom: 48px;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--border);
         }
         
         .logo {
-            font-family: 'Instrument Serif', serif;
-            font-size: 42px;
-            font-weight: 400;
-            letter-spacing: -1px;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
             margin-bottom: 8px;
         }
         
-        .logo .dead {
-            display: inline-block;
-            font-size: 18px;
-            vertical-align: super;
-            color: var(--text-dim);
-            margin-left: 4px;
+        .logo span {
+            font-weight: 400;
+            color: var(--text-secondary);
         }
         
         .tagline {
-            font-size: 13px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
+            font-size: 17px;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
         
-        .tagline em {
-            color: var(--accent);
-            font-style: normal;
-        }
-        
-        .status-bar {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-top: 20px;
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        
-        /* Main Card */
-        .main-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Card */
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         
         .card-title {
-            font-size: 11px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
         }
         
-        .card-badge {
-            font-size: 10px;
-            padding: 4px 10px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            border-radius: 20px;
-        }
-        
-        .card-body {
-            padding: 24px;
-        }
-        
-        /* Input Area */
-        .input-area {
-            position: relative;
-        }
-        
+        /* Input */
         .input-field {
             width: 100%;
             min-height: 120px;
             padding: 16px;
-            padding-bottom: 60px;
-            background: var(--surface-2);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
+            border-radius: 12px;
             font-family: inherit;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 17px;
+            line-height: 1.5;
             resize: none;
-            transition: border-color 0.2s;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
         }
         
         .input-field::placeholder {
-            color: var(--text-dim);
+            color: var(--text-secondary);
         }
         
         .input-footer {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .char-count {
-            font-size: 11px;
-            color: var(--text-dim);
+            justify-content: flex-end;
+            margin-top: 16px;
         }
         
         .submit-btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background: var(--accent);
-            color: var(--bg);
+            color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 980px;
             font-family: inherit;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
         
         .submit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(244, 208, 63, 0.3);
+            background: var(--accent-hover);
         }
         
         .submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
         
-        /* Quick Actions */
-        .quick-actions {
+        /* Tags */
+        .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
         }
         
-        .quick-btn {
-            padding: 8px 14px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-dim);
+        .tag {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: none;
+            border-radius: 980px;
             font-family: inherit;
-            font-size: 11px;
+            font-size: 14px;
+            color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .quick-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+        .tag:hover {
+            background: #E8E8ED;
+            color: var(--text);
         }
         
-        /* Response Area */
-        .response-area {
+        /* Response */
+        .response {
             margin-top: 24px;
+            padding: 24px;
+            background: var(--bg);
+            border-radius: 12px;
             display: none;
         }
         
-        .response-area.visible {
+        .response.visible {
             display: block;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.3s ease;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .response-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-size: 11px;
+        .response-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
         }
         
         .response-content {
-            padding: 20px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--accent);
-            border-radius: 0 8px 8px 0;
-            font-size: 14px;
-            line-height: 1.8;
+            font-size: 16px;
+            line-height: 1.7;
             color: var(--text);
             white-space: pre-wrap;
-        }
-        
-        .response-content.loading {
-            color: var(--text-dim);
         }
         
         /* Search Section */
@@ -288,66 +195,55 @@
             border-top: 1px solid var(--border);
         }
         
-        .search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .search-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-        }
-        
-        .search-count {
-            font-size: 11px;
-            color: var(--accent);
-        }
-        
         .search-box {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 12px;
         }
         
         .search-input {
             flex: 1;
-            padding: 12px 16px;
-            background: var(--surface-2);
+            padding: 14px 18px;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
+            border-radius: 12px;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 16px;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         
         .search-input:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
         }
         
         .search-btn {
-            padding: 12px 20px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
+            padding: 14px 24px;
+            background: var(--text);
+            color: white;
+            border: none;
+            border-radius: 12px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: opacity 0.2s;
         }
         
         .search-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+            opacity: 0.85;
         }
         
         /* Results */
+        .results-info {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
         .results-list {
+            margin-top: 16px;
             display: none;
         }
         
@@ -357,48 +253,48 @@
         
         .result-item {
             padding: 16px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            background: var(--bg);
+            border-radius: 12px;
             margin-bottom: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
         
         .result-item:hover {
-            border-color: var(--text-dim);
-            transform: translateX(4px);
+            background: #EBEBED;
         }
         
         .result-item.selected {
-            border-color: var(--accent);
-            background: var(--accent-dim);
+            background: #E3F2FD;
         }
         
-        .result-meta {
+        .result-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         
         .result-court {
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 600;
         }
         
         .result-date {
-            font-size: 11px;
-            color: var(--text-dim);
+            font-size: 13px;
+            color: var(--text-secondary);
         }
         
         .result-info {
-            font-size: 12px;
-            color: var(--text-dim);
+            font-size: 14px;
+            color: var(--text-secondary);
         }
         
-        /* Document View */
+        /* Document */
         .doc-view {
             margin-top: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
             display: none;
         }
         
@@ -411,52 +307,61 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
+            padding: 14px 18px;
+            background: var(--text);
+            color: white;
         }
         
         .doc-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 500;
         }
         
         .doc-close {
-            padding: 6px 12px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text-dim);
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 6px;
+            color: white;
             font-family: inherit;
-            font-size: 11px;
+            font-size: 13px;
             cursor: pointer;
         }
         
         .doc-close:hover {
-            border-color: var(--text);
-            color: var(--text);
+            background: rgba(255,255,255,0.3);
         }
         
         .doc-content {
             padding: 20px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.8;
             max-height: 400px;
             overflow-y: auto;
-            color: var(--text-dim);
+            color: var(--text-secondary);
             white-space: pre-wrap;
         }
         
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .footer-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .footer-note {
+            margin-top: 6px;
+            font-size: 12px;
+        }
+        
         /* Loading */
-        .loading-text::after {
+        .loading::after {
             content: '';
             animation: dots 1.5s infinite;
         }
@@ -466,256 +371,139 @@
             40% { content: '..'; }
             60%, 100% { content: '...'; }
         }
-        
-        /* Footer */
-        .footer {
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-        
-        .footer-main {
-            font-family: 'Instrument Serif', serif;
-            font-size: 18px;
-            font-style: italic;
-            color: var(--text-dim);
-            margin-bottom: 12px;
-        }
-        
-        .footer-hope {
-            font-size: 11px;
-            color: var(--text-dim);
-            opacity: 0.6;
-            margin-bottom: 16px;
-        }
-        
-        .footer-credit {
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        
-        .footer-credit a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
-        .footer-tech {
-            margin-top: 8px;
-            font-size: 10px;
-            color: var(--text-dim);
-            opacity: 0.5;
-        }
-        
-        /* Responsive */
-        @media (max-width: 600px) {
-            .container { padding: 24px 16px; }
-            .logo { font-size: 32px; }
-            .status-bar { flex-direction: column; gap: 8px; }
-            .quick-actions { justify-content: center; }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
-            <h1 class="logo">
-                nevolve.ai
-                <span class="dead">†</span>
-            </h1>
-            <p class="tagline">eski bir startup'tan <em>yeni bir başlangıç</em></p>
-            <div class="status-bar">
-                <span class="status-item">
-                    <span class="status-dot"></span>
-                    API Bağlı
-                </span>
-                <span class="status-item">1.9M+ karar</span>
-                <span class="status-item">Gemini 2.5</span>
-            </div>
+            <h1 class="logo">nevolve<span>.ai</span></h1>
+            <p class="tagline">Hukuki strateji asistanı</p>
         </header>
         
-        <!-- Main Card -->
-        <div class="main-card">
-            <div class="card-header">
-                <span class="card-title">Hukuki Strateji Asistanı</span>
-                <span class="card-badge">AI + Yargıtay</span>
+        <div class="card">
+            <div class="card-title">Soru Sor</div>
+            <textarea 
+                class="input-field" 
+                id="aiInput" 
+                placeholder="Davanızı anlatın, strateji önerileri alın..."
+            ></textarea>
+            <div class="input-footer">
+                <button class="submit-btn" id="aiSubmit">Gönder</button>
             </div>
-            <div class="card-body">
-                <div class="input-area">
-                    <textarea 
-                        class="input-field" 
-                        id="aiInput" 
-                        placeholder="Davanızı anlatın, strateji önerisi ve ilgili emsal kararlar alacaksınız...
-
-Örnek: Müvekkilim TCK 86/2 kapsamında yaralama suçundan yargılanıyor. Mağdurla uzlaşma sağlandı. Etkin pişmanlık ve iyi hal indirimi için strateji ne olmalı?"
-                    ></textarea>
-                    <div class="input-footer">
-                        <span class="char-count" id="charCount">0 karakter</span>
-                        <button class="submit-btn" id="aiSubmit">Analiz Et →</button>
-                    </div>
+            
+            <div class="tags">
+                <button class="tag" data-q="Boşanma davasında nafaka stratejisi">Nafaka</button>
+                <button class="tag" data-q="TCK 86 yaralama ceza indirimi">Yaralama</button>
+                <button class="tag" data-q="İş kazası tazminat davası">İş Kazası</button>
+                <button class="tag" data-q="Etkin pişmanlık uygulaması">Etkin Pişmanlık</button>
+                <button class="tag" data-q="Kira tahliye davası">Tahliye</button>
+            </div>
+            
+            <div class="response" id="response">
+                <div class="response-label">Yanıt</div>
+                <div class="response-content" id="responseContent"></div>
+            </div>
+            
+            <div class="search-section">
+                <div class="card-title">Yargıtay Karar Ara</div>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
+                    <button class="search-btn" id="searchBtn">Ara</button>
                 </div>
-                
-                <div class="quick-actions">
-                    <button class="quick-btn" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">nafaka</button>
-                    <button class="quick-btn" data-query="TCK 86 yaralama suçunda ceza indirimi stratejisi">yaralama</button>
-                    <button class="quick-btn" data-query="İş kazası tazminat davası için emsal kararlar">iş kazası</button>
-                    <button class="quick-btn" data-query="Etkin pişmanlık uygulaması ve şartları">etkin pişmanlık</button>
-                    <button class="quick-btn" data-query="Kira tahliye davası süreci ve stratejisi">tahliye</button>
-                </div>
-                
-                <!-- Response Area -->
-                <div class="response-area" id="responseArea">
-                    <div class="response-header">
-                        <span>◆</span> AI Analizi
+                <div class="results-info" id="resultsInfo"></div>
+                <div class="results-list" id="resultsList"></div>
+                <div class="doc-view" id="docView">
+                    <div class="doc-header">
+                        <span class="doc-title">Karar Metni</span>
+                        <button class="doc-close" id="closeDoc">Kapat</button>
                     </div>
-                    <div class="response-content" id="responseContent"></div>
-                </div>
-                
-                <!-- Search Section -->
-                <div class="search-section">
-                    <div class="search-header">
-                        <span class="search-title">Yargıtay Karar Araması</span>
-                        <span class="search-count" id="searchCount"></span>
-                    </div>
-                    <div class="search-box">
-                        <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
-                        <button class="search-btn" id="searchBtn">Ara</button>
-                    </div>
-                    
-                    <div class="results-list" id="resultsList"></div>
-                    
-                    <div class="doc-view" id="docView">
-                        <div class="doc-header">
-                            <span class="doc-title">Karar Metni</span>
-                            <button class="doc-close" id="closeDoc">× Kapat</button>
-                        </div>
-                        <div class="doc-content" id="docContent"></div>
-                    </div>
+                    <div class="doc-content" id="docContent"></div>
                 </div>
             </div>
         </div>
         
-        <!-- Footer -->
         <footer class="footer">
-            <p class="footer-main">"Evet, battım."</p>
-            <p class="footer-hope">umarım sen batmazsın ♡</p>
-            <p class="footer-credit">
-                bir <a href="#">Burhan Şimşek</a> eseri
-            </p>
-            <p class="footer-tech">Yargı API · Gemini 2.5 Flash · Tek sayfa, sıfır framework</p>
+            <span class="footer-name">Burhan Şimşek</span>
+            <div class="footer-note">evet, battım — umarım sen batmazsın</div>
         </footer>
     </div>
     
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script>
-        // App State
-        const state = { selectedDoc: null };
+        const $ = id => document.getElementById(id);
         
-        // Elements
-        const aiInput = document.getElementById('aiInput');
-        const aiSubmit = document.getElementById('aiSubmit');
-        const charCount = document.getElementById('charCount');
-        const responseArea = document.getElementById('responseArea');
-        const responseContent = document.getElementById('responseContent');
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const searchCount = document.getElementById('searchCount');
-        const resultsList = document.getElementById('resultsList');
-        const docView = document.getElementById('docView');
-        const docContent = document.getElementById('docContent');
-        const closeDoc = document.getElementById('closeDoc');
+        // AI
+        $('aiSubmit').onclick = async () => {
+            const q = $('aiInput').value.trim();
+            if (!q) return;
+            
+            $('aiSubmit').disabled = true;
+            $('aiSubmit').textContent = 'Bekle...';
+            $('response').classList.add('visible');
+            $('responseContent').innerHTML = '<span class="loading">Düşünüyor</span>';
+            
+            const r = await API.askAI(q);
+            $('responseContent').textContent = r.success ? r.text : 'Hata: ' + r.error;
+            
+            $('aiSubmit').disabled = false;
+            $('aiSubmit').textContent = 'Gönder';
+        };
         
-        // Character counter
-        aiInput.addEventListener('input', () => {
-            charCount.textContent = aiInput.value.length + ' karakter';
-        });
-        
-        // Quick actions
-        document.querySelectorAll('.quick-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                aiInput.value = btn.dataset.query;
-                charCount.textContent = aiInput.value.length + ' karakter';
-            });
-        });
-        
-        // AI Submit
-        aiSubmit.addEventListener('click', async () => {
-            const question = aiInput.value.trim();
-            if (!question) return;
-            
-            aiSubmit.disabled = true;
-            aiSubmit.textContent = 'Analiz ediliyor...';
-            responseArea.classList.add('visible');
-            responseContent.innerHTML = '<span class="loading-text">Yapay zeka düşünüyor</span>';
-            responseContent.classList.add('loading');
-            
-            const result = await API.askAI(question);
-            
-            responseContent.classList.remove('loading');
-            responseContent.textContent = result.success ? result.text : 'Hata: ' + result.error;
-            
-            aiSubmit.disabled = false;
-            aiSubmit.textContent = 'Analiz Et →';
+        // Tags
+        document.querySelectorAll('.tag').forEach(t => {
+            t.onclick = () => $('aiInput').value = t.dataset.q;
         });
         
         // Search
-        const doSearch = async () => {
-            const query = searchInput.value.trim();
-            if (!query) return;
+        const search = async () => {
+            const q = $('searchInput').value.trim();
+            if (!q) return;
             
-            searchCount.textContent = 'Aranıyor...';
-            resultsList.innerHTML = '';
-            resultsList.classList.remove('visible');
-            docView.classList.remove('visible');
+            $('resultsInfo').textContent = 'Aranıyor...';
+            $('resultsList').innerHTML = '';
+            $('resultsList').classList.remove('visible');
+            $('docView').classList.remove('visible');
             
-            const data = await API.searchCases(query);
-            
-            if (data.success && data.decisions.length > 0) {
-                searchCount.textContent = data.total.toLocaleString('tr-TR') + ' sonuç';
-                resultsList.innerHTML = data.decisions.map(d => `
+            const r = await API.searchCases(q);
+            if (r.success) {
+                $('resultsInfo').textContent = r.total.toLocaleString('tr-TR') + ' sonuç';
+                $('resultsList').innerHTML = r.decisions.map(d => `
                     <div class="result-item" data-id="${d.id}">
-                        <div class="result-meta">
+                        <div class="result-header">
                             <span class="result-court">${d.daire}</span>
                             <span class="result-date">${d.tarih}</span>
                         </div>
-                        <div class="result-info">Esas: ${d.esasNo} • Karar: ${d.kararNo}</div>
+                        <div class="result-info">${d.esasNo} / ${d.kararNo}</div>
                     </div>
                 `).join('');
-                resultsList.classList.add('visible');
+                $('resultsList').classList.add('visible');
                 
-                // Bind clicks
-                resultsList.querySelectorAll('.result-item').forEach(item => {
-                    item.addEventListener('click', () => loadDocument(item.dataset.id));
+                $('resultsList').querySelectorAll('.result-item').forEach(item => {
+                    item.onclick = () => loadDoc(item.dataset.id);
                 });
             } else {
-                searchCount.textContent = 'Sonuç bulunamadı';
+                $('resultsInfo').textContent = 'Sonuç yok';
             }
         };
         
-        searchBtn.addEventListener('click', doSearch);
-        searchInput.addEventListener('keydown', e => e.key === 'Enter' && doSearch());
+        $('searchBtn').onclick = search;
+        $('searchInput').onkeydown = e => e.key === 'Enter' && search();
         
-        // Load Document
-        async function loadDocument(id) {
-            resultsList.querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
+        // Document
+        async function loadDoc(id) {
+            $('resultsList').querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
             document.querySelector(`[data-id="${id}"]`).classList.add('selected');
-            
-            docContent.textContent = 'Yükleniyor...';
-            docView.classList.add('visible');
-            
-            const data = await API.getDocument(id);
-            docContent.textContent = data.success ? data.content : 'Hata';
+            $('docContent').textContent = 'Yükleniyor...';
+            $('docView').classList.add('visible');
+            const r = await API.getDocument(id);
+            $('docContent').textContent = r.success ? r.content : 'Hata';
         }
         
-        closeDoc.addEventListener('click', () => {
-            docView.classList.remove('visible');
-            resultsList.querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
-        });
-        
-        // Init
-        console.log('nevolve.ai† - eski bir startup\'tan yeni bir başlangıç');
+        $('closeDoc').onclick = () => {
+            $('docView').classList.remove('visible');
+            $('resultsList').querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
+        };
     </script>
 </body>
 </html>
