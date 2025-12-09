@@ -3,212 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai - Hukuki Strateji Asistanı</title>
-    <meta name="description" content="Türk avukatları için AI destekli hukuki strateji ve Yargıtay karar arama platformu">
-    <link rel="stylesheet" href="css/style.css">
+    <title>nevolve.ai † - Hukuki Strateji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1a1a1a;
+            --text: #fafafa;
+            --text-dim: #888;
+            --accent: #f4d03f;
+            --accent-dim: rgba(244, 208, 63, 0.15);
+            --success: #4ade80;
+            --border: #2a2a2a;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-family: 'Instrument Serif', serif;
+            font-size: 42px;
+            font-weight: 400;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+        
+        .logo .dead {
+            display: inline-block;
+            font-size: 18px;
+            vertical-align: super;
+            color: var(--text-dim);
+            margin-left: 4px;
+        }
+        
+        .tagline {
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+        
+        .tagline em {
+            color: var(--accent);
+            font-style: normal;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        /* Main Card */
+        .main-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+        
+        .card-badge {
+            font-size: 10px;
+            padding: 4px 10px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-radius: 20px;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        /* Input Area */
+        .input-area {
+            position: relative;
+        }
+        
+        .input-field {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            padding-bottom: 60px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .input-field::placeholder {
+            color: var(--text-dim);
+        }
+        
+        .input-footer {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .char-count {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .submit-btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 208, 63, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .quick-btn {
+            padding: 8px 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Response Area */
+        .response-area {
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .response-area.visible {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+        }
+        
+        .response-content {
+            padding: 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+        
+        .response-content.loading {
+            color: var(--text-dim);
+        }
+        
+        /* Search Section */
+        .search-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .search-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+        
+        .search-count {
+            font-size: 11px;
+            color: var(--accent);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .search-btn {
+            padding: 12px 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .search-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Results */
+        .results-list {
+            display: none;
+        }
+        
+        .results-list.visible {
+            display: block;
+        }
+        
+        .result-item {
+            padding: 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .result-item:hover {
+            border-color: var(--text-dim);
+            transform: translateX(4px);
+        }
+        
+        .result-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+        
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .result-court {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        
+        .result-date {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .result-info {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        
+        /* Document View */
+        .doc-view {
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .doc-view.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .doc-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+        
+        .doc-close {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .doc-close:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+        
+        .doc-content {
+            padding: 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            font-size: 13px;
+            line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
+            color: var(--text-dim);
+            white-space: pre-wrap;
+        }
+        
+        /* Loading */
+        .loading-text::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .footer-main {
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px;
+            font-style: italic;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+        
+        .footer-hope {
+            font-size: 11px;
+            color: var(--text-dim);
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+        
+        .footer-credit {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        
+        .footer-credit a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer-tech {
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 24px 16px; }
+            .logo { font-size: 32px; }
+            .status-bar { flex-direction: column; gap: 8px; }
+            .quick-actions { justify-content: center; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">⚖️</div>
-            <div class="logo-text">nevolve<span>.ai</span></div>
-        </div>
-        <div class="header-right">
-            <div class="area-selector">
-                <button class="area-btn active">Ceza</button>
-                <button class="area-btn">İcra</button>
-            </div>
-            <div class="status" id="status">Bağlanıyor...</div>
-        </div>
-    </header>
-
     <div class="container">
-        <!-- Navigation -->
-        <nav class="nav">
-            <button class="nav-item active" data-section="ai">
-                <span class="nav-icon">✦</span> AI Strateji
-            </button>
-            <button class="nav-item" data-section="search">
-                <span class="nav-icon">🔍</span> Karar Ara
-            </button>
-            <button class="nav-item" data-section="tools">
-                <span class="nav-icon">⚙️</span> Araçlar
-            </button>
-        </nav>
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">
+                nevolve.ai
+                <span class="dead">†</span>
+            </h1>
+            <p class="tagline">eski bir startup'tan <em>yeni bir başlangıç</em></p>
+            <div class="status-bar">
+                <span class="status-item">
+                    <span class="status-dot"></span>
+                    API Bağlı
+                </span>
+                <span class="status-item">1.9M+ karar</span>
+                <span class="status-item">Gemini 2.5</span>
+            </div>
+        </header>
+        
+        <!-- Main Card -->
+        <div class="main-card">
+            <div class="card-header">
+                <span class="card-title">Hukuki Strateji Asistanı</span>
+                <span class="card-badge">AI + Yargıtay</span>
+            </div>
+            <div class="card-body">
+                <div class="input-area">
+                    <textarea 
+                        class="input-field" 
+                        id="aiInput" 
+                        placeholder="Davanızı anlatın, strateji önerisi ve ilgili emsal kararlar alacaksınız...
 
-        <!-- AI Strategy Section -->
-        <section class="section active" id="section-ai">
-            <div class="section-header">
-                <h1 class="section-title">Hukuki Strateji Asistanı</h1>
-                <p class="section-desc">Davanızı anlatın, AI destekli strateji ve emsal kararlar alın</p>
-            </div>
-            
-            <div class="card">
-                <div class="input-container">
-                    <textarea class="input-field" id="aiInput" placeholder="Örn: Müvekkilim TCK 86/2 kapsamında yaralama suçundan yargılanıyor. Mağdurla uzlaşma sağlandı. Etkin pişmanlık ve iyi hal indirimi için strateji ne olmalı?"></textarea>
-                    <button class="btn btn-primary btn-submit" id="aiSubmit">✦ Analiz Et</button>
-                </div>
-                <div class="tags">
-                    <span class="tag" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">💍 Nafaka Stratejisi</span>
-                    <span class="tag" data-query="İş kazası tazminat davası için emsal Yargıtay kararları">🏭 İş Kazası</span>
-                    <span class="tag" data-query="TCK 86 yaralama suçunda ceza indirimi stratejisi">⚖️ Ceza İndirimi</span>
-                    <span class="tag" data-query="Kira uyuşmazlığında tahliye süreci ve stratejisi">🏠 Kira Tahliye</span>
-                </div>
-            </div>
-            
-            <div class="response" id="aiResponse">
-                <!-- AI Summary Box -->
-                <div class="ai-summary">
-                    <div class="ai-summary-header">
-                        <span>✦</span> AI Strateji Özeti
-                    </div>
-                    <div class="ai-summary-content" id="aiContent"></div>
-                </div>
-                
-                <!-- Related Cases -->
-                <div class="card" id="relatedCases" style="display:none;">
-                    <div class="card-header">İlgili Yargıtay Kararları</div>
-                    <div id="relatedCasesList"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Search Section -->
-        <section class="section" id="section-search">
-            <div class="section-header">
-                <h1 class="section-title">Yargıtay Karar Arama</h1>
-                <p class="section-desc">1.9 milyon+ kararda anahtar kelime araması</p>
-            </div>
-            
-            <div class="card">
-                <div class="input-container" style="display:flex;gap:12px;">
-                    <input type="text" class="input-field" id="searchInput" placeholder="Anahtar kelime girin... (örn: etkin pişmanlık, haksız tahrik)" style="padding-right:20px;">
-                    <button class="btn btn-primary" id="searchBtn" style="white-space:nowrap;">🔍 Ara</button>
-                </div>
-                <div class="tags">
-                    <span class="tag" data-query="etkin pişmanlık">Etkin Pişmanlık</span>
-                    <span class="tag" data-query="haksız tahrik">Haksız Tahrik</span>
-                    <span class="tag" data-query="meşru müdafaa">Meşru Müdafaa</span>
-                    <span class="tag" data-query="nafaka artırım">Nafaka Artırım</span>
-                    <span class="tag" data-query="iş kazası tazminat">İş Kazası</span>
-                </div>
-            </div>
-            
-            <div class="card hidden" id="loadingBox">
-                <div class="loading">Yargıtay veritabanı aranıyor...</div>
-            </div>
-            
-            <div class="card hidden" id="resultsBox">
-                <div class="results-header">
-                    <div class="card-header" style="margin:0;">Arama Sonuçları</div>
-                    <span class="results-count" id="resultsCount"></span>
-                </div>
-                <div id="resultsList"></div>
-            </div>
-            
-            <div class="doc-view" id="docView">
-                <div class="doc-header">
-                    <span class="doc-title" id="docTitle">📄 Karar Metni</span>
-                    <div class="doc-actions">
-                        <button class="doc-action-btn" onclick="copyDoc()">📋 Kopyala</button>
-                        <button class="doc-action-btn" id="closeDoc">✕ Kapat</button>
-                    </div>
-                </div>
-                <div class="doc-content" id="docContent"></div>
-            </div>
-        </section>
-
-        <!-- Tools Section -->
-        <section class="section" id="section-tools">
-            <div class="section-header">
-                <h1 class="section-title">Hesaplama Araçları</h1>
-                <p class="section-desc">Ceza indirimi ve yasal faiz hesaplamaları</p>
-            </div>
-            
-            <!-- Ceza Calculator -->
-            <div class="card">
-                <div class="card-header">Ceza İndirimi Hesaplama</div>
-                <div class="slider-container">
-                    <input type="range" class="slider" id="cezaSlider" min="1" max="240" value="36">
-                </div>
-                <div class="slider-value">
-                    <span class="slider-value-num" id="cezaAy">36</span>
-                    <span class="slider-value-unit">ay</span>
-                </div>
-                
-                <div class="check-list">
-                    <div class="check-item" data-rate="0.333">
-                        <div class="check-item-left">
-                            <div class="check-box">✓</div>
-                            <span class="check-item-label">Haksız Tahrik (Ağır)</span>
-                        </div>
-                        <span class="check-item-rate">1/4 - 3/4</span>
-                    </div>
-                    <div class="check-item" data-rate="0.166">
-                        <div class="check-item-left">
-                            <div class="check-box">✓</div>
-                            <span class="check-item-label">İyi Hal İndirimi (TCK 62)</span>
-                        </div>
-                        <span class="check-item-rate">1/6</span>
-                    </div>
-                    <div class="check-item" data-rate="0.5">
-                        <div class="check-item-left">
-                            <div class="check-box">✓</div>
-                            <span class="check-item-label">Etkin Pişmanlık</span>
-                        </div>
-                        <span class="check-item-rate">1/2 - 2/3</span>
-                    </div>
-                    <div class="check-item" data-rate="0.166">
-                        <div class="check-item-left">
-                            <div class="check-box">✓</div>
-                            <span class="check-item-label">Teşebbüs (TCK 35)</span>
-                        </div>
-                        <span class="check-item-rate">1/4 - 3/4</span>
+Örnek: Müvekkilim TCK 86/2 kapsamında yaralama suçundan yargılanıyor. Mağdurla uzlaşma sağlandı. Etkin pişmanlık ve iyi hal indirimi için strateji ne olmalı?"
+                    ></textarea>
+                    <div class="input-footer">
+                        <span class="char-count" id="charCount">0 karakter</span>
+                        <button class="submit-btn" id="aiSubmit">Analiz Et →</button>
                     </div>
                 </div>
                 
-                <div class="tool-result">
-                    <div class="tool-result-value" id="cezaSonuc">36 ay</div>
-                    <div class="tool-result-label" id="cezaLabel">3.0 yıl • Erteleme mümkün değil</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">nafaka</button>
+                    <button class="quick-btn" data-query="TCK 86 yaralama suçunda ceza indirimi stratejisi">yaralama</button>
+                    <button class="quick-btn" data-query="İş kazası tazminat davası için emsal kararlar">iş kazası</button>
+                    <button class="quick-btn" data-query="Etkin pişmanlık uygulaması ve şartları">etkin pişmanlık</button>
+                    <button class="quick-btn" data-query="Kira tahliye davası süreci ve stratejisi">tahliye</button>
+                </div>
+                
+                <!-- Response Area -->
+                <div class="response-area" id="responseArea">
+                    <div class="response-header">
+                        <span>◆</span> AI Analizi
+                    </div>
+                    <div class="response-content" id="responseContent"></div>
+                </div>
+                
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-header">
+                        <span class="search-title">Yargıtay Karar Araması</span>
+                        <span class="search-count" id="searchCount"></span>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
+                        <button class="search-btn" id="searchBtn">Ara</button>
+                    </div>
+                    
+                    <div class="results-list" id="resultsList"></div>
+                    
+                    <div class="doc-view" id="docView">
+                        <div class="doc-header">
+                            <span class="doc-title">Karar Metni</span>
+                            <button class="doc-close" id="closeDoc">× Kapat</button>
+                        </div>
+                        <div class="doc-content" id="docContent"></div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Faiz Calculator -->
-            <div class="card">
-                <div class="card-header">Yasal Faiz Hesaplama</div>
-                <div class="tool-grid">
-                    <div class="tool-field-group">
-                        <div class="tool-label">Anapara (₺)</div>
-                        <input type="number" class="tool-field" id="anapara" value="100000">
-                    </div>
-                    <div class="tool-field-group">
-                        <div class="tool-label">Faiz Oranı (%)</div>
-                        <input type="number" class="tool-field" id="faizOran" value="24">
-                    </div>
-                    <div class="tool-field-group">
-                        <div class="tool-label">Gün Sayısı</div>
-                        <input type="number" class="tool-field" id="gunSayisi" value="365">
-                    </div>
-                </div>
-                <div class="tool-result">
-                    <div class="tool-result-value" id="faizSonuc">124.000 ₺</div>
-                    <div class="tool-result-label" id="faizLabel">100.000 ₺ anapara + 24.000 ₺ faiz</div>
-                </div>
-            </div>
-        </section>
-
+        </div>
+        
         <!-- Footer -->
         <footer class="footer">
-            <div class="footer-brand">nevolve.ai</div>
-            <div class="footer-text">Eymen & Merve Hukuk için özel olarak geliştirildi</div>
-            <div class="footer-text" style="margin-top:4px;font-size:11px;">Yargı API + Gemini 2.5 Flash</div>
+            <p class="footer-main">"Evet, battım."</p>
+            <p class="footer-hope">umarım sen batmazsın ♡</p>
+            <p class="footer-credit">
+                bir <a href="#">Burhan Şimşek</a> eseri
+            </p>
+            <p class="footer-tech">Yargı API · Gemini 2.5 Flash · Tek sayfa, sıfır framework</p>
         </footer>
     </div>
-
-    <!-- Scripts -->
+    
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
+    <script>
+        // App State
+        const state = { selectedDoc: null };
+        
+        // Elements
+        const aiInput = document.getElementById('aiInput');
+        const aiSubmit = document.getElementById('aiSubmit');
+        const charCount = document.getElementById('charCount');
+        const responseArea = document.getElementById('responseArea');
+        const responseContent = document.getElementById('responseContent');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchCount = document.getElementById('searchCount');
+        const resultsList = document.getElementById('resultsList');
+        const docView = document.getElementById('docView');
+        const docContent = document.getElementById('docContent');
+        const closeDoc = document.getElementById('closeDoc');
+        
+        // Character counter
+        aiInput.addEventListener('input', () => {
+            charCount.textContent = aiInput.value.length + ' karakter';
+        });
+        
+        // Quick actions
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                aiInput.value = btn.dataset.query;
+                charCount.textContent = aiInput.value.length + ' karakter';
+            });
+        });
+        
+        // AI Submit
+        aiSubmit.addEventListener('click', async () => {
+            const question = aiInput.value.trim();
+            if (!question) return;
+            
+            aiSubmit.disabled = true;
+            aiSubmit.textContent = 'Analiz ediliyor...';
+            responseArea.classList.add('visible');
+            responseContent.innerHTML = '<span class="loading-text">Yapay zeka düşünüyor</span>';
+            responseContent.classList.add('loading');
+            
+            const result = await API.askAI(question);
+            
+            responseContent.classList.remove('loading');
+            responseContent.textContent = result.success ? result.text : 'Hata: ' + result.error;
+            
+            aiSubmit.disabled = false;
+            aiSubmit.textContent = 'Analiz Et →';
+        });
+        
+        // Search
+        const doSearch = async () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            searchCount.textContent = 'Aranıyor...';
+            resultsList.innerHTML = '';
+            resultsList.classList.remove('visible');
+            docView.classList.remove('visible');
+            
+            const data = await API.searchCases(query);
+            
+            if (data.success && data.decisions.length > 0) {
+                searchCount.textContent = data.total.toLocaleString('tr-TR') + ' sonuç';
+                resultsList.innerHTML = data.decisions.map(d => `
+                    <div class="result-item" data-id="${d.id}">
+                        <div class="result-meta">
+                            <span class="result-court">${d.daire}</span>
+                            <span class="result-date">${d.tarih}</span>
+                        </div>
+                        <div class="result-info">Esas: ${d.esasNo} • Karar: ${d.kararNo}</div>
+                    </div>
+                `).join('');
+                resultsList.classList.add('visible');
+                
+                // Bind clicks
+                resultsList.querySelectorAll('.result-item').forEach(item => {
+                    item.addEventListener('click', () => loadDocument(item.dataset.id));
+                });
+            } else {
+                searchCount.textContent = 'Sonuç bulunamadı';
+            }
+        };
+        
+        searchBtn.addEventListener('click', doSearch);
+        searchInput.addEventListener('keydown', e => e.key === 'Enter' && doSearch());
+        
+        // Load Document
+        async function loadDocument(id) {
+            resultsList.querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
+            document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+            
+            docContent.textContent = 'Yükleniyor...';
+            docView.classList.add('visible');
+            
+            const data = await API.getDocument(id);
+            docContent.textContent = data.success ? data.content : 'Hata';
+        }
+        
+        closeDoc.addEventListener('click', () => {
+            docView.classList.remove('visible');
+            resultsList.querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
+        });
+        
+        // Init
+        console.log('nevolve.ai† - eski bir startup\'tan yeni bir başlangıç');
+    </script>
 </body>
 </html>
