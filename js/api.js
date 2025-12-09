@@ -197,9 +197,9 @@ const API = {
         }
     },
 
-    async searchCases(keyword, timeout = 10000) {
+    async searchCases(keyword, timeout = 10000, daire = null) {
         // Önbellekten kontrol
-        const cacheKey = `search_${keyword}`;
+        const cacheKey = `search_${keyword}_${daire || 'all'}`;
         const cached = this._getCache(cacheKey);
         if (cached) {
             return { ...cached, fromCache: true };
@@ -209,7 +209,13 @@ const API = {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-            const response = await fetch(`${CONFIG.YARGI_API}/search?keyword=${encodeURIComponent(keyword)}`, {
+            // URL oluştur - daire parametresi varsa ekle
+            let url = `${CONFIG.YARGI_API}/search?keyword=${encodeURIComponent(keyword)}`;
+            if (daire) {
+                url += `&daire=${encodeURIComponent(daire)}`;
+            }
+
+            const response = await fetch(url, {
                 signal: controller.signal
             });
             clearTimeout(timeoutId);
@@ -704,10 +710,11 @@ const API = {
         return context;
     },
 
-    // Kanun kodu mapping - her dava tipi için en kritik 2 madde
+    // Kanun kodu mapping - her dava tipi için en kritik 2 madde + daire bilgisi
     KANUN_MAP: {
         ceza: {
             kaynaklar: ['yargitay'],
+            daireler: ['Ceza Dairesi', 'Ceza Genel Kurulu'],  // Tüm ceza daireleri
             kanunlar: [
                 { kod: 5237, ad: 'TCK', maddeler: [157, 168] },      // dolandırıcılık + etkin pişmanlık
                 { kod: 5271, ad: 'CMK', maddeler: [253, 231] }       // uzlaşma + HAGB
@@ -715,30 +722,35 @@ const API = {
         },
         icra: {
             kaynaklar: ['yargitay'],
+            daireler: ['12. Hukuk Dairesi'],
             kanunlar: [
                 { kod: 2004, ad: 'İİK', maddeler: [62, 72] }         // itiraz + menfi tespit
             ]
         },
         aile: {
             kaynaklar: ['yargitay'],
+            daireler: ['2. Hukuk Dairesi'],
             kanunlar: [
                 { kod: 4721, ad: 'TMK', maddeler: [166, 175] }       // boşanma + nafaka
             ]
         },
         is: {
             kaynaklar: ['yargitay'],
+            daireler: ['9. Hukuk Dairesi'],
             kanunlar: [
                 { kod: 4857, ad: 'İş Kanunu', maddeler: [18, 20, 21, 25] }   // geçerli fesih + işe iade + feshin sonuçları + haklı fesih
             ]
         },
         idari: {
             kaynaklar: ['danistay'],
+            daireler: [],  // Danıştay için daire filtresi yok
             kanunlar: [
                 { kod: 2577, ad: 'İYUK', maddeler: [7, 11] }         // dava süresi + üst makam
             ]
         },
         miras: {
             kaynaklar: ['yargitay'],
+            daireler: ['1. Hukuk Dairesi', '14. Hukuk Dairesi'],
             kanunlar: [
                 { kod: 4721, ad: 'TMK', maddeler: [505, 606] }       // saklı pay + reddi miras
             ]
@@ -832,17 +844,26 @@ const API = {
             queries.push(keywords.slice(0, 2).join(' '));
         }
 
-        // 2. Dava tipine göre ek sorgular
+        // 2. Dava tipine göre ek sorgular (API'nin iyi sonuç verdiği terimler)
+        // NOT: API bazı terimlerde doğru daire döndürmüyor, kanun numaraları daha güvenilir
         const typeKeywords = {
-            ceza: ['savunma', 'beraat', 'ceza indirimi', 'etkin pişmanlık'],
-            icra: ['itiraz', 'menfi tespit', 'istirdat'],
-            aile: ['boşanma', 'nafaka', 'velayet'],
-            is: ['işe iade', 'fesih', 'tazminat'],
-            idari: ['iptal davası', 'yürütme durdurma']
+            ceza: ['5237', 'TCK', 'savunma', 'beraat'],  // 5237 = TCK numarası
+            icra: ['2004', 'İİK', 'itiraz', 'menfi tespit'],  // 2004 = İİK numarası
+            aile: ['4721', 'TMK', 'boşanma', 'nafaka'],  // 4721 = TMK numarası
+            is: ['4857', 'işçi', 'işveren', 'fesih'],  // 4857 = İş Kanunu numarası - API bu numara ile %100 doğru daire döndürüyor
+            idari: ['2577', 'İYUK', 'iptal davası', 'idari işlem'],  // 2577 = İYUK numarası
+            miras: ['miras', 'tereke', 'veraset', 'mirasçı']
         };
 
         if (caseType && typeKeywords[caseType]) {
-            const extraKeyword = typeKeywords[caseType].find(k =>
+            // Önce kanun numarasını ekle (API ile en güvenilir sonuç)
+            const kanunNo = typeKeywords[caseType][0]; // İlk eleman kanun numarası
+            if (!queries.includes(kanunNo)) {
+                queries.unshift(kanunNo); // Başa ekle
+            }
+
+            // Sonra soruyla eşleşen keyword'ü ekle
+            const extraKeyword = typeKeywords[caseType].slice(1).find(k =>
                 question.toLowerCase().includes(k) || keywords.some(kw => k.includes(kw))
             );
             if (extraKeyword && !queries.includes(extraKeyword)) {
@@ -911,12 +932,19 @@ const API = {
             }
 
             if (caseConfig.kaynaklar.includes('yargitay')) {
+                // Dava tipine uygun daire varsa filtrele
+                const daire = caseConfig.daireler?.[0] || null;
+
                 for (const query of searchQueries.slice(0, 2)) {
                     promises.push(
-                        this.searchCases(query).then(r => {
+                        this.searchCases(query, 10000, daire).then(r => {
                             if (r.success) {
                                 r.decisions.forEach(d => {
-                                    if (!seenIds.has(d.id) && context.yargitayKararlari.length < 3) {
+                                    // Daire filtresi ile gelen sonuçları kontrol et
+                                    const isRelevantDaire = !caseConfig.daireler?.length ||
+                                        caseConfig.daireler.some(cd => d.daire?.includes(cd));
+
+                                    if (!seenIds.has(d.id) && context.yargitayKararlari.length < 3 && isRelevantDaire) {
                                         seenIds.add(d.id);
                                         context.yargitayKararlari.push(d);
                                     }

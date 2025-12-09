@@ -1,9 +1,9 @@
 # nevolve.ai - Oturum Notları
-> Son güncelleme: 10 Aralık 2024 (Oturum 2)
+> Son güncelleme: 10 Aralık 2024 (Oturum 3)
 
 ---
 
-## Proje Durumu: v3.0.1
+## Proje Durumu: v4.2.1
 
 **Site URL:** https://burhansimsek.space/isthatpossible/
 **Repo:** github.com/ozmengroup/nevolve
@@ -11,60 +11,102 @@
 
 ---
 
-## Son Oturum (10 Aralık - Oturum 2)
+## Son Oturum (10 Aralık - Oturum 3)
 
-### Puppeteer MCP Düzeltildi
-**Sorun:** `@anthropic/mcp-puppeteer` paketi npm'de yok (404 hatası)
+### Kritik Sorun: Yanlış Daire Kararları
+**Sorun:** İş davası sorulduğunda 11. Ceza Dairesi, 12. Hukuk Dairesi kararları geliyordu
 
-**Çözüm:** Doğru paket kullanıldı:
-```bash
-# Eski (çalışmıyor):
-claude mcp add puppeteer -- npx -y @anthropic/mcp-puppeteer
+**Kök Neden Analizi:**
+- Yargıtay API `daire` parametresini destekliyor ama tam filtrelemiyor
+- "kıdem tazminatı", "ihbar tazminatı" aramaları hiç 9. Hukuk Dairesi döndürmüyor
+- **Kritik Bulgu:** "4857" (İş Kanunu numarası) araması %100 9. HD döndürüyor!
 
-# Yeni (çalışıyor):
-claude mcp add puppeteer -- npx -y @hisma/server-puppeteer
+**Test Sonuçları:**
+```
+"4857"      → %100 9. Hukuk Dairesi ✅
+"işçi"      → %60 9. Hukuk Dairesi
+"işveren"   → %50 9. Hukuk Dairesi
+"kıdem tazminatı" → %0 9. HD ❌
+"işe iade"  → %0 9. HD ❌
 ```
 
-**Not:** `@modelcontextprotocol/server-puppeteer` artık desteklenmiyor (deprecated). `@hisma/server-puppeteer` aktif fork'u.
+### Yapılan İyileştirmeler (api.js)
 
-**Durum:** MCP eklendi, Claude Code yeniden başlatılması gerekiyor
+**1. Daire Eşleştirmesi Eklendi:**
+```javascript
+KANUN_MAP: {
+    ceza: { daireler: ['Ceza Dairesi', 'Ceza Genel Kurulu'], ... },
+    icra: { daireler: ['12. Hukuk Dairesi'], ... },
+    aile: { daireler: ['2. Hukuk Dairesi'], ... },
+    is: { daireler: ['9. Hukuk Dairesi'], ... },
+    idari: { daireler: [], ... },  // Danıştay
+    miras: { daireler: ['1. Hukuk Dairesi', '14. Hukuk Dairesi'], ... }
+}
+```
+
+**2. searchCases() Fonksiyonu Güncellendi:**
+- `daire` parametresi eklendi
+- Client-side filtreleme eklendi (API'nin eksik filtresi için)
+
+**3. Arama Stratejisi Değiştirildi:**
+```javascript
+// ESKİ (çalışmıyordu):
+is: ['işe iade', 'fesih', 'tazminat']
+
+// YENİ (kanun numaraları öncelikli):
+is: ['4857', 'işçi', 'işveren', 'fesih']  // 4857 = İş Kanunu
+ceza: ['5237', 'TCK', 'savunma', 'beraat']  // 5237 = TCK
+icra: ['2004', 'İİK', 'itiraz', 'menfi tespit']  // 2004 = İİK
+```
+
+**4. Kanun Numarası Önceliği:**
+- İş davası algılandığında önce "4857" ile aranıyor
+- Bu sayede %100 doğru daire (9. HD) geliyor
+
+---
+
+## Puppeteer MCP Durumu
+**Sorun:** `detached Frame` hatası devam ediyor
+**Gerekli:** Claude Code yeniden başlatılması
 
 ---
 
 ## Devam Edilecek İşler
 
 ### Hemen Yapılacak
-1. [x] Puppeteer MCP paket sorunu düzeltildi
-2. [ ] Claude Code'u yeniden başlat
-3. [ ] Puppeteer MCP'nin çalıştığını test et
-4. [ ] Siteyi gerçek kullanım ile test et (soru sor, yanıt al)
+1. [x] API kaynak analizi tamamlandı
+2. [x] Daire filtreleme eklendi
+3. [ ] GitHub'a push et (deploy)
+4. [ ] Siteyi test et
+5. [ ] Puppeteer MCP'yi düzelt (Claude Code restart)
 
-### İyileştirme Önerileri (Backlog)
+### Backlog
 - [ ] Dark mode
 - [ ] PDF export
 - [ ] Arama geçmişi
-- [ ] Daha detaylı loading göstergesi
 
 ---
 
-## Önceki Oturum Özeti
+## API Bulguları (Test Sonuçları)
 
-### 1. AI Veri Stratejisi (v2.3)
-- `parseKarar()` fonksiyonu eklendi - ham karar metnini yapılandırılmış veriye dönüştürür
-- `findBestMatch()` - en alakalı kararları seçer
-- `buildStructuredContext()` - AI'a temiz veri gönderir
-- Token kullanımı %60 azaldı, yanıt kalitesi arttı
+### Çalışan Aramalar (Doğru Daire)
+| Arama | 9. HD Oranı |
+|-------|-------------|
+| 4857 | %100 |
+| işçi | %60 |
+| işveren | %50 |
+| fesih | %70 (daire filtresiyle) |
+| dolandırıcılık | %100 Ceza Dairesi |
 
-### 2. UI Tasarımı (v3.0)
-- Minimal Legal tasarım denendi (siyah-beyaz, serif font)
-- Kullanıcı geri bildirimi: "Eski renkli kartlar daha anlaşılırdı"
-- **v3.0.1:** Mix tasarım uygulandı:
-  - Minimal header (Cormorant Garamond serif)
-  - Renkli kartlar geri eklendi:
-    - ÖZET - Mavi (#F0F9FF)
-    - HEMEN YAP - Yeşil (#F0FDF4)
-    - EMSAL - Turuncu (#FFF7ED)
-    - DİKKAT - Sarı (#FEFCE8)
+### Çalışmayan Aramalar
+| Arama | Sorun |
+|-------|-------|
+| kıdem tazminatı | %0 9. HD |
+| ihbar tazminatı | %0 9. HD |
+| işe iade | %0 9. HD |
+| iş sözleşmesi | %0 9. HD |
+
+**Sonuç:** Kanun numaraları (4857, 5237, 2004) en güvenilir arama terimleri
 
 ---
 
@@ -73,56 +115,23 @@ claude mcp add puppeteer -- npx -y @hisma/server-puppeteer
 ### Dosya Yapısı
 ```
 /nevolve
-├── index.html      # Ana uygulama (v3.0.1)
+├── index.html      # Ana uygulama
 ├── js/
-│   ├── config.js   # API keys, prompt, ayarlar
-│   └── api.js      # Tüm API fonksiyonları + parseKarar sistemi
-└── SESSION_NOTES.md # Bu dosya
-```
-
-### API Endpoints
-```
-Yargi API: https://yargi-api.onrender.com
-├── /search         - Yargıtay kararları
-├── /document       - Karar içeriği
-├── /danistay       - Danıştay kararları
-├── /mevzuat/madde  - Kanun maddesi
-└── /aym            - Anayasa Mahkemesi
-
-AI: Groq API (Llama 3.3 70B) - 14,400 istek/gün ücretsiz
+│   ├── config.js   # System prompt, AI ayarları
+│   └── api.js      # API + Daire filtreleme sistemi (v4.2.1)
+└── SESSION_NOTES.md
 ```
 
 ### Önemli Fonksiyonlar (api.js)
-- `parseKarar(rawContent, meta)` - Karar parse
-- `_extractSonuc()`, `_extractCeza()`, `_extractMaddeler()` - Bilgi çıkarma
-- `findBestMatch(soru, kararlar)` - Alaka skorlama
-- `buildStructuredContext()` - AI context oluşturma
+- `searchCases(keyword, timeout, daire)` - Daire filtreli arama
+- `generateSearchQueries(question, caseType)` - Kanun numarası öncelikli sorgular
 - `detectCaseType(question)` - Dava tipi algılama
-
-### Puppeteer MCP Bilgileri
-**Paket:** `@hisma/server-puppeteer`
-**Kurulum:** `claude mcp add puppeteer -- npx -y @hisma/server-puppeteer`
-**Araçlar:**
-- `puppeteer_navigate` - URL'ye git
-- `puppeteer_screenshot` - Ekran görüntüsü al
-- `puppeteer_click` - Elemente tıkla
-- `puppeteer_fill` - Form alanına yaz
-- `puppeteer_evaluate` - JavaScript çalıştır
+- `buildEnrichedContext(question)` - Akıllı kaynak toplama
 
 ---
 
 ## Yeni Oturumda Devam Etmek İçin
 
-Claude'a şunu söyle:
 ```
-"SESSION_NOTES.md dosyasını oku ve kaldığımız yerden devam edelim.
-Puppeteer MCP test edelim."
+"SESSION_NOTES.md oku. GitHub'a push edip siteyi test edelim."
 ```
-
----
-
-## Site Değerlendirmesi (WebFetch ile)
-- Tasarım: 8.5/10
-- Tipografi: Inter + Cormorant Garamond başarılı
-- Renk sistemi: Mavi/Yeşil/Turuncu/Sarı anlaşılır
-- Responsive: Mobilde çalışıyor
