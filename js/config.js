@@ -52,5 +52,5 @@ FORMAT (KISA VE NET):
     },
     
     APP_NAME: 'nevolve.ai',
-    APP_VERSION: '2.3.0'
+    APP_VERSION: '3.0.0'
 };

@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai</title>
+    <title>nevolve — Hukuki Araştırma</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #F5F5F5;
+            --bg: #FAFAFA;
             --card: #FFFFFF;
-            --text: #111111;
-            --text-secondary: #555555;
-            --text-muted: #888888;
-            --border: #E0E0E0;
+            --text: #1A1A1A;
+            --text-secondary: #4A4A4A;
+            --text-muted: #8A8A8A;
+            --border: #E5E5E5;
+            --border-dark: #D0D0D0;
+            --accent: #1A1A1A;
         }
 
         body {
@@ -27,49 +29,56 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+
         .app {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Header */
+        /* Header - Minimal */
         .header {
-            padding: 16px 24px;
+            padding: 24px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--card);
             border-bottom: 1px solid var(--border);
         }
 
         .logo {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: lowercase;
         }
 
-        .new-btn {
-            padding: 8px 16px;
-            background: var(--text);
-            color: white;
-            border: none;
-            border-radius: 8px;
+        .header-actions { display: flex; gap: 12px; }
+
+        .header-btn {
+            padding: 10px 18px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
         }
 
-        .new-btn:hover { opacity: 0.85; }
+        .header-btn:hover { border-color: var(--text); color: var(--text); }
+        .header-btn.primary { background: var(--text); color: white; border-color: var(--text); }
+        .header-btn.primary:hover { opacity: 0.85; }
 
-        /* Chat */
-        .chat {
+        /* Main Content */
+        .main {
             flex: 1;
-            padding: 24px;
-            overflow-y: auto;
+            padding: 48px 32px;
         }
 
         /* Welcome */
@@ -78,257 +87,269 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 60vh;
+            min-height: 55vh;
             text-align: center;
         }
 
-        .welcome-icon { font-size: 56px; margin-bottom: 16px; }
-        .welcome-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-        .welcome-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; }
+        .welcome-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 42px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
 
-        .quick-btns {
+        .welcome-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+        }
+
+        .quick-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 500px;
+            gap: 16px;
+            max-width: 600px;
+            width: 100%;
         }
 
-        .quick-btn {
-            padding: 14px 12px;
+        .quick-item {
+            padding: 20px 16px;
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 4px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s;
-            text-align: center;
+            transition: all 0.2s;
+            text-align: left;
+            color: var(--text);
         }
 
-        .quick-btn:hover { border-color: var(--text); background: var(--bg); }
+        .quick-item:hover { border-color: var(--text); }
+        .quick-item-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
 
-        /* Messages */
-        .messages { display: none; flex-direction: column; gap: 16px; }
-        .messages.visible { display: flex; }
+        /* Conversation */
+        .conversation { display: none; }
+        .conversation.visible { display: block; }
 
-        .user-msg {
-            align-self: flex-end;
-            max-width: 75%;
-            padding: 14px 18px;
-            background: var(--text);
-            color: white;
-            border-radius: 18px 18px 4px 18px;
-            font-size: 14px;
-            line-height: 1.5;
+        /* User Question */
+        .question {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
         }
 
-        /* AI Response */
-        .ai-msg {
+        .question-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 1.4;
+            color: var(--text);
+        }
+
+        /* Response Document */
+        .document {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
+            border-radius: 4px;
+            margin-bottom: 24px;
         }
 
-        .ai-header {
+        .doc-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 20px;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .doc-meta { }
+        .doc-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .doc-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        .doc-date { font-size: 12px; color: var(--text-muted); text-align: right; }
+
+        .doc-body { padding: 32px; }
+
+        /* Document Sections */
+        .doc-section { margin-bottom: 32px; }
+        .doc-section:last-child { margin-bottom: 0; }
+
+        .doc-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--border);
         }
 
-        .ai-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--text);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .ai-name { font-size: 14px; font-weight: 600; }
-
-        .ai-body { padding: 20px; }
-
-        /* Section Cards */
-        .section {
-            margin-bottom: 16px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .section:last-child { margin-bottom: 0; }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .section-body { padding: 16px; }
-
-        /* ÖZET Section */
-        .section-ozet { background: #F0F9FF; }
-        .section-ozet .section-header { background: #E0F2FE; color: #0369A1; }
-
-        .ozet-cards {
+        /* Summary Grid */
+        .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
-        .ozet-card {
-            background: white;
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
-            border: 1px solid #BAE6FD;
-        }
+        .summary-item { }
+        .summary-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .summary-value { font-size: 16px; font-weight: 600; color: var(--text); }
 
-        .ozet-card-icon { font-size: 20px; margin-bottom: 6px; }
-        .ozet-card-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .ozet-card-value { font-size: 15px; font-weight: 700; color: var(--text); }
+        /* Action List */
+        .action-list { }
 
-        /* HEMEN YAP Section */
-        .section-hemen { background: #F0FDF4; }
-        .section-hemen .section-header { background: #DCFCE7; color: #15803D; }
-
-        .hemen-list { display: flex; flex-direction: column; gap: 10px; }
-
-        .hemen-item {
+        .action-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 12px 14px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #BBF7D0;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
         }
 
-        .hemen-num {
-            width: 24px;
-            height: 24px;
-            background: #22C55E;
+        .action-item:last-child { border-bottom: none; }
+
+        .action-num {
+            width: 28px;
+            height: 28px;
+            background: var(--text);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             flex-shrink: 0;
         }
 
-        .hemen-text { font-size: 14px; line-height: 1.5; color: var(--text); }
+        .action-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text);
+            padding-top: 4px;
+        }
 
-        /* EMSAL Section */
-        .section-emsal { background: #FFF7ED; }
-        .section-emsal .section-header { background: #FFEDD5; color: #C2410C; }
-
-        .emsal-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #FED7AA;
+        /* Precedent Card */
+        .precedent {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px 24px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
 
-        .emsal-card:hover { border-color: #F97316; }
+        .precedent:hover { border-color: var(--text); }
 
-        .emsal-text { font-size: 13px; line-height: 1.5; color: var(--text-secondary); flex: 1; }
-        .emsal-arrow { font-size: 18px; color: var(--text-muted); margin-left: 12px; }
-
-        /* DİKKAT Section */
-        .section-dikkat { background: #FEF9C3; }
-        .section-dikkat .section-header { background: #FEF08A; color: #A16207; }
-
-        .dikkat-list { display: flex; flex-direction: column; gap: 8px; }
-
-        .dikkat-item {
+        .precedent-header {
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 14px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #FDE047;
-            font-size: 13px;
-            line-height: 1.5;
-            color: var(--text-secondary);
-        }
-
-        .dikkat-icon { font-size: 14px; flex-shrink: 0; }
-
-        /* Sources */
-        .sources {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        .sources-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 12px;
         }
 
-        .sources-list { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        .source-btn {
-            padding: 10px 14px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-align: left;
+        .precedent-court {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
         }
 
-        .source-btn:hover { border-color: var(--text); }
+        .precedent-arrow { color: var(--text-muted); font-size: 14px; }
 
-        .source-type { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
-        .source-name { font-weight: 600; color: var(--text); margin-bottom: 2px; }
-        .source-info { font-size: 10px; color: var(--text-secondary); }
+        .precedent-text {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 17px;
+            font-style: italic;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
 
-        /* Copy Button */
-        .copy-response-btn {
+        /* Warning */
+        .warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 4px;
+        }
+
+        .warning-icon { font-size: 16px; flex-shrink: 0; }
+        .warning-text { font-size: 14px; line-height: 1.5; color: #92400E; }
+
+        /* Sources Footer */
+        .doc-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .sources-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .source-tag {
+            padding: 8px 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .source-tag:hover { border-color: var(--text); color: var(--text); }
+
+        .doc-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .doc-action-btn {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 14px;
-            background: var(--bg);
+            padding: 10px 16px;
+            background: transparent;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 4px;
             font-family: inherit;
             font-size: 12px;
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
-        .copy-response-btn:hover { border-color: var(--text); color: var(--text); }
 
-        /* Input */
+        .doc-action-btn:hover { border-color: var(--text); color: var(--text); }
+
+        /* Input Area */
         .input-area {
-            padding: 16px 24px 24px;
+            padding: 24px 32px;
             background: var(--card);
             border-top: 1px solid var(--border);
         }
@@ -336,11 +357,11 @@
         .input-box {
             display: flex;
             align-items: flex-end;
-            gap: 12px;
-            background: var(--bg);
+            gap: 16px;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 4px;
+            padding: 16px 20px;
+            transition: border-color 0.2s;
         }
 
         .input-box:focus-within { border-color: var(--text); }
@@ -350,7 +371,7 @@
             border: none;
             background: none;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.5;
             resize: none;
             min-height: 24px;
@@ -362,17 +383,18 @@
         #input::placeholder { color: var(--text-muted); }
 
         .send-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: var(--text);
             border: none;
-            border-radius: 10px;
+            border-radius: 4px;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: opacity 0.2s;
         }
 
         .send-btn:hover { opacity: 0.85; }
@@ -383,7 +405,7 @@
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             z-index: 999;
             opacity: 0;
             visibility: hidden;
@@ -395,95 +417,101 @@
         .panel {
             position: fixed;
             top: 0;
-            right: -440px;
-            width: 440px;
+            right: -500px;
+            width: 500px;
             height: 100vh;
             background: var(--card);
             z-index: 1000;
             transition: right 0.3s ease;
             display: flex;
             flex-direction: column;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
         }
 
         .panel.open { right: 0; }
 
         .panel-header {
-            padding: 20px;
+            padding: 24px 32px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
         }
 
-        .panel-type { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-        .panel-title { font-size: 16px; font-weight: 700; }
+        .panel-type { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
+        .panel-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 600; }
 
         .panel-close {
-            width: 32px;
-            height: 32px;
-            background: var(--bg);
+            width: 36px;
+            height: 36px;
+            background: transparent;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .panel-close:hover { background: var(--border); }
+        .panel-close:hover { border-color: var(--text); color: var(--text); }
 
         .panel-meta {
-            padding: 16px 20px;
+            padding: 20px 32px;
             background: var(--bg);
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            font-size: 12px;
+            gap: 16px;
+            font-size: 13px;
         }
 
-        .meta-label { color: var(--text-muted); margin-bottom: 2px; }
+        .meta-label { color: var(--text-muted); margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
         .meta-value { font-weight: 600; color: var(--text); }
 
         .panel-content {
             flex: 1;
-            padding: 20px;
+            padding: 32px;
             overflow-y: auto;
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.8;
             color: var(--text-secondary);
             white-space: pre-wrap;
         }
 
         .panel-actions {
-            padding: 16px 20px;
+            padding: 20px 32px;
             border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
         }
 
         .panel-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--text);
-            color: white;
-            border: none;
-            border-radius: 8px;
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
             font-family: inherit;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
         }
 
-        .panel-btn:hover { opacity: 0.85; }
+        .panel-btn:hover { border-color: var(--text); color: var(--text); }
+        .panel-btn.primary { background: var(--text); color: white; border-color: var(--text); }
 
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 32px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            padding: 12px 20px;
+            padding: 14px 24px;
             background: var(--text);
             color: white;
-            border-radius: 10px;
+            border-radius: 4px;
             font-size: 13px;
             font-weight: 500;
             opacity: 0;
@@ -493,105 +521,125 @@
 
         .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* Loading - Skeleton */
-        .skeleton { padding: 20px; }
-        .skeleton-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+        /* Loading */
+        .loading {
+            padding: 48px 32px;
+            text-align: center;
         }
-        .skeleton-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 2px;
             background: var(--border);
+            border-radius: 2px;
+            margin: 24px auto 0;
+            overflow: hidden;
         }
-        .skeleton-title {
-            height: 14px;
-            width: 80px;
-            border-radius: 4px;
-            background: var(--border);
+
+        .loading-bar::after {
+            content: '';
+            display: block;
+            width: 40%;
+            height: 100%;
+            background: var(--text);
+            animation: loading 1.2s ease-in-out infinite;
         }
-        .skeleton-card {
-            background: var(--bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-        .skeleton-line {
-            height: 12px;
-            background: linear-gradient(90deg, var(--border) 25%, #f0f0f0 50%, var(--border) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-            margin-bottom: 8px;
-        }
-        .skeleton-line:last-child { margin-bottom: 0; }
-        .skeleton-line.short { width: 60%; }
-        .skeleton-line.medium { width: 80%; }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        .loading-text::after { content: ''; animation: dots 1.5s infinite; }
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(350%); }
         }
 
         /* Mobile */
-        @media (max-width: 600px) {
-            .chat { padding: 16px; }
-            .ozet-cards { grid-template-columns: repeat(2, 1fr); }
+        @media (max-width: 640px) {
+            .header { padding: 16px 20px; }
+            .logo { font-size: 20px; }
+            .main { padding: 32px 20px; }
+            .welcome-title { font-size: 32px; }
+            .quick-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .doc-header, .doc-body, .doc-footer { padding: 20px; }
+            .summary-grid { grid-template-columns: 1fr; gap: 16px; }
             .panel { width: 100%; right: -100%; }
-            .quick-btns { grid-template-columns: repeat(2, 1fr); }
+            .input-area { padding: 16px 20px; }
         }
     </style>
 </head>
 <body>
     <div class="app">
         <header class="header">
-            <div class="logo">nevolve.ai</div>
-            <button class="new-btn" onclick="newChat()">Yeni Sohbet</button>
+            <div class="logo">nevolve</div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="newChat()">Yeni</button>
+            </div>
         </header>
 
-        <div class="chat" id="chat">
+        <div class="main" id="main">
             <div class="welcome" id="welcome">
-                <div class="welcome-icon">⚖️</div>
-                <h1 class="welcome-title">Hukuki Danışman</h1>
-                <p class="welcome-desc">Davanı anlat, strateji oluşturalım.</p>
-                <div class="quick-btns">
-                    <button class="quick-btn" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">🔍 Ceza Davası</button>
-                    <button class="quick-btn" data-q="Borçlu icra takibine itiraz etti. 7 gün içinde ne yapmalıyım?">📋 İcra Takibi</button>
-                    <button class="quick-btn" data-q="İdari işleme karşı iptal davası açmak istiyorum. Süre ve prosedür nedir?">🏛️ İdari Dava</button>
-                    <button class="quick-btn" data-q="Boşanma davasında mal paylaşımı ve nafaka hesaplama nasıl yapılır?">👨‍👩‍👧 Aile Hukuku</button>
-                    <button class="quick-btn" data-q="İşçi haksız yere işten çıkarıldı. İşe iade ve tazminat hakları neler?">💼 İş Hukuku</button>
-                    <button class="quick-btn" data-q="Miras paylaşımında anlaşmazlık var. Saklı pay ve tenkis davası nedir?">🏠 Miras Hukuku</button>
+                <h1 class="welcome-title">Hukuki Araştırma Asistanı</h1>
+                <p class="welcome-desc">Davanızı anlatın, emsal ve strateji oluşturalım.</p>
+                <div class="quick-grid">
+                    <button class="quick-item" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">
+                        <div class="quick-item-label">Ceza</div>
+                        Dolandırıcılık Savunması
+                    </button>
+                    <button class="quick-item" data-q="Borçlu icra takibine itiraz etti. 7 gün içinde ne yapmalıyım?">
+                        <div class="quick-item-label">İcra</div>
+                        İtirazın Kaldırılması
+                    </button>
+                    <button class="quick-item" data-q="İdari işleme karşı iptal davası açmak istiyorum. Süre ve prosedür nedir?">
+                        <div class="quick-item-label">İdari</div>
+                        İptal Davası
+                    </button>
+                    <button class="quick-item" data-q="Boşanma davasında mal paylaşımı ve nafaka hesaplama nasıl yapılır?">
+                        <div class="quick-item-label">Aile</div>
+                        Boşanma & Nafaka
+                    </button>
+                    <button class="quick-item" data-q="İşçi haksız yere işten çıkarıldı. İşe iade ve tazminat hakları neler?">
+                        <div class="quick-item-label">İş</div>
+                        İşe İade Davası
+                    </button>
+                    <button class="quick-item" data-q="Miras paylaşımında anlaşmazlık var. Saklı pay ve tenkis davası nedir?">
+                        <div class="quick-item-label">Miras</div>
+                        Saklı Pay & Tenkis
+                    </button>
                 </div>
             </div>
 
-            <div class="messages" id="messages">
-                <div class="user-msg" id="userMsg"></div>
-                <div class="ai-msg">
-                    <div class="ai-header">
-                        <div class="ai-icon">⚖️</div>
-                        <div class="ai-name">nevolve.ai</div>
+            <div class="conversation" id="conversation">
+                <div class="question">
+                    <div class="question-label">Soru</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="document" id="document">
+                    <div class="doc-header">
+                        <div class="doc-meta">
+                            <div class="doc-title" id="docTitle">Hukuki Analiz</div>
+                            <div class="doc-subtitle" id="docSubtitle">Yargıtay İçtihadı</div>
+                        </div>
+                        <div class="doc-date" id="docDate"></div>
                     </div>
-                    <div class="ai-body" id="aiBody"></div>
-                    <div class="sources" id="sources" style="display:none; padding: 16px 20px;">
-                        <div class="sources-title">Kaynaklar</div>
-                        <div class="sources-list" id="sourcesList"></div>
+
+                    <div class="doc-body" id="docBody">
+                        <!-- Content will be injected here -->
                     </div>
-                    <div class="ai-actions" id="aiActions" style="display:none; padding: 12px 20px; border-top: 1px solid var(--border);">
-                        <button class="copy-response-btn" onclick="copyResponse()">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
-                            </svg>
-                            Kopyala
-                        </button>
+
+                    <div class="doc-footer">
+                        <div class="sources-row" id="sourcesRow"></div>
+                        <div class="doc-actions">
+                            <button class="doc-action-btn" onclick="copyResponse()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+                                </svg>
+                                Kopyala
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -599,10 +647,10 @@
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="input" placeholder="Davanızı anlatın..." rows="1"></textarea>
-                <button class="send-btn" id="sendBtn">
+                <textarea id="input" rows="1" placeholder="Hukuki sorunuzu yazın..."></textarea>
+                <button class="send-btn" id="sendBtn" onclick="send()">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </button>
             </div>
@@ -613,16 +661,16 @@
     <div class="panel" id="panel">
         <div class="panel-header">
             <div>
-                <div class="panel-type" id="panelType">YARGITAY</div>
-                <div class="panel-title" id="panelTitle">11. Ceza Dairesi</div>
+                <div class="panel-type" id="panelType">YARGITAY KARARI</div>
+                <div class="panel-title" id="panelTitle">15. Ceza Dairesi</div>
             </div>
             <button class="panel-close" onclick="closePanel()">×</button>
         </div>
         <div class="panel-meta" id="panelMeta"></div>
         <div class="panel-content" id="panelContent"></div>
-        <div class="panel-actions" style="display: flex; gap: 8px;">
-            <button class="panel-btn" onclick="copyPanel()">📋 Kopyala</button>
-            <button class="panel-btn" id="openSourceBtn" onclick="openSourceUrl()" style="flex: 1;">🔗 Kaynağa Git</button>
+        <div class="panel-actions">
+            <button class="panel-btn" onclick="copyPanel()">Kopyala</button>
+            <button class="panel-btn primary" id="openSourceBtn" onclick="openSourceUrl()">Kaynağa Git →</button>
         </div>
     </div>
 
@@ -649,10 +697,16 @@
 
         function newChat() {
             $('welcome').style.display = 'flex';
-            $('messages').classList.remove('visible');
+            $('conversation').classList.remove('visible');
             $('input').value = '';
             caseContents = [];
             mevzuatData = [];
+        }
+
+        function formatDate() {
+            const now = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return now.toLocaleDateString('tr-TR', options);
         }
 
         function parseResponse(text) {
@@ -662,140 +716,111 @@
             const ozetMatch = text.match(/ÖZET[\s\S]*?(?=HEMEN|$)/i);
             if (ozetMatch) {
                 const ozetText = ozetMatch[0];
-                const cezaMatch = ozetText.match(/Ceza[^:]*:\s*([^\n•]+)/i);
-                const uzlasmaMatch = ozetText.match(/Uzlaşma[^:]*:\s*([^\n•]+)/i);
-                const indirimMatch = ozetText.match(/İndirim[^:]*:\s*([^\n•]+)/i);
-                const sucMatch = ozetText.match(/Suç[^:]*:\s*([^\n•]+)/i);
+                const konuMatch = ozetText.match(/Konu[^:]*:\s*([^\n•]+)/i);
+                const sonucMatch = ozetText.match(/Sonuç[^:]*:\s*([^\n•]+)/i);
+                const sureMatch = ozetText.match(/Süre[^:]*:\s*([^\n•]+)/i);
 
                 sections.ozet = {
-                    suc: sucMatch ? sucMatch[1].trim() : '',
-                    ceza: cezaMatch ? cezaMatch[1].trim() : '',
-                    uzlasma: uzlasmaMatch ? uzlasmaMatch[1].trim() : '',
-                    indirim: indirimMatch ? indirimMatch[1].trim() : ''
+                    konu: konuMatch ? konuMatch[1].trim() : '',
+                    sonuc: sonucMatch ? sonucMatch[1].trim() : '',
+                    sure: sureMatch ? sureMatch[1].trim() : ''
                 };
             }
 
             // Parse HEMEN YAP
             const hemenMatch = text.match(/HEMEN YAP[\s\S]*?(?=EMSAL|DİKKAT|$)/i);
             if (hemenMatch) {
-                const items = hemenMatch[0].match(/(?:^|\n)\s*(?:\d+\.|\•|\-)\s*([^\n]+)/g);
-                if (items) {
-                    sections.hemen = items.map(item => item.replace(/^\s*(?:\d+\.|\•|\-)\s*/, '').trim()).filter(Boolean);
-                }
+                const items = hemenMatch[0].match(/\d+\.\s*[^\n]+/g) || [];
+                sections.hemen = items.map(item => item.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
             }
 
             // Parse EMSAL
             const emsalMatch = text.match(/EMSAL[\s\S]*?(?=DİKKAT|KAYNAKLAR|$)/i);
             if (emsalMatch) {
-                sections.emsal = emsalMatch[0].replace(/^EMSAL\s*/i, '').replace(/\n/g, ' ').trim();
+                sections.emsal = emsalMatch[0].replace(/^EMSAL\s*\[\d+\]?\s*/i, '').replace(/\n/g, ' ').trim();
             }
 
             // Parse DİKKAT
-            const dikkatMatch = text.match(/DİKKAT[\s\S]*?(?=KAYNAKLAR|$)/i);
+            const dikkatMatch = text.match(/DİKKAT[\s\S]*$/i);
             if (dikkatMatch) {
-                const items = dikkatMatch[0].match(/(?:^|\n)\s*(?:\•|\-)\s*([^\n]+)/g);
-                if (items) {
-                    sections.dikkat = items.map(item => item.replace(/^\s*(?:\•|\-)\s*/, '').trim()).filter(Boolean);
-                }
+                const items = dikkatMatch[0].match(/[•\-]\s*[^\n]+/g) || [];
+                sections.dikkat = items.map(item => item.replace(/^[•\-]\s*/, '').trim()).filter(Boolean);
             }
 
             return sections;
         }
 
-        // Markdown render - **kalın** ve ### temizliği
         function renderMarkdown(text) {
             if (!text) return '';
             return text
-                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')  // **kalın** → <strong>
-                .replace(/\*([^*]+)\*/g, '<em>$1</em>')              // *italik* → <em>
-                .replace(/#{1,3}\s*/g, '')                           // ### kaldır
-                .replace(/\n/g, ' ')                                  // satır sonlarını temizle
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/#{1,3}\s*/g, '')
+                .replace(/\[\d+\]/g, '')
                 .trim();
         }
 
-        function renderResponse(sections) {
+        function renderDocument(sections) {
             let html = '';
 
-            // ÖZET
-            if (sections.ozet.ceza || sections.ozet.uzlasma || sections.ozet.indirim) {
+            // ÖZET Section
+            if (sections.ozet.konu || sections.ozet.sonuc || sections.ozet.sure) {
                 html += `
-                    <div class="section section-ozet">
-                        <div class="section-header">📋 Özet</div>
-                        <div class="section-body">
-                            <div class="ozet-cards">
-                                ${sections.ozet.ceza ? `
-                                <div class="ozet-card">
-                                    <div class="ozet-card-icon">⚖️</div>
-                                    <div class="ozet-card-label">Ceza</div>
-                                    <div class="ozet-card-value">${sections.ozet.ceza}</div>
-                                </div>` : ''}
-                                ${sections.ozet.uzlasma ? `
-                                <div class="ozet-card">
-                                    <div class="ozet-card-icon">${sections.ozet.uzlasma.includes('VAR') ? '✅' : '❌'}</div>
-                                    <div class="ozet-card-label">Uzlaşma</div>
-                                    <div class="ozet-card-value">${sections.ozet.uzlasma}</div>
-                                </div>` : ''}
-                                ${sections.ozet.indirim ? `
-                                <div class="ozet-card">
-                                    <div class="ozet-card-icon">📉</div>
-                                    <div class="ozet-card-label">İndirim</div>
-                                    <div class="ozet-card-value">${sections.ozet.indirim}</div>
-                                </div>` : ''}
-                            </div>
+                    <div class="doc-section">
+                        <div class="doc-section-title">Özet</div>
+                        <div class="summary-grid">
+                            ${sections.ozet.konu ? `<div class="summary-item"><div class="summary-label">Konu</div><div class="summary-value">${renderMarkdown(sections.ozet.konu)}</div></div>` : ''}
+                            ${sections.ozet.sonuc ? `<div class="summary-item"><div class="summary-label">Sonuç</div><div class="summary-value">${renderMarkdown(sections.ozet.sonuc)}</div></div>` : ''}
+                            ${sections.ozet.sure ? `<div class="summary-item"><div class="summary-label">Süre</div><div class="summary-value">${renderMarkdown(sections.ozet.sure)}</div></div>` : ''}
                         </div>
                     </div>
                 `;
             }
 
-            // HEMEN YAP
+            // HEMEN YAP Section
             if (sections.hemen.length > 0) {
                 html += `
-                    <div class="section section-hemen">
-                        <div class="section-header">⚡ Hemen Yap</div>
-                        <div class="section-body">
-                            <div class="hemen-list">
-                                ${sections.hemen.map((item, i) => `
-                                    <div class="hemen-item">
-                                        <div class="hemen-num">${i + 1}</div>
-                                        <div class="hemen-text">${renderMarkdown(item)}</div>
-                                    </div>
-                                `).join('')}
-                            </div>
+                    <div class="doc-section">
+                        <div class="doc-section-title">Eylem Planı</div>
+                        <div class="action-list">
+                            ${sections.hemen.map((item, i) => `
+                                <div class="action-item">
+                                    <div class="action-num">${i + 1}</div>
+                                    <div class="action-text">${renderMarkdown(item)}</div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
             }
 
-            // EMSAL
+            // EMSAL Section
             if (sections.emsal) {
                 html += `
-                    <div class="section section-emsal">
-                        <div class="section-header">📕 Emsal Karar</div>
-                        <div class="section-body">
-                            <div class="emsal-card" onclick="openFirstSource()">
-                                <div class="emsal-text">${renderMarkdown(sections.emsal)}</div>
-                                <div class="emsal-arrow">→</div>
+                    <div class="doc-section">
+                        <div class="doc-section-title">Emsal Karar</div>
+                        <div class="precedent" onclick="openFirstSource()">
+                            <div class="precedent-header">
+                                <div class="precedent-court">${caseContents[0]?.daire || 'Yargıtay'}</div>
+                                <div class="precedent-arrow">→</div>
                             </div>
+                            <div class="precedent-text">"${renderMarkdown(sections.emsal)}"</div>
                         </div>
                     </div>
                 `;
             }
 
-            // DİKKAT
+            // DİKKAT Section
             if (sections.dikkat.length > 0) {
                 html += `
-                    <div class="section section-dikkat">
-                        <div class="section-header">⚠️ Dikkat</div>
-                        <div class="section-body">
-                            <div class="dikkat-list">
-                                ${sections.dikkat.map(item => `
-                                    <div class="dikkat-item">
-                                        <span class="dikkat-icon">•</span>
-                                        <span>${renderMarkdown(item)}</span>
-                                    </div>
-                                `).join('')}
+                    <div class="doc-section">
+                        <div class="doc-section-title">Önemli Uyarı</div>
+                        ${sections.dikkat.map(item => `
+                            <div class="warning">
+                                <div class="warning-icon">⚠</div>
+                                <div class="warning-text">${renderMarkdown(item)}</div>
                             </div>
-                        </div>
+                        `).join('')}
                     </div>
                 `;
             }
@@ -803,24 +828,11 @@
             return html;
         }
 
-        function showSkeleton(step = 1) {
-            const steps = ['Kaynaklar aranıyor', 'Emsal kararlar okunuyor', 'Analiz hazırlanıyor'];
+        function showLoading() {
             return `
-                <div class="skeleton">
-                    <div class="skeleton-header">
-                        <div class="skeleton-avatar"></div>
-                        <div class="skeleton-title"></div>
-                    </div>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;" class="loading-text">${steps[step - 1]}</p>
-                    <div class="skeleton-card">
-                        <div class="skeleton-line"></div>
-                        <div class="skeleton-line medium"></div>
-                        <div class="skeleton-line short"></div>
-                    </div>
-                    <div class="skeleton-card">
-                        <div class="skeleton-line"></div>
-                        <div class="skeleton-line short"></div>
-                    </div>
+                <div class="loading">
+                    <div class="loading-text">Kaynaklar analiz ediliyor...</div>
+                    <div class="loading-bar"></div>
                 </div>
             `;
         }
@@ -831,61 +843,31 @@
 
             $('sendBtn').disabled = true;
             $('welcome').style.display = 'none';
-            $('messages').classList.add('visible');
-            $('userMsg').textContent = q;
-            $('aiBody').innerHTML = showSkeleton(1);
-            $('sources').style.display = 'none';
-            $('aiActions').style.display = 'none';
+            $('conversation').classList.add('visible');
+            $('questionText').textContent = q;
+            $('docBody').innerHTML = showLoading();
+            $('sourcesRow').innerHTML = '';
+            $('docDate').textContent = formatDate();
             $('input').value = '';
             $('input').style.height = 'auto';
 
             const ctx = await API.buildEnrichedContext(q);
 
-            $('aiBody').innerHTML = showSkeleton(2);
-
-            let casesContext = '';
-            caseContents = [];
-
-            // Akıllı karar kesme - SONUÇ kısmını öncelikle al
-            function smartTruncate(content, maxLen = 1800) {
-                if (!content || content.length <= maxLen) return content;
-
-                // SONUÇ veya KARAR kısmını bul
-                const sonucPatterns = [
-                    /SONUÇ\s*:[\s\S]*/i,
-                    /KARAR\s*:[\s\S]*/i,
-                    /Hüküm\s*:[\s\S]*/i,
-                    /BOZULMASINA[\s\S]*/i,
-                    /ONANMASINA[\s\S]*/i
-                ];
-
-                let sonucPart = '';
-                for (const pattern of sonucPatterns) {
-                    const match = content.match(pattern);
-                    if (match) {
-                        sonucPart = match[0].substring(0, 800);
-                        break;
-                    }
-                }
-
-                // Başlangıç kısmı (dava özeti)
-                const baslangic = content.substring(0, maxLen - sonucPart.length - 50);
-
-                if (sonucPart) {
-                    return baslangic + '\n...\n' + sonucPart;
-                }
-                return content.substring(0, maxLen);
+            // Set document title based on case type
+            if (ctx.caseType && ctx.caseType.type !== 'genel') {
+                $('docTitle').textContent = ctx.caseType.label + ' Analizi';
+                $('docSubtitle').textContent = ctx.caseType.type === 'idari' ? 'Danıştay İçtihadı' : 'Yargıtay İçtihadı';
             }
 
-            // === YENİ: YAPILANDIRILMIŞ VERİ SİSTEMİ ===
+            let casesContext = '';
             let parsedKararlar = [];
+            caseContents = [];
 
             // === YARGITAY KARARLARI ===
             if (ctx.yargitayKararlari.length > 0) {
                 for (let i = 0; i < Math.min(2, ctx.yargitayKararlari.length); i++) {
                     const doc = await API.getDocument(ctx.yargitayKararlari[i].id);
                     if (doc.success) {
-                        // Ham içeriği parse et
                         const parsed = API.parseKarar(doc.content, {
                             daire: ctx.yargitayKararlari[i].daire,
                             esasNo: ctx.yargitayKararlari[i].esasNo,
@@ -894,7 +876,7 @@
                             kaynak: 'yargitay'
                         });
                         if (parsed) {
-                            parsed.content = doc.content; // Ham içerik panel için
+                            parsed.content = doc.content;
                             parsedKararlar.push(parsed);
                             caseContents.push({ ...ctx.yargitayKararlari[i], content: doc.content, kaynak: 'yargitay', parsed });
                         }
@@ -902,7 +884,7 @@
                 }
             }
 
-            // === DANIŞTAY KARARLARI === (İdari davalar için)
+            // === DANIŞTAY KARARLARI ===
             if (ctx.danistayKararlari.length > 0) {
                 for (let i = 0; i < Math.min(2, ctx.danistayKararlari.length); i++) {
                     const doc = await API.getDanistayDocument(ctx.danistayKararlari[i].id);
@@ -929,24 +911,19 @@
                 }
             }
 
-            // === AKILLI KAYNAK SEÇİMİ ===
-            // En alakalı kararları seç
+            // Akıllı kaynak seçimi
             if (parsedKararlar.length > 2) {
                 parsedKararlar = API.findBestMatch(q, parsedKararlar);
             }
 
-            // === MEVZUAT MADDELERİ ===
+            // Mevzuat
             if (ctx.mevzuatMaddeleri.length > 0) {
                 mevzuatData = ctx.mevzuatMaddeleri;
             }
 
-            $('aiBody').innerHTML = showSkeleton(3);
-
-            // === YAPILANDIRILMIŞ CONTEXT OLUŞTUR ===
-            // Artık ham metin yerine parse edilmiş, temiz veri gönderiyoruz
+            // Yapılandırılmış context
             casesContext = API.buildStructuredContext(parsedKararlar, mevzuatData);
 
-            // Dava tipi bilgisini ekle
             let finalPrompt = q;
             if (ctx.caseType && ctx.caseType.type !== 'genel') {
                 finalPrompt = `[${ctx.caseType.label} davası]\n\n${q}`;
@@ -957,39 +934,22 @@
 
             if (r.success) {
                 const sections = parseResponse(r.text);
-                $('aiBody').innerHTML = renderResponse(sections);
+                $('docBody').innerHTML = renderDocument(sections);
 
-                // Sources - Kaynakları göster
-                if (caseContents.length > 0 || mevzuatData.length > 0) {
-                    let srcHtml = '';
-                    caseContents.forEach((c, i) => {
-                        const kaynakTipi = c.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay';
-                        srcHtml += `
-                            <button class="source-btn" onclick="openPanel('karar', ${i})">
-                                <div class="source-type">${kaynakTipi}</div>
-                                <div class="source-name">${c.daire || kaynakTipi}</div>
-                                <div class="source-info">E.${c.esasNo} K.${c.kararNo}</div>
-                            </button>
-                        `;
-                    });
-                    mevzuatData.forEach((m, i) => {
-                        const kanunAdi = m.kanunAdi || 'Kanun';
-                        srcHtml += `
-                            <button class="source-btn" onclick="openPanel('mevzuat', ${i})">
-                                <div class="source-type">Mevzuat</div>
-                                <div class="source-name">${kanunAdi} m.${m.madde}</div>
-                                <div class="source-info">Kanun Maddesi</div>
-                            </button>
-                        `;
-                    });
-                    $('sourcesList').innerHTML = srcHtml;
-                    $('sources').style.display = 'block';
-                }
+                // Sources
+                let srcHtml = '';
+                caseContents.forEach((c, i) => {
+                    const label = c.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay';
+                    srcHtml += `<button class="source-tag" onclick="openPanel('karar', ${i})">${label} ${c.daire || ''}</button>`;
+                });
+                mevzuatData.forEach((m, i) => {
+                    srcHtml += `<button class="source-tag" onclick="openPanel('mevzuat', ${i})">${m.kanunAdi || 'Kanun'} m.${m.madde}</button>`;
+                });
+                $('sourcesRow').innerHTML = srcHtml;
 
-                $('aiActions').style.display = 'block';
                 toast('Analiz tamamlandı');
             } else {
-                $('aiBody').innerHTML = `<p style="color: #DC2626; padding: 20px;">Hata: ${r.error?.message || 'Bilinmeyen hata'}</p>`;
+                $('docBody').innerHTML = `<div class="warning"><div class="warning-icon">⚠</div><div class="warning-text">${r.error?.message || 'Bir hata oluştu'}</div></div>`;
             }
 
             $('sendBtn').disabled = false;
@@ -1003,7 +963,6 @@
             currentSourceUrl = null;
 
             if (type === 'karar') {
-                // Yargıtay veya Danıştay kararı
                 const c = caseContents[index];
                 const kaynakAdi = c.kaynak === 'danistay' ? 'DANIŞTAY KARARI' : 'YARGITAY KARARI';
                 const kaynakKurum = c.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay';
@@ -1017,14 +976,12 @@
                 `;
                 $('panelContent').textContent = c.content;
 
-                // Kaynak URL oluştur
                 if (c.kaynak === 'danistay') {
                     currentSourceUrl = 'https://www.danistay.gov.tr/karar-arama';
                 } else {
                     currentSourceUrl = 'https://karararama.yargitay.gov.tr/';
                 }
             } else if (type === 'mevzuat') {
-                // Kanun maddesi
                 const m = mevzuatData[index];
                 const kanunAdi = m.kanunAdi || 'Kanun';
                 const kanunNo = m.kanunKodu || m.kanun_no || '';
@@ -1038,7 +995,6 @@
                 `;
                 $('panelContent').textContent = m.content || 'İçerik yüklenemedi';
 
-                // Mevzuat URL - kanun numarasına göre
                 if (kanunNo) {
                     currentSourceUrl = `https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=${kanunNo}&MevzuatTur=1&MevzuatTertip=5`;
                 } else {
@@ -1046,9 +1002,7 @@
                 }
             }
 
-            // Kaynak butonunu güncelle
             $('openSourceBtn').style.display = currentSourceUrl ? 'block' : 'none';
-
             $('panel').classList.add('open');
             $('overlay').classList.add('visible');
         }
@@ -1070,12 +1024,11 @@
         }
 
         function copyResponse() {
-            const text = $('aiBody').innerText;
+            const text = $('docBody').innerText;
             navigator.clipboard.writeText(text);
             toast('Yanıt kopyalandı');
         }
 
-        $('sendBtn').onclick = send;
         $('overlay').onclick = closePanel;
 
         $('input').addEventListener('keydown', e => {
@@ -1085,7 +1038,7 @@
             }
         });
 
-        document.querySelectorAll('.quick-btn').forEach(btn => {
+        document.querySelectorAll('.quick-item').forEach(btn => {
             btn.onclick = () => {
                 $('input').value = btn.dataset.q;
                 send();
