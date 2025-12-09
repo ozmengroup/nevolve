@@ -119,6 +119,13 @@ const API = {
                 // İlk chunk'ı logla - format kontrolü için
                 if (chunkCount === 1) {
                     console.log('[API] İlk chunk (ham):', chunk.substring(0, 300));
+
+                    // Rate limit hatası kontrolü
+                    if (chunk.includes('"error"') && chunk.includes('Rate limit')) {
+                        const match = chunk.match(/try again in (\d+m?\d*\.?\d*s?)/);
+                        const waitTime = match ? match[1] : '10 dakika';
+                        throw new Error(`API limit aşıldı. Lütfen ${waitTime} sonra tekrar deneyin.`);
+                    }
                 }
 
                 for (const line of lines) {
