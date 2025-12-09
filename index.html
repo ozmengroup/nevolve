@@ -386,11 +386,102 @@
             content: '';
             animation: dots 1.5s infinite;
         }
-        
+
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
             60%, 100% { content: '...'; }
+        }
+
+        /* Error States */
+        .error-box {
+            padding: 20px;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .error-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #DC2626;
+            margin-bottom: 6px;
+        }
+
+        .error-detail {
+            font-size: 13px;
+            color: #7F1D1D;
+            margin-bottom: 16px;
+        }
+
+        .error-retry {
+            padding: 10px 20px;
+            background: #DC2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .error-retry:hover { background: #B91C1C; }
+        .error-retry:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Countdown */
+        .countdown {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #FEE2E2;
+            border-radius: 4px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            background: #1A1A1A;
+            color: white;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #059669; }
+        .toast.error { background: #DC2626; }
+
+        /* Cache indicator */
+        .cache-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #DBEAFE;
+            color: #1D4ED8;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -439,10 +530,12 @@
         </div>
         
         <footer class="footer">
-            evet bu şirket battı, umarım sen batmazsın — <a href="#">👨‍🚀 Burhan</a>
+            evet bu şirket battı, umarım sen batmazsın — <a href="#">Burhan</a>
         </footer>
     </div>
-    
+
+    <div class="toast" id="toast"></div>
+
     <div class="doc-modal" id="docModal">
         <div class="doc-container">
             <div class="doc-header">
@@ -464,59 +557,117 @@
     <script>
         const $ = id => document.getElementById(id);
         let currentCases = [];
-        
+        let lastQuery = '';
+        let lastCasesContext = '';
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = $('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' visible';
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        // Hata gösterimi
+        function showError(error, onRetry) {
+            const isRateLimit = error.type === 'rate_limit';
+            let countdownHtml = '';
+
+            if (isRateLimit && error.retryAfter > 0) {
+                countdownHtml = `<span class="countdown" id="countdown">${error.retryAfter}</span> saniye`;
+            }
+
+            const html = `
+                <div class="error-box">
+                    <div class="error-icon">${isRateLimit ? '⏳' : '⚠️'}</div>
+                    <div class="error-title">${error.message}</div>
+                    <div class="error-detail">${countdownHtml || error.detail}</div>
+                    <button class="error-retry" id="retryBtn" ${isRateLimit ? 'disabled' : ''}>
+                        ${isRateLimit ? 'Bekleniyor...' : 'Tekrar Dene'}
+                    </button>
+                </div>
+            `;
+
+            $('responseContent').innerHTML = html;
+
+            // Countdown timer
+            if (isRateLimit && error.retryAfter > 0) {
+                let remaining = error.retryAfter;
+                const interval = setInterval(() => {
+                    remaining--;
+                    const countdownEl = $('countdown');
+                    const retryBtn = $('retryBtn');
+
+                    if (countdownEl) countdownEl.textContent = remaining;
+
+                    if (remaining <= 0) {
+                        clearInterval(interval);
+                        if (retryBtn) {
+                            retryBtn.disabled = false;
+                            retryBtn.textContent = 'Tekrar Dene';
+                        }
+                    }
+                }, 1000);
+            }
+
+            // Retry button
+            const retryBtn = $('retryBtn');
+            if (retryBtn && onRetry) {
+                retryBtn.onclick = () => {
+                    API.resetRateLimit();
+                    onRetry();
+                };
+            }
+        }
+
         function formatResponse(text) {
-            // Markdown to HTML conversion
             let html = text
-                // Headers
                 .replace(/^### (.+)$/gm, '<h3>$1</h3>')
                 .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-                // Bold
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                // Code/references
                 .replace(/`([^`]+)`/g, '<code>$1</code>')
-                // Numbered lists
                 .replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
-                // Bullet lists
                 .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
-                // Paragraphs
                 .replace(/\n\n/g, '</p><p>')
-                // Single line breaks
                 .replace(/\n/g, '<br>');
-            
-            // Wrap consecutive <li> in <ul>
+
             html = html.replace(/(<li>.*?<\/li>(<br>)?)+/g, match => {
                 return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
             });
-            
+
             return '<p>' + html + '</p>';
         }
-        
-        $('aiSubmit').onclick = async () => {
+
+        async function analyzeCase() {
             const q = $('aiInput').value.trim();
             if (!q) return;
-            
+
+            lastQuery = q;
             $('aiSubmit').disabled = true;
-            $('aiSubmit').textContent = 'Bekle...';
+            $('aiSubmit').textContent = 'Analiz ediliyor...';
             $('response').classList.add('visible');
             $('responseContent').innerHTML = '<span class="loading">Emsal kararlar taranıyor</span>';
             $('casesSection').classList.remove('visible');
-            
+
             const keywords = q.match(/TCK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB/gi) || [];
             const searchQuery = keywords.length > 0 ? keywords.slice(0,2).join(' ') : q.split(' ').filter(w => w.length > 4).slice(0, 2).join(' ');
-            
+
             const searchResult = await API.searchCases(searchQuery);
-            
+
+            if (searchResult.fromCache) {
+                showToast('Önbellekten yüklendi', 'success');
+            }
+
             let casesContext = '';
             let casesHtml = '';
             currentCases = [];
-            
+
             if (searchResult.success && searchResult.decisions.length > 0) {
                 const topCases = searchResult.decisions.slice(0, 5);
                 currentCases = topCases;
-                
+
                 $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
-                
+
                 const caseContents = [];
                 for (let i = 0; i < Math.min(2, topCases.length); i++) {
                     const doc = await API.getDocument(topCases[i].id);
@@ -527,7 +678,7 @@
                         });
                     }
                 }
-                
+
                 casesHtml = topCases.map((d, i) => `
                     <div class="case-card" data-id="${d.id}" data-index="${i}">
                         <div class="case-header">
@@ -537,7 +688,7 @@
                         <div class="case-info">E. ${d.esasNo} K. ${d.kararNo}</div>
                     </div>
                 `).join('');
-                
+
                 if (caseContents.length > 0) {
                     casesContext = '\n\nEmsal Kararlar:\n';
                     caseContents.forEach((c, i) => {
@@ -545,16 +696,19 @@
                     });
                 }
             }
-            
-            $('responseContent').innerHTML = '<span class="loading">Analiz yapılıyor</span>';
+
+            lastCasesContext = casesContext;
+            $('responseContent').innerHTML = '<span class="loading">AI analiz yapıyor</span>';
+
             const r = await API.askAI(q + casesContext);
-            
+
             if (r.success) {
                 $('responseContent').innerHTML = formatResponse(r.text);
+                showToast('Analiz tamamlandı', 'success');
             } else {
-                $('responseContent').textContent = 'Hata: ' + r.error;
+                showError(r.error, analyzeCase);
             }
-            
+
             if (casesHtml) {
                 $('casesList').innerHTML = casesHtml;
                 $('casesSection').classList.add('visible');
@@ -562,27 +716,33 @@
                     card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
                 });
             }
-            
+
             $('aiSubmit').disabled = false;
             $('aiSubmit').textContent = 'Analiz Et';
-        };
-        
+        }
+
+        $('aiSubmit').onclick = analyzeCase;
+
         document.querySelectorAll('.tag').forEach(t => {
             t.onclick = () => $('aiInput').value = t.dataset.q;
         });
-        
+
         const search = async () => {
             const q = $('searchInput').value.trim();
             if (!q) return;
-            
+
             $('resultsInfo').textContent = 'Aranıyor...';
             $('resultsList').innerHTML = '';
             $('resultsList').classList.remove('visible');
-            
+
             const r = await API.searchCases(q);
+
             if (r.success && r.decisions.length > 0) {
                 currentCases = r.decisions;
-                $('resultsInfo').textContent = r.total.toLocaleString('tr-TR') + ' sonuç';
+                let infoText = r.total.toLocaleString('tr-TR') + ' sonuç';
+                if (r.fromCache) infoText += ' <span class="cache-badge">ÖNBELLEK</span>';
+                $('resultsInfo').innerHTML = infoText;
+
                 $('resultsList').innerHTML = r.decisions.map((d, i) => `
                     <div class="result-item" data-id="${d.id}" data-index="${i}">
                         <div class="result-header">
@@ -600,10 +760,10 @@
                 $('resultsInfo').textContent = 'Sonuç bulunamadı';
             }
         };
-        
+
         $('searchBtn').onclick = search;
         $('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
-        
+
         async function openDocModal(id, index) {
             const c = currentCases[index];
             $('docTitle').textContent = c?.daire || 'Karar';
@@ -617,11 +777,25 @@
             $('docContent').textContent = 'Yükleniyor...';
             $('docModal').classList.add('visible');
             const r = await API.getDocument(id);
-            $('docContent').textContent = r.success ? r.content : 'Yüklenemedi';
+
+            if (r.success) {
+                $('docContent').textContent = r.content;
+                if (r.fromCache) showToast('Önbellekten yüklendi', 'success');
+            } else {
+                $('docContent').textContent = 'Yüklenemedi: ' + (r.error?.message || 'Bilinmeyen hata');
+            }
         }
-        
+
         $('closeDoc').onclick = () => $('docModal').classList.remove('visible');
         $('docModal').onclick = e => { if (e.target === $('docModal')) $('docModal').classList.remove('visible'); };
+
+        // Keyboard shortcut: Enter to analyze
+        $('aiInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                analyzeCase();
+            }
+        });
     </script>
 </body>
 </html>
