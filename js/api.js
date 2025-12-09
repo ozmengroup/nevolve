@@ -74,94 +74,34 @@ const API = {
             };
         }
 
-        // Groq veya Gemini kullan
-        if (CONFIG.AI_PROVIDER === 'groq') {
-            return await this._askGroq(question, retryCount);
-        } else {
-            return await this._askGemini(question, retryCount);
-        }
-    },
-
-    // Groq API (Llama 3.3 70B - çok hızlı)
-    async _askGroq(question, retryCount = 0) {
         try {
-            const response = await fetch(CONFIG.GROQ_API, {
+            const response = await fetch(CONFIG.WORKER_API, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${CONFIG.GROQ_KEY}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: CONFIG.GROQ_MODEL,
                     messages: [
                         { role: 'system', content: CONFIG.AI_SYSTEM_PROMPT },
                         { role: 'user', content: question }
-                    ],
-                    temperature: CONFIG.AI_CONFIG.temperature,
-                    max_tokens: CONFIG.AI_CONFIG.maxOutputTokens
+                    ]
                 })
             });
 
             const data = await response.json();
 
             if (data.choices?.[0]?.message?.content) {
-                return { success: true, text: data.choices[0].message.content, provider: 'groq' };
+                return { success: true, text: data.choices[0].message.content, provider: 'worker' };
             }
 
             const errorMsg = data.error?.message || 'Bilinmeyen hata';
 
-            // Rate limit hatası
             if (this._isRateLimitError(errorMsg)) {
-                this._rateLimitUntil = Date.now() + 10000; // Groq için 10 saniye yeterli
-
+                this._rateLimitUntil = Date.now() + 10000;
                 if (retryCount < 1) {
                     return {
                         success: false,
                         error: this._formatError(errorMsg),
                         willRetry: true,
                         retryAfter: 10
-                    };
-                }
-            }
-
-            return { success: false, error: this._formatError(errorMsg) };
-        } catch (e) {
-            return { success: false, error: this._formatError(e.message) };
-        }
-    },
-
-    // Gemini API (Fallback)
-    async _askGemini(question, retryCount = 0) {
-        try {
-            const response = await fetch(`${CONFIG.GEMINI_API}?key=${CONFIG.GEMINI_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: CONFIG.AI_SYSTEM_PROMPT + '\n\nSoru: ' + question }] }],
-                    generationConfig: CONFIG.AI_CONFIG
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.candidates?.[0]) {
-                const fullText = data.candidates[0].content.parts[0].text;
-                return { success: true, text: fullText, provider: 'gemini' };
-            }
-
-            const errorMsg = data.error?.message || 'Bilinmeyen hata';
-
-            // Rate limit hatası - 35 saniye bekle
-            if (this._isRateLimitError(errorMsg)) {
-                this._rateLimitUntil = Date.now() + 35000;
-
-                // Otomatik retry (max 1 kez, 35 saniye sonra)
-                if (retryCount < 1) {
-                    return {
-                        success: false,
-                        error: this._formatError(errorMsg),
-                        willRetry: true,
-                        retryAfter: 35
                     };
                 }
             }
