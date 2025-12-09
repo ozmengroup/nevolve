@@ -620,8 +620,9 @@
         </div>
         <div class="panel-meta" id="panelMeta"></div>
         <div class="panel-content" id="panelContent"></div>
-        <div class="panel-actions">
-            <button class="panel-btn" onclick="copyPanel()">Kopyala</button>
+        <div class="panel-actions" style="display: flex; gap: 8px;">
+            <button class="panel-btn" onclick="copyPanel()">📋 Kopyala</button>
+            <button class="panel-btn" id="openSourceBtn" onclick="openSourceUrl()" style="flex: 1;">🔗 Kaynağa Git</button>
         </div>
     </div>
 
@@ -633,6 +634,7 @@
         const $ = id => document.getElementById(id);
         let caseContents = [];
         let mevzuatData = [];
+        let currentSourceUrl = null;
 
         $('input').addEventListener('input', function() {
             this.style.height = 'auto';
@@ -700,6 +702,17 @@
             return sections;
         }
 
+        // Markdown render - **kalın** ve ### temizliği
+        function renderMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')  // **kalın** → <strong>
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')              // *italik* → <em>
+                .replace(/#{1,3}\s*/g, '')                           // ### kaldır
+                .replace(/\n/g, ' ')                                  // satır sonlarını temizle
+                .trim();
+        }
+
         function renderResponse(sections) {
             let html = '';
 
@@ -744,7 +757,7 @@
                                 ${sections.hemen.map((item, i) => `
                                     <div class="hemen-item">
                                         <div class="hemen-num">${i + 1}</div>
-                                        <div class="hemen-text">${item}</div>
+                                        <div class="hemen-text">${renderMarkdown(item)}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -760,7 +773,7 @@
                         <div class="section-header">📕 Emsal Karar</div>
                         <div class="section-body">
                             <div class="emsal-card" onclick="openFirstSource()">
-                                <div class="emsal-text">${sections.emsal}</div>
+                                <div class="emsal-text">${renderMarkdown(sections.emsal)}</div>
                                 <div class="emsal-arrow">→</div>
                             </div>
                         </div>
@@ -778,7 +791,7 @@
                                 ${sections.dikkat.map(item => `
                                     <div class="dikkat-item">
                                         <span class="dikkat-icon">•</span>
-                                        <span>${item}</span>
+                                        <span>${renderMarkdown(item)}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -970,6 +983,8 @@
         }
 
         function openPanel(type, index) {
+            currentSourceUrl = null;
+
             if (type === 'karar') {
                 // Yargıtay veya Danıştay kararı
                 const c = caseContents[index];
@@ -984,6 +999,13 @@
                     <div><div class="meta-label">Kaynak</div><div class="meta-value">${kaynakKurum}</div></div>
                 `;
                 $('panelContent').textContent = c.content;
+
+                // Kaynak URL oluştur
+                if (c.kaynak === 'danistay') {
+                    currentSourceUrl = 'https://www.danistay.gov.tr/karar-arama';
+                } else {
+                    currentSourceUrl = 'https://karararama.yargitay.gov.tr/';
+                }
             } else if (type === 'mevzuat') {
                 // Kanun maddesi
                 const m = mevzuatData[index];
@@ -998,9 +1020,26 @@
                     <div><div class="meta-label">Kaynak</div><div class="meta-value">mevzuat.gov.tr</div></div>
                 `;
                 $('panelContent').textContent = m.content || 'İçerik yüklenemedi';
+
+                // Mevzuat URL - kanun numarasına göre
+                if (kanunNo) {
+                    currentSourceUrl = `https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=${kanunNo}&MevzuatTur=1&MevzuatTertip=5`;
+                } else {
+                    currentSourceUrl = 'https://www.mevzuat.gov.tr/';
+                }
             }
+
+            // Kaynak butonunu güncelle
+            $('openSourceBtn').style.display = currentSourceUrl ? 'block' : 'none';
+
             $('panel').classList.add('open');
             $('overlay').classList.add('visible');
+        }
+
+        function openSourceUrl() {
+            if (currentSourceUrl) {
+                window.open(currentSourceUrl, '_blank');
+            }
         }
 
         function closePanel() {

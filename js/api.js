@@ -353,44 +353,43 @@ const API = {
         }).filter(Boolean);
     },
 
-    // Kanun kodu mapping - her dava tipi için ilgili kanunlar ve kritik maddeler
+    // Kanun kodu mapping - her dava tipi için en kritik 2 madde
     KANUN_MAP: {
         ceza: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 5237, ad: 'TCK', maddeler: [157, 158, 141, 142, 86, 87, 106, 109] },
-                { kod: 5271, ad: 'CMK', maddeler: [253, 254, 231] }
+                { kod: 5237, ad: 'TCK', maddeler: [157, 168] },      // dolandırıcılık + etkin pişmanlık
+                { kod: 5271, ad: 'CMK', maddeler: [253, 231] }       // uzlaşma + HAGB
             ]
         },
         icra: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 2004, ad: 'İİK', maddeler: [62, 68, 72, 89, 94, 97] }
+                { kod: 2004, ad: 'İİK', maddeler: [62, 72] }         // itiraz + menfi tespit
             ]
         },
         aile: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 4721, ad: 'TMK', maddeler: [161, 166, 169, 175, 182, 185, 186, 336] }
+                { kod: 4721, ad: 'TMK', maddeler: [166, 175] }       // boşanma + nafaka
             ]
         },
         is: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 4857, ad: 'İş Kanunu', maddeler: [17, 18, 20, 21, 25, 41] },
-                { kod: 7036, ad: 'İş Mahkemeleri K.', maddeler: [3] }
+                { kod: 4857, ad: 'İş Kanunu', maddeler: [20, 25] }   // işe iade + haklı fesih
             ]
         },
         idari: {
-            kaynaklar: ['danistay'],  // İdari davalarda Danıştay öncelikli!
+            kaynaklar: ['danistay'],
             kanunlar: [
-                { kod: 2577, ad: 'İYUK', maddeler: [7, 10, 11, 12, 13, 20] }
+                { kod: 2577, ad: 'İYUK', maddeler: [7, 11] }         // dava süresi + üst makam
             ]
         },
         miras: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 4721, ad: 'TMK', maddeler: [495, 505, 506, 560, 564, 565, 605, 606] }
+                { kod: 4721, ad: 'TMK', maddeler: [505, 606] }       // saklı pay + reddi miras
             ]
         }
     },
@@ -503,7 +502,7 @@ const API = {
                 // İdari dava - Danıştay öncelikli
                 promises.push(
                     this.searchDanistay(searchQuery).then(r => {
-                        if (r.success) context.danistayKararlari = r.decisions.slice(0, 3);
+                        if (r.success) context.danistayKararlari = r.decisions.slice(0, 2);
                     }).catch(() => {})
                 );
             }
@@ -512,15 +511,14 @@ const API = {
                 // Diğer davalar - Yargıtay
                 promises.push(
                     this.searchCases(searchQuery).then(r => {
-                        if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
+                        if (r.success) context.yargitayKararlari = r.decisions.slice(0, 2);
                     }).catch(() => {})
                 );
             }
 
-            // 2. Dava tipine göre ilgili kanun maddeleri - OTOMATİK ÇEK
+            // 2. Dava tipine göre ilgili kanun maddeleri - sadece 2 madde/kanun
             for (const kanun of caseConfig.kanunlar) {
-                // Her kanundan en kritik 2-3 maddeyi çek
-                const kritikMaddeler = kanun.maddeler.slice(0, 3);
+                const kritikMaddeler = kanun.maddeler.slice(0, 2);
                 for (const maddeNo of kritikMaddeler) {
                     promises.push(
                         this.getKanunMaddesi(kanun.kod, maddeNo).then(r => {
