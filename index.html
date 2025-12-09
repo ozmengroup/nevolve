@@ -11,13 +11,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #FAFAFA;
+            --bg: #F5F5F5;
             --card: #FFFFFF;
             --text: #111111;
             --text-secondary: #555555;
-            --text-muted: #999999;
-            --border: #E5E5E5;
-            --border-dark: #D0D0D0;
+            --text-muted: #888888;
+            --border: #E0E0E0;
         }
 
         body {
@@ -28,7 +27,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Main Layout */
         .app {
             max-width: 900px;
             margin: 0 auto;
@@ -39,12 +37,12 @@
 
         /* Header */
         .header {
-            padding: 20px 24px;
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
             background: var(--card);
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
@@ -53,7 +51,7 @@
             letter-spacing: -0.5px;
         }
 
-        .new-chat-btn {
+        .new-btn {
             padding: 8px 16px;
             background: var(--text);
             color: white;
@@ -63,19 +61,18 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: opacity 0.15s;
         }
 
-        .new-chat-btn:hover { opacity: 0.8; }
+        .new-btn:hover { opacity: 0.85; }
 
-        /* Chat Area */
-        .chat-area {
+        /* Chat */
+        .chat {
             flex: 1;
             padding: 24px;
             overflow-y: auto;
         }
 
-        /* Welcome Screen */
+        /* Welcome */
         .welcome {
             display: flex;
             flex-direction: column;
@@ -85,63 +82,33 @@
             text-align: center;
         }
 
-        .welcome-icon {
-            font-size: 56px;
-            margin-bottom: 20px;
-        }
+        .welcome-icon { font-size: 56px; margin-bottom: 16px; }
+        .welcome-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .welcome-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; }
 
-        .welcome-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .welcome-desc {
-            font-size: 15px;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-        }
-
-        .quick-btns {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        .quick-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
         .quick-btn {
-            padding: 12px 20px;
+            padding: 12px 18px;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 10px;
             font-family: inherit;
             font-size: 13px;
             font-weight: 500;
-            color: var(--text);
             cursor: pointer;
             transition: all 0.15s;
         }
 
-        .quick-btn:hover {
-            border-color: var(--text);
-        }
+        .quick-btn:hover { border-color: var(--text); }
 
         /* Messages */
-        .messages {
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .messages { display: none; flex-direction: column; gap: 16px; }
+        .messages.visible { display: flex; }
 
-        .messages.visible {
-            display: flex;
-        }
-
-        /* User Message */
         .user-msg {
             align-self: flex-end;
-            max-width: 70%;
+            max-width: 75%;
             padding: 14px 18px;
             background: var(--text);
             color: white;
@@ -155,73 +122,159 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px;
+            overflow: hidden;
         }
 
         .ai-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
+            gap: 10px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border);
         }
 
         .ai-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: var(--text);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        .ai-name {
-            font-size: 14px;
-            font-weight: 600;
+        .ai-name { font-size: 14px; font-weight: 600; }
+
+        .ai-body { padding: 20px; }
+
+        /* Section Cards */
+        .section {
+            margin-bottom: 16px;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        .ai-content {
-            font-size: 14px;
-            line-height: 1.8;
-        }
+        .section:last-child { margin-bottom: 0; }
 
-        .ai-content h3,
-        .ai-content strong {
-            display: block;
-            font-size: 13px;
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin: 24px 0 12px 0;
-            color: var(--text);
         }
 
-        .ai-content h3:first-child { margin-top: 0; }
+        .section-body { padding: 16px; }
 
-        .ai-content p { margin-bottom: 12px; }
+        /* ÖZET Section */
+        .section-ozet { background: #F0F9FF; }
+        .section-ozet .section-header { background: #E0F2FE; color: #0369A1; }
 
-        .ai-content ul, .ai-content ol {
-            margin: 12px 0;
-            padding-left: 20px;
+        .ozet-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
         }
 
-        .ai-content li {
-            margin-bottom: 8px;
-            line-height: 1.7;
+        .ozet-card {
+            background: white;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid #BAE6FD;
         }
+
+        .ozet-card-icon { font-size: 20px; margin-bottom: 6px; }
+        .ozet-card-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .ozet-card-value { font-size: 15px; font-weight: 700; color: var(--text); }
+
+        /* HEMEN YAP Section */
+        .section-hemen { background: #F0FDF4; }
+        .section-hemen .section-header { background: #DCFCE7; color: #15803D; }
+
+        .hemen-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .hemen-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #BBF7D0;
+        }
+
+        .hemen-num {
+            width: 24px;
+            height: 24px;
+            background: #22C55E;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .hemen-text { font-size: 14px; line-height: 1.5; color: var(--text); }
+
+        /* EMSAL Section */
+        .section-emsal { background: #FFF7ED; }
+        .section-emsal .section-header { background: #FFEDD5; color: #C2410C; }
+
+        .emsal-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #FED7AA;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .emsal-card:hover { border-color: #F97316; }
+
+        .emsal-text { font-size: 13px; line-height: 1.5; color: var(--text-secondary); flex: 1; }
+        .emsal-arrow { font-size: 18px; color: var(--text-muted); margin-left: 12px; }
+
+        /* DİKKAT Section */
+        .section-dikkat { background: #FEF9C3; }
+        .section-dikkat .section-header { background: #FEF08A; color: #A16207; }
+
+        .dikkat-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .dikkat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #FDE047;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .dikkat-icon { font-size: 14px; flex-shrink: 0; }
 
         /* Sources */
         .sources {
-            margin-top: 24px;
-            padding-top: 20px;
+            margin-top: 16px;
+            padding-top: 16px;
             border-top: 1px solid var(--border);
         }
 
         .sources-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -229,11 +282,7 @@
             margin-bottom: 12px;
         }
 
-        .sources-list {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .sources-list { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .source-btn {
             padding: 10px 14px;
@@ -241,36 +290,19 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.15s;
             text-align: left;
         }
 
-        .source-btn:hover {
-            border-color: var(--text);
-        }
+        .source-btn:hover { border-color: var(--text); }
 
-        .source-type {
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
+        .source-type { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
+        .source-name { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .source-info { font-size: 10px; color: var(--text-secondary); }
 
-        .source-name {
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 2px;
-        }
-
-        .source-info {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        /* Input Area */
+        /* Input */
         .input-area {
             padding: 16px 24px 24px;
             background: var(--card);
@@ -285,12 +317,9 @@
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 12px 16px;
-            transition: border-color 0.15s;
         }
 
-        .input-box:focus-within {
-            border-color: var(--text);
-        }
+        .input-box:focus-within { border-color: var(--text); }
 
         #input {
             flex: 1;
@@ -319,31 +348,41 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.15s;
             flex-shrink: 0;
         }
 
-        .send-btn:hover { opacity: 0.8; }
-        .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
+        .send-btn:hover { opacity: 0.85; }
+        .send-btn:disabled { opacity: 0.3; }
         .send-btn svg { width: 18px; height: 18px; }
 
         /* Side Panel */
-        .side-panel {
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.visible { opacity: 1; visibility: visible; }
+
+        .panel {
             position: fixed;
             top: 0;
-            right: -420px;
-            width: 420px;
+            right: -440px;
+            width: 440px;
             height: 100vh;
             background: var(--card);
-            border-left: 1px solid var(--border);
             z-index: 1000;
             transition: right 0.3s ease;
             display: flex;
             flex-direction: column;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
         }
 
-        .side-panel.open { right: 0; }
+        .panel.open { right: 0; }
 
         .panel-header {
             padding: 20px;
@@ -353,19 +392,8 @@
             align-items: center;
         }
 
-        .panel-type {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .panel-title {
-            font-size: 16px;
-            font-weight: 700;
-        }
+        .panel-type { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+        .panel-title { font-size: 16px; font-weight: 700; }
 
         .panel-close {
             width: 32px;
@@ -374,17 +402,11 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 18px;
             color: var(--text-secondary);
-            transition: all 0.15s;
         }
 
-        .panel-close:hover {
-            background: var(--border);
-        }
+        .panel-close:hover { background: var(--border); }
 
         .panel-meta {
             padding: 16px 20px;
@@ -395,16 +417,8 @@
             font-size: 12px;
         }
 
-        .meta-item label {
-            display: block;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-        }
-
-        .meta-item span {
-            font-weight: 600;
-            color: var(--text);
-        }
+        .meta-label { color: var(--text-muted); margin-bottom: 2px; }
+        .meta-value { font-weight: 600; color: var(--text); }
 
         .panel-content {
             flex: 1;
@@ -413,60 +427,28 @@
             font-size: 13px;
             line-height: 1.8;
             color: var(--text-secondary);
+            white-space: pre-wrap;
         }
 
         .panel-actions {
             padding: 16px 20px;
             border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
         }
 
         .panel-btn {
-            flex: 1;
-            padding: 10px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
+            width: 100%;
+            padding: 12px;
+            background: var(--text);
+            color: white;
+            border: none;
             border-radius: 8px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s;
         }
 
-        .panel-btn:hover { border-color: var(--text); }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-
-        .overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Loading */
-        .loading::after {
-            content: '';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
+        .panel-btn:hover { opacity: 0.85; }
 
         /* Toast */
         .toast {
@@ -485,20 +467,23 @@
             z-index: 1001;
         }
 
-        .toast.visible {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
+        .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Loading */
+        .loading-text::after { content: ''; animation: dots 1.5s infinite; }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
         }
 
         /* Mobile */
         @media (max-width: 600px) {
-            .header { padding: 16px; }
-            .chat-area { padding: 16px; }
-            .input-area { padding: 12px 16px 20px; }
-            .user-msg { max-width: 85%; }
+            .chat { padding: 16px; }
+            .ozet-cards { grid-template-columns: repeat(2, 1fr); }
+            .panel { width: 100%; right: -100%; }
             .quick-btns { flex-direction: column; }
             .quick-btn { width: 100%; }
-            .side-panel { width: 100%; right: -100%; }
         }
     </style>
 </head>
@@ -506,11 +491,10 @@
     <div class="app">
         <header class="header">
             <div class="logo">nevolve.ai</div>
-            <button class="new-chat-btn" onclick="newChat()">Yeni Sohbet</button>
+            <button class="new-btn" onclick="newChat()">Yeni Sohbet</button>
         </header>
 
-        <div class="chat-area" id="chatArea">
-            <!-- Welcome -->
+        <div class="chat" id="chat">
             <div class="welcome" id="welcome">
                 <div class="welcome-icon">⚖️</div>
                 <h1 class="welcome-title">Hukuki Danışman</h1>
@@ -522,7 +506,6 @@
                 </div>
             </div>
 
-            <!-- Messages -->
             <div class="messages" id="messages">
                 <div class="user-msg" id="userMsg"></div>
                 <div class="ai-msg">
@@ -530,8 +513,8 @@
                         <div class="ai-icon">⚖️</div>
                         <div class="ai-name">nevolve.ai</div>
                     </div>
-                    <div class="ai-content" id="aiContent"></div>
-                    <div class="sources" id="sources" style="display:none;">
+                    <div class="ai-body" id="aiBody"></div>
+                    <div class="sources" id="sources" style="display:none; padding: 16px 20px;">
                         <div class="sources-title">Kaynaklar</div>
                         <div class="sources-list" id="sourcesList"></div>
                     </div>
@@ -541,7 +524,7 @@
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="input" placeholder="Davanızı detaylı anlatın..." rows="1"></textarea>
+                <textarea id="input" placeholder="Davanızı anlatın..." rows="1"></textarea>
                 <button class="send-btn" id="sendBtn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -551,20 +534,19 @@
         </div>
     </div>
 
-    <!-- Side Panel -->
     <div class="overlay" id="overlay"></div>
-    <div class="side-panel" id="sidePanel">
+    <div class="panel" id="panel">
         <div class="panel-header">
             <div>
                 <div class="panel-type" id="panelType">YARGITAY</div>
                 <div class="panel-title" id="panelTitle">11. Ceza Dairesi</div>
             </div>
-            <button class="panel-close" id="panelClose">×</button>
+            <button class="panel-close" onclick="closePanel()">×</button>
         </div>
         <div class="panel-meta" id="panelMeta"></div>
         <div class="panel-content" id="panelContent"></div>
         <div class="panel-actions">
-            <button class="panel-btn" onclick="copyContent()">Kopyala</button>
+            <button class="panel-btn" onclick="copyPanel()">Kopyala</button>
         </div>
     </div>
 
@@ -574,45 +556,165 @@
     <script src="js/api.js"></script>
     <script>
         const $ = id => document.getElementById(id);
-        let currentCases = [];
         let caseContents = [];
+        let mevzuatData = [];
 
-        // Auto-resize textarea
         $('input').addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
-        // Toast
         function toast(msg) {
             $('toast').textContent = msg;
             $('toast').classList.add('visible');
             setTimeout(() => $('toast').classList.remove('visible'), 2500);
         }
 
-        // Format response
-        function formatResponse(text) {
-            return text
-                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-                .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
-                .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>')
-                .replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
-        }
-
-        // New chat
         function newChat() {
             $('welcome').style.display = 'flex';
             $('messages').classList.remove('visible');
             $('input').value = '';
-            currentCases = [];
             caseContents = [];
+            mevzuatData = [];
         }
 
-        // Send message
+        function parseResponse(text) {
+            const sections = { ozet: {}, hemen: [], emsal: '', dikkat: [] };
+
+            // Parse ÖZET
+            const ozetMatch = text.match(/ÖZET[\s\S]*?(?=HEMEN|$)/i);
+            if (ozetMatch) {
+                const ozetText = ozetMatch[0];
+                const cezaMatch = ozetText.match(/Ceza[^:]*:\s*([^\n•]+)/i);
+                const uzlasmaMatch = ozetText.match(/Uzlaşma[^:]*:\s*([^\n•]+)/i);
+                const indirimMatch = ozetText.match(/İndirim[^:]*:\s*([^\n•]+)/i);
+                const sucMatch = ozetText.match(/Suç[^:]*:\s*([^\n•]+)/i);
+
+                sections.ozet = {
+                    suc: sucMatch ? sucMatch[1].trim() : '',
+                    ceza: cezaMatch ? cezaMatch[1].trim() : '',
+                    uzlasma: uzlasmaMatch ? uzlasmaMatch[1].trim() : '',
+                    indirim: indirimMatch ? indirimMatch[1].trim() : ''
+                };
+            }
+
+            // Parse HEMEN YAP
+            const hemenMatch = text.match(/HEMEN YAP[\s\S]*?(?=EMSAL|DİKKAT|$)/i);
+            if (hemenMatch) {
+                const items = hemenMatch[0].match(/(?:^|\n)\s*(?:\d+\.|\•|\-)\s*([^\n]+)/g);
+                if (items) {
+                    sections.hemen = items.map(item => item.replace(/^\s*(?:\d+\.|\•|\-)\s*/, '').trim()).filter(Boolean);
+                }
+            }
+
+            // Parse EMSAL
+            const emsalMatch = text.match(/EMSAL[\s\S]*?(?=DİKKAT|KAYNAKLAR|$)/i);
+            if (emsalMatch) {
+                sections.emsal = emsalMatch[0].replace(/^EMSAL\s*/i, '').replace(/\n/g, ' ').trim();
+            }
+
+            // Parse DİKKAT
+            const dikkatMatch = text.match(/DİKKAT[\s\S]*?(?=KAYNAKLAR|$)/i);
+            if (dikkatMatch) {
+                const items = dikkatMatch[0].match(/(?:^|\n)\s*(?:\•|\-)\s*([^\n]+)/g);
+                if (items) {
+                    sections.dikkat = items.map(item => item.replace(/^\s*(?:\•|\-)\s*/, '').trim()).filter(Boolean);
+                }
+            }
+
+            return sections;
+        }
+
+        function renderResponse(sections) {
+            let html = '';
+
+            // ÖZET
+            if (sections.ozet.ceza || sections.ozet.uzlasma || sections.ozet.indirim) {
+                html += `
+                    <div class="section section-ozet">
+                        <div class="section-header">📋 Özet</div>
+                        <div class="section-body">
+                            <div class="ozet-cards">
+                                ${sections.ozet.ceza ? `
+                                <div class="ozet-card">
+                                    <div class="ozet-card-icon">⚖️</div>
+                                    <div class="ozet-card-label">Ceza</div>
+                                    <div class="ozet-card-value">${sections.ozet.ceza}</div>
+                                </div>` : ''}
+                                ${sections.ozet.uzlasma ? `
+                                <div class="ozet-card">
+                                    <div class="ozet-card-icon">${sections.ozet.uzlasma.includes('VAR') ? '✅' : '❌'}</div>
+                                    <div class="ozet-card-label">Uzlaşma</div>
+                                    <div class="ozet-card-value">${sections.ozet.uzlasma}</div>
+                                </div>` : ''}
+                                ${sections.ozet.indirim ? `
+                                <div class="ozet-card">
+                                    <div class="ozet-card-icon">📉</div>
+                                    <div class="ozet-card-label">İndirim</div>
+                                    <div class="ozet-card-value">${sections.ozet.indirim}</div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // HEMEN YAP
+            if (sections.hemen.length > 0) {
+                html += `
+                    <div class="section section-hemen">
+                        <div class="section-header">⚡ Hemen Yap</div>
+                        <div class="section-body">
+                            <div class="hemen-list">
+                                ${sections.hemen.map((item, i) => `
+                                    <div class="hemen-item">
+                                        <div class="hemen-num">${i + 1}</div>
+                                        <div class="hemen-text">${item}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // EMSAL
+            if (sections.emsal) {
+                html += `
+                    <div class="section section-emsal">
+                        <div class="section-header">📕 Emsal Karar</div>
+                        <div class="section-body">
+                            <div class="emsal-card" onclick="openFirstSource()">
+                                <div class="emsal-text">${sections.emsal}</div>
+                                <div class="emsal-arrow">→</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // DİKKAT
+            if (sections.dikkat.length > 0) {
+                html += `
+                    <div class="section section-dikkat">
+                        <div class="section-header">⚠️ Dikkat</div>
+                        <div class="section-body">
+                            <div class="dikkat-list">
+                                ${sections.dikkat.map(item => `
+                                    <div class="dikkat-item">
+                                        <span class="dikkat-icon">•</span>
+                                        <span>${item}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
         async function send() {
             const q = $('input').value.trim();
             if (!q) return;
@@ -621,70 +723,54 @@
             $('welcome').style.display = 'none';
             $('messages').classList.add('visible');
             $('userMsg').textContent = q;
-            $('aiContent').innerHTML = '<span class="loading">Analiz ediliyor</span>';
+            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Analiz ediliyor</p>';
             $('sources').style.display = 'none';
             $('input').value = '';
             $('input').style.height = 'auto';
 
-            // Get enriched context
             const ctx = await API.buildEnrichedContext(q);
 
-            $('aiContent').innerHTML = '<span class="loading">Kaynaklar okunuyor</span>';
+            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Kaynaklar okunuyor</p>';
 
             let casesContext = '';
             caseContents = [];
-            currentCases = [];
 
-            // Yargıtay
             if (ctx.yargitayKararlari.length > 0) {
-                currentCases = ctx.yargitayKararlari;
-                for (let i = 0; i < Math.min(3, currentCases.length); i++) {
-                    const doc = await API.getDocument(currentCases[i].id);
+                for (let i = 0; i < Math.min(3, ctx.yargitayKararlari.length); i++) {
+                    const doc = await API.getDocument(ctx.yargitayKararlari[i].id);
                     if (doc.success) {
-                        caseContents.push({
-                            ...currentCases[i],
-                            content: doc.content
-                        });
+                        caseContents.push({ ...ctx.yargitayKararlari[i], content: doc.content });
                     }
                 }
                 if (caseContents.length > 0) {
-                    casesContext += '\n\n=== YARGITAY KARARLARI ===\n';
+                    casesContext += '\n\n=== YARGITAY ===\n';
                     caseContents.forEach((c, i) => {
-                        casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${c.content.substring(0, 2000)}\n\n`;
+                        casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo}:\n${c.content.substring(0, 1500)}\n\n`;
                     });
                 }
             }
 
-            // Mevzuat
             if (ctx.mevzuatMaddeleri.length > 0) {
-                casesContext += '\n\n=== KANUN MADDELERİ ===\n';
+                mevzuatData = ctx.mevzuatMaddeleri;
+                casesContext += '\n\n=== MEVZUAT ===\n';
                 ctx.mevzuatMaddeleri.forEach(m => {
-                    casesContext += `TCK Madde ${m.madde}: ${m.content}\n\n`;
+                    casesContext += `TCK ${m.madde}: ${m.content}\n\n`;
                 });
             }
 
-            // Danıştay
-            if (ctx.danistayKararlari.length > 0) {
-                casesContext += '\n\n=== DANIŞTAY KARARLARI ===\n';
-                ctx.danistayKararlari.forEach((d, i) => {
-                    casesContext += `${i+1}. ${d.daire} E.${d.esasNo} K.${d.kararNo} (${d.tarih})\n`;
-                });
-            }
-
-            $('aiContent').innerHTML = '<span class="loading">Yanıt hazırlanıyor</span>';
+            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Yanıt hazırlanıyor</p>';
 
             const r = await API.askAI(q + casesContext);
 
             if (r.success) {
-                $('aiContent').innerHTML = formatResponse(r.text);
+                const sections = parseResponse(r.text);
+                $('aiBody').innerHTML = renderResponse(sections);
 
                 // Sources
-                const totalSources = caseContents.length + ctx.mevzuatMaddeleri.length + ctx.danistayKararlari.length;
-                if (totalSources > 0) {
-                    let html = '';
-
+                if (caseContents.length > 0 || mevzuatData.length > 0) {
+                    let srcHtml = '';
                     caseContents.forEach((c, i) => {
-                        html += `
+                        srcHtml += `
                             <button class="source-btn" onclick="openPanel('yargitay', ${i})">
                                 <div class="source-type">Yargıtay</div>
                                 <div class="source-name">${c.daire}</div>
@@ -692,9 +778,8 @@
                             </button>
                         `;
                     });
-
-                    ctx.mevzuatMaddeleri.forEach((m, i) => {
-                        html += `
+                    mevzuatData.forEach((m, i) => {
+                        srcHtml += `
                             <button class="source-btn" onclick="openPanel('mevzuat', ${i})">
                                 <div class="source-type">Mevzuat</div>
                                 <div class="source-name">TCK m.${m.madde}</div>
@@ -702,70 +787,61 @@
                             </button>
                         `;
                     });
-
-                    // Store mevzuat for panel
-                    window.mevzuatData = ctx.mevzuatMaddeleri;
-
-                    $('sourcesList').innerHTML = html;
+                    $('sourcesList').innerHTML = srcHtml;
                     $('sources').style.display = 'block';
                 }
 
                 toast('Analiz tamamlandı');
             } else {
-                $('aiContent').innerHTML = `<p>Hata: ${r.error?.message || 'Bilinmeyen hata'}</p>`;
+                $('aiBody').innerHTML = `<p style="color: #DC2626; padding: 20px;">Hata: ${r.error?.message || 'Bilinmeyen hata'}</p>`;
             }
 
             $('sendBtn').disabled = false;
         }
 
-        // Open side panel
-        function openPanel(type, index) {
-            const panel = $('sidePanel');
-            const overlay = $('overlay');
+        function openFirstSource() {
+            if (caseContents.length > 0) openPanel('yargitay', 0);
+        }
 
+        function openPanel(type, index) {
             if (type === 'yargitay') {
                 const c = caseContents[index];
                 $('panelType').textContent = 'YARGITAY KARARI';
                 $('panelTitle').textContent = c.daire;
                 $('panelMeta').innerHTML = `
-                    <div class="meta-item"><label>Esas No</label><span>${c.esasNo}</span></div>
-                    <div class="meta-item"><label>Karar No</label><span>${c.kararNo}</span></div>
-                    <div class="meta-item"><label>Tarih</label><span>${c.tarih}</span></div>
-                    <div class="meta-item"><label>Kaynak</label><span>Yargıtay</span></div>
+                    <div><div class="meta-label">Esas No</div><div class="meta-value">${c.esasNo}</div></div>
+                    <div><div class="meta-label">Karar No</div><div class="meta-value">${c.kararNo}</div></div>
+                    <div><div class="meta-label">Tarih</div><div class="meta-value">${c.tarih}</div></div>
+                    <div><div class="meta-label">Kaynak</div><div class="meta-value">Yargıtay</div></div>
                 `;
                 $('panelContent').textContent = c.content;
-            } else if (type === 'mevzuat') {
-                const m = window.mevzuatData[index];
+            } else {
+                const m = mevzuatData[index];
                 $('panelType').textContent = 'KANUN MADDESİ';
                 $('panelTitle').textContent = `TCK Madde ${m.madde}`;
                 $('panelMeta').innerHTML = `
-                    <div class="meta-item"><label>Kanun</label><span>Türk Ceza Kanunu</span></div>
-                    <div class="meta-item"><label>Kanun No</label><span>5237</span></div>
-                    <div class="meta-item"><label>Madde</label><span>${m.madde}</span></div>
-                    <div class="meta-item"><label>Kaynak</label><span>mevzuat.gov.tr</span></div>
+                    <div><div class="meta-label">Kanun</div><div class="meta-value">Türk Ceza Kanunu</div></div>
+                    <div><div class="meta-label">Kanun No</div><div class="meta-value">5237</div></div>
+                    <div><div class="meta-label">Madde</div><div class="meta-value">${m.madde}</div></div>
+                    <div><div class="meta-label">Kaynak</div><div class="meta-value">mevzuat.gov.tr</div></div>
                 `;
                 $('panelContent').textContent = m.content || 'İçerik yüklenemedi';
             }
-
-            panel.classList.add('open');
-            overlay.classList.add('visible');
+            $('panel').classList.add('open');
+            $('overlay').classList.add('visible');
         }
 
-        // Close panel
         function closePanel() {
-            $('sidePanel').classList.remove('open');
+            $('panel').classList.remove('open');
             $('overlay').classList.remove('visible');
         }
 
-        // Copy content
-        function copyContent() {
+        function copyPanel() {
             navigator.clipboard.writeText($('panelContent').textContent);
             toast('Kopyalandı');
         }
 
-        // Event listeners
         $('sendBtn').onclick = send;
-        $('panelClose').onclick = closePanel;
         $('overlay').onclick = closePanel;
 
         $('input').addEventListener('keydown', e => {
