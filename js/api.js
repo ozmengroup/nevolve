@@ -641,30 +641,39 @@ const API = {
         let context = '';
 
         if (parsedKararlar && parsedKararlar.length > 0) {
-            context += '\n=== EMSAL KARARLAR ===\n';
+            context += '\n\n=== EMSAL KARARLAR (Bu kaynaklardan MUTLAKA alıntı yap) ===\n';
             parsedKararlar.forEach((k, i) => {
-                context += `\n[${i + 1}] ${k.daire || 'Yargıtay'} E.${k.esasNo} K.${k.kararNo}`;
-                if (k.tarih) context += ` (${k.tarih})`;
+                context += `\n[${i + 1}] ${k.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay'} ${k.daire || ''}\n`;
+                context += `    Esas: ${k.esasNo}, Karar: ${k.kararNo}`;
+                if (k.tarih) context += `, Tarih: ${k.tarih}`;
                 context += '\n';
 
-                if (k.sucTuru) context += `Konu: ${k.sucTuru}\n`;
-                if (k.sonuc) context += `Sonuç: ${k.sonuc}\n`;
-                if (k.ceza) context += `Ceza: ${k.ceza}\n`;
+                if (k.sucTuru) context += `    Konu: ${k.sucTuru}\n`;
+                if (k.sonuc) context += `    Mahkeme Kararı: ${k.sonuc}\n`;
+                if (k.ceza) context += `    Verilen Ceza: ${k.ceza}\n`;
                 if (k.maddeler && k.maddeler.length > 0) {
-                    context += `Maddeler: ${k.maddeler.map(m => `${m.kanun} ${m.madde}`).join(', ')}\n`;
+                    context += `    Uygulanan Maddeler: ${k.maddeler.map(m => `${m.kanun} m.${m.madde}`).join(', ')}\n`;
                 }
                 if (k.kritikBolum) {
-                    context += `Karar: ${k.kritikBolum.substring(0, 400)}\n`;
+                    context += `    Gerekçe: ${k.kritikBolum.substring(0, 500)}\n`;
+                }
+                if (k.kararOzeti && k.kararOzeti.length > 100) {
+                    context += `    Özet: ${k.kararOzeti.substring(0, 400)}\n`;
                 }
             });
         }
 
         if (mevzuatlar && mevzuatlar.length > 0) {
-            context += '\n=== İLGİLİ MEVZUAT ===\n';
+            context += '\n=== İLGİLİ KANUN MADDELERİ ===\n';
             mevzuatlar.forEach(m => {
                 const kanunAdi = m.kanunAdi || 'Kanun';
-                context += `${kanunAdi} m.${m.madde}: ${(m.content || '').substring(0, 300)}\n`;
+                context += `\n${kanunAdi} Madde ${m.madde}:\n`;
+                context += `${(m.content || '').substring(0, 400)}\n`;
             });
+        }
+
+        if (!parsedKararlar?.length && !mevzuatlar?.length) {
+            context += '\n\n[Emsal karar bulunamadı - Genel Yargıtay içtihadı bilgisiyle yanıtla]\n';
         }
 
         return context;
