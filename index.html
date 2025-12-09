@@ -41,12 +41,19 @@
             font-size: 32px;
             font-weight: 600;
             letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         
         .logo span {
             font-weight: 400;
             color: var(--text-secondary);
+        }
+        
+        .logo-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 8px;
         }
         
         .tagline {
@@ -156,9 +163,6 @@
         /* Response */
         .response {
             margin-top: 24px;
-            padding: 24px;
-            background: var(--bg);
-            border-radius: 12px;
             display: none;
         }
         
@@ -172,13 +176,23 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        .response-section {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
         .response-label {
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .response-content {
@@ -186,6 +200,56 @@
             line-height: 1.7;
             color: var(--text);
             white-space: pre-wrap;
+        }
+        
+        /* Related Cases in Response */
+        .related-cases {
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .related-cases.visible {
+            display: block;
+        }
+        
+        .case-card {
+            padding: 14px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .case-card:hover {
+            border-color: var(--accent);
+        }
+        
+        .case-card.selected {
+            border-color: var(--accent);
+            background: #F0F7FF;
+        }
+        
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .case-court {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .case-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .case-info {
+            font-size: 13px;
+            color: var(--text-secondary);
         }
         
         /* Search Section */
@@ -350,14 +414,14 @@
             color: var(--text-secondary);
         }
         
-        .footer-name {
-            font-weight: 500;
+        .footer a {
             color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
         }
         
-        .footer-note {
-            margin-top: 6px;
-            font-size: 12px;
+        .footer a:hover {
+            text-decoration: underline;
         }
         
         /* Loading */
@@ -377,18 +441,19 @@
     <div class="container">
         <header class="header">
             <h1 class="logo">nevolve<span>.ai</span></h1>
+            <p class="logo-sub">is that possible?</p>
             <p class="tagline">Hukuki strateji asistanı</p>
         </header>
         
         <div class="card">
-            <div class="card-title">Soru Sor</div>
+            <div class="card-title">Strateji Sor</div>
             <textarea 
                 class="input-field" 
                 id="aiInput" 
-                placeholder="Davanızı anlatın, strateji önerileri alın..."
+                placeholder="Davanızı anlatın — AI strateji önerisi + ilgili Yargıtay kararları getirecek..."
             ></textarea>
             <div class="input-footer">
-                <button class="submit-btn" id="aiSubmit">Gönder</button>
+                <button class="submit-btn" id="aiSubmit">Analiz Et</button>
             </div>
             
             <div class="tags">
@@ -400,12 +465,19 @@
             </div>
             
             <div class="response" id="response">
-                <div class="response-label">Yanıt</div>
-                <div class="response-content" id="responseContent"></div>
+                <div class="response-section">
+                    <div class="response-label">✨ AI Strateji</div>
+                    <div class="response-content" id="responseContent"></div>
+                </div>
+                
+                <div class="related-cases" id="relatedCases">
+                    <div class="response-label">📋 İlgili Yargıtay Kararları</div>
+                    <div id="casesList"></div>
+                </div>
             </div>
             
             <div class="search-section">
-                <div class="card-title">Yargıtay Karar Ara</div>
+                <div class="card-title">Karar Ara</div>
                 <div class="search-box">
                     <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
                     <button class="search-btn" id="searchBtn">Ara</button>
@@ -423,8 +495,7 @@
         </div>
         
         <footer class="footer">
-            <span class="footer-name">Burhan Şimşek</span>
-            <div class="footer-note">evet, battım — umarım sen batmazsın</div>
+            umarım batmamana destek olur — <a href="#">Burhan Şimşek</a>
         </footer>
     </div>
     
@@ -433,21 +504,62 @@
     <script>
         const $ = id => document.getElementById(id);
         
-        // AI
+        // AI with integrated search
         $('aiSubmit').onclick = async () => {
             const q = $('aiInput').value.trim();
             if (!q) return;
             
             $('aiSubmit').disabled = true;
-            $('aiSubmit').textContent = 'Bekle...';
+            $('aiSubmit').textContent = 'Analiz ediliyor...';
             $('response').classList.add('visible');
-            $('responseContent').innerHTML = '<span class="loading">Düşünüyor</span>';
+            $('responseContent').innerHTML = '<span class="loading">İlgili kararlar aranıyor ve analiz ediliyor</span>';
+            $('relatedCases').classList.remove('visible');
             
-            const r = await API.askAI(q);
+            // 1. Önce ilgili kararları ara
+            const keywords = q.split(' ').filter(w => w.length > 3).slice(0, 3).join(' ');
+            const searchResult = await API.searchCases(keywords);
+            
+            let casesContext = '';
+            let casesHtml = '';
+            
+            if (searchResult.success && searchResult.decisions.length > 0) {
+                const topCases = searchResult.decisions.slice(0, 5);
+                
+                // Kararları göster
+                casesHtml = topCases.map(d => `
+                    <div class="case-card" data-id="${d.id}">
+                        <div class="case-header">
+                            <span class="case-court">${d.daire}</span>
+                            <span class="case-date">${d.tarih}</span>
+                        </div>
+                        <div class="case-info">${d.esasNo} / ${d.kararNo}</div>
+                    </div>
+                `).join('');
+                
+                // AI context için kararları hazırla
+                casesContext = '\n\nİlgili Yargıtay Kararları:\n' + topCases.map(d => 
+                    `- ${d.daire} ${d.esasNo} (${d.tarih})`
+                ).join('\n');
+            }
+            
+            // 2. AI'dan strateji al
+            const r = await API.askAI(q + casesContext);
+            
             $('responseContent').textContent = r.success ? r.text : 'Hata: ' + r.error;
             
+            // 3. Kararları göster
+            if (casesHtml) {
+                $('casesList').innerHTML = casesHtml;
+                $('relatedCases').classList.add('visible');
+                
+                // Kart tıklamaları
+                $('casesList').querySelectorAll('.case-card').forEach(card => {
+                    card.onclick = () => loadDoc(card.dataset.id, 'casesList');
+                });
+            }
+            
             $('aiSubmit').disabled = false;
-            $('aiSubmit').textContent = 'Gönder';
+            $('aiSubmit').textContent = 'Analiz Et';
         };
         
         // Tags
@@ -480,7 +592,7 @@
                 $('resultsList').classList.add('visible');
                 
                 $('resultsList').querySelectorAll('.result-item').forEach(item => {
-                    item.onclick = () => loadDoc(item.dataset.id);
+                    item.onclick = () => loadDoc(item.dataset.id, 'resultsList');
                 });
             } else {
                 $('resultsInfo').textContent = 'Sonuç yok';
@@ -491,9 +603,10 @@
         $('searchInput').onkeydown = e => e.key === 'Enter' && search();
         
         // Document
-        async function loadDoc(id) {
-            $('resultsList').querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
-            document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+        async function loadDoc(id, listId) {
+            const list = $(listId);
+            list.querySelectorAll('[data-id]').forEach(i => i.classList.remove('selected'));
+            list.querySelector(`[data-id="${id}"]`).classList.add('selected');
             $('docContent').textContent = 'Yükleniyor...';
             $('docView').classList.add('visible');
             const r = await API.getDocument(id);
@@ -503,6 +616,7 @@
         $('closeDoc').onclick = () => {
             $('docView').classList.remove('visible');
             $('resultsList').querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
+            $('casesList').querySelectorAll('.case-card').forEach(i => i.classList.remove('selected'));
         };
     </script>
 </body>
