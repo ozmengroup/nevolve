@@ -15,8 +15,8 @@
             --border: #D2D2D7;
             --accent: #06C;
             --accent-light: #E8F4FD;
-            --mint: #E3F6F0;
-            --mint-dark: #34C759;
+            --warning: #FF9500;
+            --warning-light: #FFF4E5;
         }
         
         body {
@@ -30,33 +30,32 @@
         .container {
             max-width: 720px;
             margin: 0 auto;
-            padding: 48px 24px;
+            padding: 40px 24px;
         }
         
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
         
         .logo {
             font-size: 28px;
             font-weight: 600;
             letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
         
         .logo span { color: var(--text-secondary); font-weight: 400; }
         
-        .badge {
+        .warning-badge {
             display: inline-block;
-            padding: 4px 12px;
-            background: var(--mint);
-            color: var(--mint-dark);
+            padding: 6px 14px;
+            background: var(--warning-light);
+            color: var(--warning);
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
-            margin-top: 8px;
         }
         
         /* Card */
@@ -68,23 +67,23 @@
         }
         
         .section-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         
         /* Input */
         .input-field {
             width: 100%;
-            min-height: 100px;
-            padding: 16px;
+            min-height: 90px;
+            padding: 14px 16px;
             border: 1px solid var(--border);
             border-radius: 14px;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 1.5;
             resize: none;
             background: var(--bg);
@@ -99,22 +98,22 @@
             background: white;
         }
         
-        .input-field::placeholder { color: var(--text-secondary); }
+        .input-field::placeholder { color: #A1A1A6; }
         
         .input-footer {
             display: flex;
             justify-content: flex-end;
-            margin-top: 14px;
+            margin-top: 12px;
         }
         
         .btn {
-            padding: 12px 28px;
+            padding: 10px 24px;
             background: var(--accent);
             color: white;
             border: none;
             border-radius: 980px;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -122,26 +121,23 @@
         
         .btn:hover { filter: brightness(1.1); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .btn-dark {
-            background: var(--text);
-        }
+        .btn-dark { background: var(--text); }
         
         /* Tags */
         .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: 14px;
         }
         
         .tag {
-            padding: 8px 16px;
+            padding: 7px 14px;
             background: var(--bg);
             border: none;
             border-radius: 980px;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s;
@@ -151,7 +147,7 @@
         
         /* Response */
         .response {
-            margin-top: 24px;
+            margin-top: 20px;
             display: none;
         }
         
@@ -166,49 +162,64 @@
             padding: 20px;
             background: var(--bg);
             border-radius: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         
         .response-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .response-content {
-            font-size: 15px;
-            line-height: 1.75;
+            font-size: 14px;
+            line-height: 1.8;
             color: var(--text);
-            white-space: pre-wrap;
         }
         
         .response-content h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            color: var(--text);
-            margin: 20px 0 10px 0;
+            color: var(--accent);
+            margin: 18px 0 10px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
         }
         
-        .response-content h3:first-child {
-            margin-top: 0;
+        .response-content h3:first-child { margin-top: 0; }
+        
+        .response-content ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .response-content li {
+            margin-bottom: 6px;
+        }
+        
+        .response-content strong {
+            color: var(--text);
         }
         
         /* Cases */
         .cases-section {
-            margin-top: 16px;
+            margin-top: 14px;
             display: none;
         }
         
         .cases-section.visible { display: block; }
         
         .case-card {
-            padding: 14px 16px;
+            padding: 12px 14px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.2s;
@@ -220,18 +231,18 @@
         .case-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         
-        .case-court { font-size: 14px; font-weight: 600; }
-        .case-date { font-size: 12px; color: var(--text-secondary); }
-        .case-info { font-size: 13px; color: var(--text-secondary); }
+        .case-court { font-size: 13px; font-weight: 600; }
+        .case-date { font-size: 11px; color: var(--text-secondary); }
+        .case-info { font-size: 12px; color: var(--text-secondary); }
         
         /* Divider */
         .divider {
             height: 1px;
             background: var(--border);
-            margin: 24px 0;
+            margin: 20px 0;
         }
         
         /* Search */
@@ -242,11 +253,11 @@
         
         .search-input {
             flex: 1;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 12px;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 14px;
             background: var(--bg);
             color: var(--text);
             transition: all 0.2s;
@@ -260,22 +271,22 @@
         }
         
         .results-info {
-            margin-top: 14px;
-            font-size: 13px;
+            margin-top: 12px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
         
         .results-list {
-            margin-top: 14px;
+            margin-top: 12px;
             display: none;
         }
         
         .results-list.visible { display: block; }
         
         .result-item {
-            padding: 14px 16px;
+            padding: 12px 14px;
             background: var(--bg);
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.2s;
@@ -287,19 +298,19 @@
         .result-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         
-        .result-court { font-size: 14px; font-weight: 600; }
-        .result-date { font-size: 12px; color: var(--text-secondary); }
-        .result-info { font-size: 13px; color: var(--text-secondary); }
+        .result-court { font-size: 13px; font-weight: 600; }
+        .result-date { font-size: 11px; color: var(--text-secondary); }
+        .result-info { font-size: 12px; color: var(--text-secondary); }
         
         /* Document */
         .doc-view {
-            margin-top: 14px;
+            margin-top: 12px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
             display: none;
         }
@@ -310,31 +321,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: var(--text);
             color: white;
         }
         
-        .doc-title { font-size: 13px; font-weight: 500; }
+        .doc-title { font-size: 12px; font-weight: 500; }
         
         .doc-close {
-            padding: 6px 14px;
+            padding: 5px 12px;
             background: rgba(255,255,255,0.15);
             border: none;
             border-radius: 6px;
             color: white;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
         }
         
         .doc-close:hover { background: rgba(255,255,255,0.25); }
         
         .doc-content {
-            padding: 18px;
-            font-size: 13px;
-            line-height: 1.8;
-            max-height: 350px;
+            padding: 16px;
+            font-size: 12px;
+            line-height: 1.7;
+            max-height: 300px;
             overflow-y: auto;
             color: var(--text-secondary);
             white-space: pre-wrap;
@@ -342,9 +353,9 @@
         
         /* Footer */
         .footer {
-            margin-top: 40px;
+            margin-top: 32px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
         
@@ -371,7 +382,7 @@
     <div class="container">
         <header class="header">
             <h1 class="logo">nevolve<span>.ai</span></h1>
-            <div class="badge">Eymen Test</div>
+            <div class="warning-badge">⚠️ linki paylaşma, ay sonu fatura şoku yaşatma</div>
         </header>
         
         <div class="card">
@@ -399,7 +410,7 @@
                 </div>
                 
                 <div class="cases-section" id="casesSection">
-                    <div class="response-label">📋 İlgili Yargıtay Kararları</div>
+                    <div class="response-label">📋 İlgili Emsal Kararlar</div>
                     <div id="casesList"></div>
                 </div>
             </div>
@@ -423,7 +434,7 @@
         </div>
         
         <footer class="footer">
-            evet bu şirket battı, umarım sen batmazsın =) — <a href="#">Burhan Şimşek</a>
+            evet bu şirket battı, umarım sen batmazsın =) — <a href="#">Burhan</a>
         </footer>
     </div>
     
@@ -432,7 +443,7 @@
     <script>
         const $ = id => document.getElementById(id);
         
-        // AI with MCP integration
+        // AI with full case content
         $('aiSubmit').onclick = async () => {
             const q = $('aiInput').value.trim();
             if (!q) return;
@@ -440,10 +451,10 @@
             $('aiSubmit').disabled = true;
             $('aiSubmit').textContent = 'Analiz ediliyor...';
             $('response').classList.add('visible');
-            $('responseContent').innerHTML = '<span class="loading">Yargıtay kararları taranıyor ve analiz ediliyor</span>';
+            $('responseContent').innerHTML = '<span class="loading">Emsal kararlar taranıyor</span>';
             $('casesSection').classList.remove('visible');
             
-            // 1. İlgili kararları ara
+            // 1. Arama yap
             const keywords = q.split(' ').filter(w => w.length > 3).slice(0, 3).join(' ');
             const searchResult = await API.searchCases(keywords);
             
@@ -451,7 +462,21 @@
             let casesHtml = '';
             
             if (searchResult.success && searchResult.decisions.length > 0) {
-                const topCases = searchResult.decisions.slice(0, 5);
+                const topCases = searchResult.decisions.slice(0, 3);
+                
+                // İlk 2 kararın içeriğini al
+                $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
+                
+                const caseContents = [];
+                for (let i = 0; i < Math.min(2, topCases.length); i++) {
+                    const doc = await API.getDocument(topCases[i].id);
+                    if (doc.success) {
+                        caseContents.push({
+                            ...topCases[i],
+                            content: doc.content.substring(0, 2000)
+                        });
+                    }
+                }
                 
                 casesHtml = topCases.map(d => `
                     <div class="case-card" data-id="${d.id}">
@@ -463,20 +488,26 @@
                     </div>
                 `).join('');
                 
-                casesContext = '\n\n## Referans Yargıtay Kararları (bu kararlara atıf yap):\n' + topCases.map(d => 
-                    `- ${d.daire}, ${d.esasNo}, ${d.tarih}`
-                ).join('\n');
+                // AI'ya karar içeriklerini de gönder
+                if (caseContents.length > 0) {
+                    casesContext = '\n\n## Emsal Yargıtay Kararları (bu kararları analiz et ve atıf yap):\n\n';
+                    caseContents.forEach((c, i) => {
+                        casesContext += `### Karar ${i+1}: ${c.daire} - ${c.esasNo} (${c.tarih})\n${c.content}\n\n`;
+                    });
+                }
             }
             
             // 2. AI analizi
+            $('responseContent').innerHTML = '<span class="loading">AI analiz ediyor</span>';
             const r = await API.askAI(q + casesContext);
             
             if (r.success) {
-                // Markdown'u basit HTML'e çevir
                 let html = r.text
                     .replace(/### (.*)/g, '<h3>$1</h3>')
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/^- (.*)/gm, '• $1');
+                    .replace(/^- (.*)/gm, '<li>$1</li>')
+                    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                    .replace(/<\/ul>\s*<ul>/g, '');
                 $('responseContent').innerHTML = html;
             } else {
                 $('responseContent').textContent = 'Hata: ' + r.error;
