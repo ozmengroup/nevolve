@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai - Hukuki Strateji Asistanı</title>
+    <title>nevolve.ai</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,18 +11,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #F8F9FA;
-            --sidebar-bg: #FFFFFF;
+            --bg: #FAFAFA;
             --card: #FFFFFF;
-            --text: #1A1A1A;
-            --text-secondary: #6B7280;
-            --text-muted: #9CA3AF;
-            --border: #E5E7EB;
-            --accent: #3B82F6;
-            --accent-light: #EFF6FF;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
+            --text: #111111;
+            --text-secondary: #555555;
+            --text-muted: #999999;
+            --border: #E5E5E5;
+            --border-dark: #D0D0D0;
         }
 
         body {
@@ -33,290 +28,154 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Layout */
-        .app-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
+        /* Main Layout */
+        .app {
+            max-width: 900px;
+            margin: 0 auto;
             min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            position: sticky;
-            top: 0;
         }
 
-        .sidebar-header {
-            padding: 20px;
+        /* Header */
+        .header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid var(--border);
+            background: var(--card);
         }
 
         .logo {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
-        .logo span { color: var(--accent); }
-
-        .sidebar-section {
-            padding: 16px 12px;
-        }
-
-        .sidebar-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 8px;
-            margin-bottom: 8px;
-        }
-
-        .template-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .template-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
+        .new-chat-btn {
+            padding: 8px 16px;
+            background: var(--text);
+            color: white;
             border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-        }
-
-        .template-item:hover {
-            background: var(--accent-light);
-        }
-
-        .template-item.active {
-            background: var(--accent-light);
-            color: var(--accent);
-        }
-
-        .template-icon {
-            width: 32px;
-            height: 32px;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .template-icon.ceza { background: #FEE2E2; }
-        .template-icon.icra { background: #FEF3C7; }
-        .template-icon.idari { background: #DBEAFE; }
-        .template-icon.aile { background: #FCE7F3; }
-
-        .template-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .template-name {
+            font-family: inherit;
             font-size: 13px;
             font-weight: 500;
-            color: var(--text);
-            margin-bottom: 2px;
+            cursor: pointer;
+            transition: opacity 0.15s;
         }
 
-        .template-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 16px;
-            border-top: 1px solid var(--border);
-            font-size: 11px;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .sidebar-footer a {
-            color: var(--text-secondary);
-            text-decoration: none;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .main-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            background: var(--card);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .main-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: #ECFDF5;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--success);
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-        }
+        .new-chat-btn:hover { opacity: 0.8; }
 
         /* Chat Area */
         .chat-area {
             flex: 1;
-            overflow-y: auto;
             padding: 24px;
+            overflow-y: auto;
         }
 
-        .welcome-card {
-            max-width: 600px;
-            margin: 0 auto;
+        /* Welcome Screen */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
             text-align: center;
-            padding: 48px 24px;
         }
 
         .welcome-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 56px;
+            margin-bottom: 20px;
         }
 
         .welcome-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .welcome-desc {
+            font-size: 15px;
             color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        .quick-btns {
+            display: flex;
             gap: 12px;
-            max-width: 500px;
-            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .quick-action {
-            padding: 16px;
+        .quick-btn {
+            padding: 12px 20px;
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
             cursor: pointer;
             transition: all 0.15s;
-            text-align: left;
         }
 
-        .quick-action:hover {
-            border-color: var(--accent);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        .quick-btn:hover {
+            border-color: var(--text);
         }
 
-        .quick-action-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .quick-action-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Response */
-        .response-container {
-            max-width: 800px;
-            margin: 0 auto;
+        /* Messages */
+        .messages {
             display: none;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .response-container.visible {
-            display: block;
+        .messages.visible {
+            display: flex;
         }
 
-        .user-message {
-            background: var(--accent);
-            color: white;
+        /* User Message */
+        .user-msg {
+            align-self: flex-end;
+            max-width: 70%;
             padding: 14px 18px;
-            border-radius: 16px 16px 4px 16px;
-            margin-bottom: 16px;
+            background: var(--text);
+            color: white;
+            border-radius: 18px 18px 4px 18px;
             font-size: 14px;
-            max-width: 80%;
-            margin-left: auto;
+            line-height: 1.5;
         }
 
-        .ai-response {
+        /* AI Response */
+        .ai-msg {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 24px;
-            margin-bottom: 16px;
         }
 
-        .ai-response-header {
+        .ai-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 12px;
+            margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border);
         }
 
-        .ai-avatar {
+        .ai-icon {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, var(--accent), #8B5CF6);
+            background: var(--text);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 16px;
-        }
-
-        .ai-info {
-            flex: 1;
+            font-size: 18px;
         }
 
         .ai-name {
@@ -324,174 +183,116 @@
             font-weight: 600;
         }
 
-        .ai-source {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .response-content {
+        .ai-content {
             font-size: 14px;
             line-height: 1.8;
+        }
+
+        .ai-content h3,
+        .ai-content strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 12px 0;
             color: var(--text);
         }
 
-        .response-content h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--accent);
-            margin: 24px 0 12px 0;
-            padding: 8px 12px;
-            background: var(--accent-light);
-            border-radius: 8px;
-            display: inline-block;
-        }
+        .ai-content h3:first-child { margin-top: 0; }
 
-        .response-content h3:first-child { margin-top: 0; }
+        .ai-content p { margin-bottom: 12px; }
 
-        .response-content p {
-            margin-bottom: 12px;
-        }
-
-        .response-content ul, .response-content ol {
+        .ai-content ul, .ai-content ol {
             margin: 12px 0;
             padding-left: 20px;
         }
 
-        .response-content li {
+        .ai-content li {
             margin-bottom: 8px;
             line-height: 1.7;
         }
 
-        .response-content strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .response-content code {
-            padding: 2px 6px;
-            background: #F3F4F6;
-            border-radius: 4px;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 12px;
-        }
-
-        /* Sources Panel */
-        .sources-panel {
-            margin-top: 16px;
-            padding: 16px;
-            background: #F9FAFB;
-            border-radius: 12px;
+        /* Sources */
+        .sources {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
         }
 
         .sources-title {
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .source-cards {
+        .sources-list {
             display: flex;
+            gap: 10px;
             flex-wrap: wrap;
-            gap: 8px;
         }
 
-        .source-card {
-            padding: 12px 16px;
-            background: white;
+        .source-btn {
+            padding: 10px 14px;
+            background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.15s;
-            font-size: 12px;
-            min-width: 200px;
-            flex: 1;
-            max-width: 280px;
+            text-align: left;
         }
 
-        .source-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        .source-btn:hover {
+            border-color: var(--text);
         }
 
-        .source-card-type {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
+        .source-type {
             font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .source-card-type.yargitay { background: #FEE2E2; color: #DC2626; }
-        .source-card-type.mevzuat { background: #DBEAFE; color: #2563EB; }
-        .source-card-type.danistay { background: #FEF3C7; color: #D97706; }
-        .source-card-type.aym { background: #F3E8FF; color: #7C3AED; }
-
-        .source-card-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--text);
-        }
-
-        .source-card-info {
-            color: var(--text-secondary);
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-
-        .source-card-date {
             color: var(--text-muted);
-            font-size: 10px;
+            margin-bottom: 4px;
         }
 
-        .source-card-preview {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid var(--border);
+        .source-name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .source-info {
             font-size: 11px;
             color: var(--text-secondary);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
 
         /* Input Area */
         .input-area {
-            padding: 16px 24px;
+            padding: 16px 24px 24px;
             background: var(--card);
             border-top: 1px solid var(--border);
         }
 
-        .input-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .input-wrapper {
+        .input-box {
             display: flex;
             align-items: flex-end;
             gap: 12px;
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 14px;
             padding: 12px 16px;
-            transition: all 0.15s;
+            transition: border-color 0.15s;
         }
 
-        .input-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        .input-box:focus-within {
+            border-color: var(--text);
         }
 
-        #aiInput {
+        #input {
             flex: 1;
             border: none;
             background: none;
@@ -500,140 +301,160 @@
             line-height: 1.5;
             resize: none;
             min-height: 24px;
-            max-height: 150px;
+            max-height: 120px;
             color: var(--text);
         }
 
-        #aiInput:focus { outline: none; }
-        #aiInput::placeholder { color: var(--text-muted); }
+        #input:focus { outline: none; }
+        #input::placeholder { color: var(--text-muted); }
 
-        .submit-btn {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--text);
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: opacity 0.15s;
             flex-shrink: 0;
         }
 
-        .submit-btn:hover { background: #2563EB; }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .send-btn:hover { opacity: 0.8; }
+        .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .submit-btn svg {
-            width: 20px;
-            height: 20px;
-        }
+        .send-btn svg { width: 18px; height: 18px; }
 
-        /* Document Modal */
-        .doc-modal {
-            display: none;
+        /* Side Panel */
+        .side-panel {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            top: 0;
+            right: -420px;
+            width: 420px;
+            height: 100vh;
+            background: var(--card);
+            border-left: 1px solid var(--border);
             z-index: 1000;
-            padding: 40px 20px;
-            overflow-y: auto;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
-        .doc-modal.visible { display: block; }
+        .side-panel.open { right: 0; }
 
-        .doc-container {
-            max-width: 720px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            animation: slideUp 0.2s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .doc-header {
-            padding: 16px 20px;
-            background: var(--text);
-            color: white;
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .doc-header-info h3 {
-            font-size: 14px;
+        .panel-type {
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
             margin-bottom: 4px;
         }
 
-        .doc-header-info span { font-size: 12px; opacity: 0.8; }
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
 
-        .doc-close {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-family: inherit;
-            font-size: 13px;
+        .panel-close {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             cursor: pointer;
-        }
-
-        .doc-close:hover { background: rgba(255,255,255,0.3); }
-
-        .doc-body {
-            padding: 24px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .doc-content {
-            font-size: 13px;
-            line-height: 1.9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
             color: var(--text-secondary);
-            white-space: pre-wrap;
+            transition: all 0.15s;
         }
 
-        .doc-meta {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .panel-close:hover {
+            background: var(--border);
+        }
+
+        .panel-meta {
             padding: 16px 20px;
             background: var(--bg);
-            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 12px;
         }
 
-        .doc-meta-item { font-size: 12px; }
-        .doc-meta-item label { color: var(--text-muted); display: block; margin-bottom: 2px; }
-        .doc-meta-item span { color: var(--text); font-weight: 500; }
+        .meta-item label {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            padding: 14px 20px;
-            background: var(--text);
-            color: white;
-            border-radius: 12px;
+        .meta-item span {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
             font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
+            line-height: 1.8;
+            color: var(--text-secondary);
         }
 
-        .toast.visible { transform: translateY(0); opacity: 1; }
-        .toast.success { background: var(--success); }
-        .toast.error { background: var(--danger); }
+        .panel-actions {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .panel-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .panel-btn:hover { border-color: var(--text); }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
         /* Loading */
         .loading::after {
@@ -647,545 +468,319 @@
             60%, 100% { content: '...'; }
         }
 
-        /* Error */
-        .error-box {
-            padding: 24px;
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .error-icon { font-size: 32px; margin-bottom: 12px; }
-        .error-title { font-size: 15px; font-weight: 600; color: var(--danger); margin-bottom: 6px; }
-        .error-detail { font-size: 13px; color: #7F1D1D; margin-bottom: 16px; }
-
-        .error-retry {
-            padding: 10px 20px;
-            background: var(--danger);
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 20px;
+            background: var(--text);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: inherit;
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 500;
-            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1001;
         }
 
-        .error-retry:hover { background: #DC2626; }
-        .error-retry:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .countdown {
-            display: inline-block;
-            padding: 2px 8px;
-            background: #FEE2E2;
-            border-radius: 4px;
-            font-weight: 600;
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
         /* Mobile */
-        @media (max-width: 768px) {
-            .app-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                display: none;
-            }
-
-            .chat-area {
-                padding: 16px;
-            }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 600px) {
+            .header { padding: 16px; }
+            .chat-area { padding: 16px; }
+            .input-area { padding: 12px 16px 20px; }
+            .user-msg { max-width: 85%; }
+            .quick-btns { flex-direction: column; }
+            .quick-btn { width: 100%; }
+            .side-panel { width: 100%; right: -100%; }
         }
     </style>
 </head>
 <body>
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="logo">nevolve<span>.ai</span></h1>
-            </div>
+    <div class="app">
+        <header class="header">
+            <div class="logo">nevolve.ai</div>
+            <button class="new-chat-btn" onclick="newChat()">Yeni Sohbet</button>
+        </header>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Hukuk Alanları</div>
-                <div class="template-list">
-                    <button class="template-item" data-category="ceza">
-                        <div class="template-icon ceza">⚖️</div>
-                        <div class="template-info">
-                            <div class="template-name">Ceza Hukuku</div>
-                            <div class="template-desc">TCK, CMK, Yargıtay</div>
-                        </div>
-                    </button>
-                    <button class="template-item" data-category="icra">
-                        <div class="template-icon icra">📋</div>
-                        <div class="template-info">
-                            <div class="template-name">İcra Hukuku</div>
-                            <div class="template-desc">İİK, Takip, İtiraz</div>
-                        </div>
-                    </button>
-                    <button class="template-item" data-category="idari">
-                        <div class="template-icon idari">🏛️</div>
-                        <div class="template-info">
-                            <div class="template-name">İdare Hukuku</div>
-                            <div class="template-desc">Danıştay, İptal</div>
-                        </div>
-                    </button>
-                    <button class="template-item" data-category="aile">
-                        <div class="template-icon aile">👨‍👩‍👧</div>
-                        <div class="template-info">
-                            <div class="template-name">Aile Hukuku</div>
-                            <div class="template-desc">Boşanma, Nafaka</div>
-                        </div>
-                    </button>
+        <div class="chat-area" id="chatArea">
+            <!-- Welcome -->
+            <div class="welcome" id="welcome">
+                <div class="welcome-icon">⚖️</div>
+                <h1 class="welcome-title">Hukuki Danışman</h1>
+                <p class="welcome-desc">Davanı anlat, strateji oluşturalım.</p>
+                <div class="quick-btns">
+                    <button class="quick-btn" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">🔍 Ceza Davası</button>
+                    <button class="quick-btn" data-q="Borçlu icra takibine itiraz etti. Nasıl bir yol izlemeliyim?">📋 İcra Takibi</button>
+                    <button class="quick-btn" data-q="İdari işleme karşı iptal davası açmak istiyorum.">🏛️ İdari Dava</button>
                 </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Örnek Davalar</div>
-                <div class="template-list" id="exampleList">
-                    <button class="template-item example" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. 50.000 TL zarar iddiası var. Etkin pişmanlık ve uzlaşma mümkün mü?">
-                        <div class="template-info">
-                            <div class="template-name">Dolandırıcılık</div>
-                            <div class="template-desc">TCK 157, Etkin pişmanlık</div>
-                        </div>
-                    </button>
-                    <button class="template-item example" data-q="Borçlu icra takibine itiraz etti. İtirazın iptali davası açacağız. Süreler ve strateji nasıl olmalı?">
-                        <div class="template-info">
-                            <div class="template-name">İtirazın İptali</div>
-                            <div class="template-desc">İcra takibi, İİK</div>
-                        </div>
-                    </button>
-                    <button class="template-item example" data-q="Müvekkilim TCK 86/2 kasten yaralama suçundan yargılanıyor. HAGB ve ceza indirimi şartları nedir?">
-                        <div class="template-info">
-                            <div class="template-name">Kasten Yaralama</div>
-                            <div class="template-desc">TCK 86, HAGB</div>
-                        </div>
-                    </button>
-                    <button class="template-item example" data-q="Kambiyo senedine dayalı icra takibinde borçlu zamanaşımı itirazında bulundu. İtiraz geçerli mi?">
-                        <div class="template-info">
-                            <div class="template-name">Kambiyo Senedi</div>
-                            <div class="template-desc">Zamanaşımı itirazı</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="sidebar-footer">
-                nevolve.ai v1.6
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="main-header">
-                <h2 class="main-title">Hukuki Strateji Asistanı</h2>
-                <div class="status-badge">
-                    <span class="status-dot"></span>
-                    Aktif
-                </div>
-            </header>
-
-            <div class="chat-area" id="chatArea">
-                <!-- Welcome Screen -->
-                <div class="welcome-card" id="welcomeCard">
-                    <div class="welcome-icon">⚖️</div>
-                    <h2 class="welcome-title">Hoş geldin!</h2>
-                    <p class="welcome-desc">Davanı detaylı anlat, Yargıtay kararları ve mevzuat ile destekli hukuki analiz yapayım.</p>
-
-                    <div class="quick-actions">
-                        <div class="quick-action" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">
-                            <div class="quick-action-title">🔍 Ceza Davası Analizi</div>
-                            <div class="quick-action-desc">TCK kapsamında savunma stratejisi</div>
-                        </div>
-                        <div class="quick-action" data-q="Borçlu icra takibine itiraz etti. Nasıl bir yol izlemeliyim?">
-                            <div class="quick-action-title">📋 İcra Takibi</div>
-                            <div class="quick-action-desc">İtiraz ve takip süreçleri</div>
-                        </div>
-                        <div class="quick-action" data-q="İdari işleme karşı iptal davası açmak istiyorum. Şartlar nedir?">
-                            <div class="quick-action-title">🏛️ İdari Dava</div>
-                            <div class="quick-action-desc">İptal davası prosedürü</div>
-                        </div>
-                        <div class="quick-action" data-q="Boşanma davasında nafaka ve velayet konusunda strateji ne olmalı?">
-                            <div class="quick-action-title">👨‍👩‍👧 Aile Hukuku</div>
-                            <div class="quick-action-desc">Boşanma ve nafaka</div>
-                        </div>
+            <!-- Messages -->
+            <div class="messages" id="messages">
+                <div class="user-msg" id="userMsg"></div>
+                <div class="ai-msg">
+                    <div class="ai-header">
+                        <div class="ai-icon">⚖️</div>
+                        <div class="ai-name">nevolve.ai</div>
                     </div>
-                </div>
-
-                <!-- Response Container -->
-                <div class="response-container" id="responseContainer">
-                    <div class="user-message" id="userMessage"></div>
-
-                    <div class="ai-response">
-                        <div class="ai-response-header">
-                            <div class="ai-avatar">⚖️</div>
-                            <div class="ai-info">
-                                <div class="ai-name">nevolve.ai</div>
-                                <div class="ai-source" id="aiSource">Yargıtay, Mevzuat, Danıştay</div>
-                            </div>
-                        </div>
-                        <div class="response-content" id="responseContent"></div>
-
-                        <div class="sources-panel" id="sourcesPanel" style="display: none;">
-                            <div class="sources-title">📚 Kullanılan Kaynaklar</div>
-                            <div class="source-cards" id="sourceCards"></div>
-                        </div>
+                    <div class="ai-content" id="aiContent"></div>
+                    <div class="sources" id="sources" style="display:none;">
+                        <div class="sources-title">Kaynaklar</div>
+                        <div class="sources-list" id="sourcesList"></div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Input Area -->
-            <div class="input-area">
-                <div class="input-container">
-                    <div class="input-wrapper">
-                        <textarea id="aiInput" placeholder="Davanızı detaylı anlatın..." rows="1"></textarea>
-                        <button class="submit-btn" id="aiSubmit">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <div class="doc-modal" id="docModal">
-        <div class="doc-container">
-            <div class="doc-header">
-                <div class="doc-header-info">
-                    <h3 id="docTitle">Karar</h3>
-                    <span id="docSubtitle"></span>
-                </div>
-                <button class="doc-close" id="closeDoc">Kapat</button>
-            </div>
-            <div class="doc-meta" id="docMeta"></div>
-            <div class="doc-body">
-                <div class="doc-content" id="docContent"></div>
+        <div class="input-area">
+            <div class="input-box">
+                <textarea id="input" placeholder="Davanızı detaylı anlatın..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Side Panel -->
+    <div class="overlay" id="overlay"></div>
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div>
+                <div class="panel-type" id="panelType">YARGITAY</div>
+                <div class="panel-title" id="panelTitle">11. Ceza Dairesi</div>
+            </div>
+            <button class="panel-close" id="panelClose">×</button>
+        </div>
+        <div class="panel-meta" id="panelMeta"></div>
+        <div class="panel-content" id="panelContent"></div>
+        <div class="panel-actions">
+            <button class="panel-btn" onclick="copyContent()">Kopyala</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script>
         const $ = id => document.getElementById(id);
         let currentCases = [];
-        let lastQuery = '';
-
-        // Toast
-        function showToast(message, type = 'info') {
-            const toast = $('toast');
-            toast.textContent = message;
-            toast.className = 'toast ' + type + ' visible';
-            setTimeout(() => toast.classList.remove('visible'), 3000);
-        }
+        let caseContents = [];
 
         // Auto-resize textarea
-        $('aiInput').addEventListener('input', function() {
+        $('input').addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
-        // Error display
-        function showError(error, onRetry) {
-            const isRateLimit = error.type === 'rate_limit';
-            let countdownHtml = '';
-
-            if (isRateLimit && error.retryAfter > 0) {
-                countdownHtml = `<span class="countdown" id="countdown">${error.retryAfter}</span> saniye`;
-            }
-
-            const html = `
-                <div class="error-box">
-                    <div class="error-icon">${isRateLimit ? '⏳' : '⚠️'}</div>
-                    <div class="error-title">${error.message}</div>
-                    <div class="error-detail">${countdownHtml || error.detail}</div>
-                    <button class="error-retry" id="retryBtn" ${isRateLimit ? 'disabled' : ''}>
-                        ${isRateLimit ? 'Bekleniyor...' : 'Tekrar Dene'}
-                    </button>
-                </div>
-            `;
-
-            $('responseContent').innerHTML = html;
-
-            if (isRateLimit && error.retryAfter > 0) {
-                let remaining = error.retryAfter;
-                const interval = setInterval(() => {
-                    remaining--;
-                    const countdownEl = $('countdown');
-                    const retryBtn = $('retryBtn');
-                    if (countdownEl) countdownEl.textContent = remaining;
-                    if (remaining <= 0) {
-                        clearInterval(interval);
-                        if (retryBtn) {
-                            retryBtn.disabled = false;
-                            retryBtn.textContent = 'Tekrar Dene';
-                        }
-                    }
-                }, 1000);
-            }
-
-            const retryBtn = $('retryBtn');
-            if (retryBtn && onRetry) {
-                retryBtn.onclick = () => {
-                    API.resetRateLimit();
-                    onRetry();
-                };
-            }
+        // Toast
+        function toast(msg) {
+            $('toast').textContent = msg;
+            $('toast').classList.add('visible');
+            setTimeout(() => $('toast').classList.remove('visible'), 2500);
         }
 
+        // Format response
         function formatResponse(text) {
-            let html = text
+            return text
                 .replace(/^### (.+)$/gm, '<h3>$1</h3>')
                 .replace(/^## (.+)$/gm, '<h3>$1</h3>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/`([^`]+)`/g, '<code>$1</code>')
                 .replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
                 .replace(/^[\-\*]\s+(.+)$/gm, '<li>$1</li>')
                 .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>');
-
-            html = html.replace(/(<li>.*?<\/li>(<br>)?)+/g, match => {
-                return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
-            });
-
-            return '<p>' + html + '</p>';
+                .replace(/\n/g, '<br>')
+                .replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
         }
 
-        async function analyzeCase() {
-            const q = $('aiInput').value.trim();
+        // New chat
+        function newChat() {
+            $('welcome').style.display = 'flex';
+            $('messages').classList.remove('visible');
+            $('input').value = '';
+            currentCases = [];
+            caseContents = [];
+        }
+
+        // Send message
+        async function send() {
+            const q = $('input').value.trim();
             if (!q) return;
 
-            lastQuery = q;
-            $('aiSubmit').disabled = true;
-            $('welcomeCard').style.display = 'none';
-            $('responseContainer').classList.add('visible');
-            $('userMessage').textContent = q;
-            $('responseContent').innerHTML = '<span class="loading">Kaynaklar taranıyor</span>';
-            $('sourcesPanel').style.display = 'none';
+            $('sendBtn').disabled = true;
+            $('welcome').style.display = 'none';
+            $('messages').classList.add('visible');
+            $('userMsg').textContent = q;
+            $('aiContent').innerHTML = '<span class="loading">Analiz ediliyor</span>';
+            $('sources').style.display = 'none';
+            $('input').value = '';
+            $('input').style.height = 'auto';
 
-            // Build enriched context
-            const enrichedContext = await API.buildEnrichedContext(q);
+            // Get enriched context
+            const ctx = await API.buildEnrichedContext(q);
 
-            $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
+            $('aiContent').innerHTML = '<span class="loading">Kaynaklar okunuyor</span>';
 
             let casesContext = '';
-            let caseContents = [];
+            caseContents = [];
             currentCases = [];
 
-            // Yargıtay kararları
-            if (enrichedContext.yargitayKararlari.length > 0) {
-                currentCases = enrichedContext.yargitayKararlari;
+            // Yargıtay
+            if (ctx.yargitayKararlari.length > 0) {
+                currentCases = ctx.yargitayKararlari;
                 for (let i = 0; i < Math.min(3, currentCases.length); i++) {
                     const doc = await API.getDocument(currentCases[i].id);
                     if (doc.success) {
                         caseContents.push({
                             ...currentCases[i],
-                            content: doc.content.substring(0, 2000)
+                            content: doc.content
                         });
                     }
                 }
-
                 if (caseContents.length > 0) {
-                    casesContext += '\n\n=== YARGITAY EMSAL KARARLARI ===\n';
+                    casesContext += '\n\n=== YARGITAY KARARLARI ===\n';
                     caseContents.forEach((c, i) => {
-                        casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${c.content}\n\n`;
+                        casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${c.content.substring(0, 2000)}\n\n`;
                     });
                 }
             }
 
             // Mevzuat
-            if (enrichedContext.mevzuatMaddeleri.length > 0) {
-                casesContext += '\n\n=== İLGİLİ KANUN MADDELERİ ===\n';
-                enrichedContext.mevzuatMaddeleri.forEach(m => {
+            if (ctx.mevzuatMaddeleri.length > 0) {
+                casesContext += '\n\n=== KANUN MADDELERİ ===\n';
+                ctx.mevzuatMaddeleri.forEach(m => {
                     casesContext += `TCK Madde ${m.madde}: ${m.content}\n\n`;
                 });
             }
 
             // Danıştay
-            if (enrichedContext.danistayKararlari.length > 0) {
+            if (ctx.danistayKararlari.length > 0) {
                 casesContext += '\n\n=== DANIŞTAY KARARLARI ===\n';
-                enrichedContext.danistayKararlari.forEach((d, i) => {
+                ctx.danistayKararlari.forEach((d, i) => {
                     casesContext += `${i+1}. ${d.daire} E.${d.esasNo} K.${d.kararNo} (${d.tarih})\n`;
                 });
             }
 
-            // AYM
-            if (enrichedContext.aymKararlari.length > 0) {
-                casesContext += '\n\n=== ANAYASA MAHKEMESİ KARARLARI ===\n';
-                enrichedContext.aymKararlari.forEach((a, i) => {
-                    casesContext += `${i+1}. ${a.esas_karar_no} (${a.tarih}) - ${a.sonuc}\n`;
-                });
-            }
-
-            $('responseContent').innerHTML = '<span class="loading">AI analiz yapıyor</span>';
+            $('aiContent').innerHTML = '<span class="loading">Yanıt hazırlanıyor</span>';
 
             const r = await API.askAI(q + casesContext);
 
             if (r.success) {
-                $('responseContent').innerHTML = formatResponse(r.text);
+                $('aiContent').innerHTML = formatResponse(r.text);
 
-                // Show sources
-                const sourceCount = enrichedContext.yargitayKararlari.length +
-                                   enrichedContext.mevzuatMaddeleri.length +
-                                   enrichedContext.danistayKararlari.length +
-                                   enrichedContext.aymKararlari.length;
+                // Sources
+                const totalSources = caseContents.length + ctx.mevzuatMaddeleri.length + ctx.danistayKararlari.length;
+                if (totalSources > 0) {
+                    let html = '';
 
-                if (sourceCount > 0) {
-                    let sourcesHtml = '';
-
-                    // Yargıtay kararları
-                    enrichedContext.yargitayKararlari.forEach((d, i) => {
-                        const preview = caseContents[i]?.content?.substring(0, 150) || '';
-                        sourcesHtml += `
-                            <div class="source-card" data-id="${d.id}" data-index="${i}" data-type="yargitay">
-                                <div class="source-card-type yargitay">Yargıtay</div>
-                                <div class="source-card-title">${d.daire}</div>
-                                <div class="source-card-info">E. ${d.esasNo} K. ${d.kararNo}</div>
-                                <div class="source-card-date">${d.tarih}</div>
-                                ${preview ? `<div class="source-card-preview">${preview}...</div>` : ''}
-                            </div>
+                    caseContents.forEach((c, i) => {
+                        html += `
+                            <button class="source-btn" onclick="openPanel('yargitay', ${i})">
+                                <div class="source-type">Yargıtay</div>
+                                <div class="source-name">${c.daire}</div>
+                                <div class="source-info">E.${c.esasNo} K.${c.kararNo}</div>
+                            </button>
                         `;
                     });
 
-                    // Mevzuat maddeleri
-                    enrichedContext.mevzuatMaddeleri.forEach((m, i) => {
-                        const preview = m.content?.substring(0, 150) || '';
-                        sourcesHtml += `
-                            <div class="source-card" data-type="mevzuat" data-content="${encodeURIComponent(m.content || '')}">
-                                <div class="source-card-type mevzuat">Mevzuat</div>
-                                <div class="source-card-title">TCK Madde ${m.madde}</div>
-                                <div class="source-card-info">5237 Sayılı Türk Ceza Kanunu</div>
-                                ${preview ? `<div class="source-card-preview">${preview}...</div>` : ''}
-                            </div>
+                    ctx.mevzuatMaddeleri.forEach((m, i) => {
+                        html += `
+                            <button class="source-btn" onclick="openPanel('mevzuat', ${i})">
+                                <div class="source-type">Mevzuat</div>
+                                <div class="source-name">TCK m.${m.madde}</div>
+                                <div class="source-info">Kanun Maddesi</div>
+                            </button>
                         `;
                     });
 
-                    // Danıştay kararları
-                    enrichedContext.danistayKararlari.forEach((d, i) => {
-                        sourcesHtml += `
-                            <div class="source-card" data-type="danistay">
-                                <div class="source-card-type danistay">Danıştay</div>
-                                <div class="source-card-title">${d.daire || 'Danıştay'}</div>
-                                <div class="source-card-info">E. ${d.esasNo} K. ${d.kararNo}</div>
-                                <div class="source-card-date">${d.tarih}</div>
-                            </div>
-                        `;
-                    });
+                    // Store mevzuat for panel
+                    window.mevzuatData = ctx.mevzuatMaddeleri;
 
-                    // AYM kararları
-                    enrichedContext.aymKararlari.forEach((a, i) => {
-                        sourcesHtml += `
-                            <div class="source-card" data-type="aym">
-                                <div class="source-card-type aym">AYM</div>
-                                <div class="source-card-title">${a.esas_karar_no || 'Anayasa Mahkemesi'}</div>
-                                <div class="source-card-info">${a.sonuc || ''}</div>
-                                <div class="source-card-date">${a.tarih}</div>
-                            </div>
-                        `;
-                    });
-
-                    $('sourceCards').innerHTML = sourcesHtml;
-                    $('sourcesPanel').style.display = 'block';
-
-                    // Click handlers for Yargıtay source cards
-                    document.querySelectorAll('.source-card[data-id]').forEach(card => {
-                        card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
-                    });
-
-                    // Click handlers for Mevzuat cards
-                    document.querySelectorAll('.source-card[data-type="mevzuat"]').forEach(card => {
-                        card.onclick = () => {
-                            const content = decodeURIComponent(card.dataset.content || '');
-                            const title = card.querySelector('.source-card-title').textContent;
-                            showMevzuatModal(title, content);
-                        };
-                    });
+                    $('sourcesList').innerHTML = html;
+                    $('sources').style.display = 'block';
                 }
 
-                $('aiSource').textContent = `${sourceCount} kaynak kullanıldı`;
-                showToast(`Analiz tamamlandı`, 'success');
+                toast('Analiz tamamlandı');
             } else {
-                showError(r.error, analyzeCase);
+                $('aiContent').innerHTML = `<p>Hata: ${r.error?.message || 'Bilinmeyen hata'}</p>`;
             }
 
-            $('aiSubmit').disabled = false;
-            $('aiInput').value = '';
-            $('aiInput').style.height = 'auto';
+            $('sendBtn').disabled = false;
+        }
+
+        // Open side panel
+        function openPanel(type, index) {
+            const panel = $('sidePanel');
+            const overlay = $('overlay');
+
+            if (type === 'yargitay') {
+                const c = caseContents[index];
+                $('panelType').textContent = 'YARGITAY KARARI';
+                $('panelTitle').textContent = c.daire;
+                $('panelMeta').innerHTML = `
+                    <div class="meta-item"><label>Esas No</label><span>${c.esasNo}</span></div>
+                    <div class="meta-item"><label>Karar No</label><span>${c.kararNo}</span></div>
+                    <div class="meta-item"><label>Tarih</label><span>${c.tarih}</span></div>
+                    <div class="meta-item"><label>Kaynak</label><span>Yargıtay</span></div>
+                `;
+                $('panelContent').textContent = c.content;
+            } else if (type === 'mevzuat') {
+                const m = window.mevzuatData[index];
+                $('panelType').textContent = 'KANUN MADDESİ';
+                $('panelTitle').textContent = `TCK Madde ${m.madde}`;
+                $('panelMeta').innerHTML = `
+                    <div class="meta-item"><label>Kanun</label><span>Türk Ceza Kanunu</span></div>
+                    <div class="meta-item"><label>Kanun No</label><span>5237</span></div>
+                    <div class="meta-item"><label>Madde</label><span>${m.madde}</span></div>
+                    <div class="meta-item"><label>Kaynak</label><span>mevzuat.gov.tr</span></div>
+                `;
+                $('panelContent').textContent = m.content || 'İçerik yüklenemedi';
+            }
+
+            panel.classList.add('open');
+            overlay.classList.add('visible');
+        }
+
+        // Close panel
+        function closePanel() {
+            $('sidePanel').classList.remove('open');
+            $('overlay').classList.remove('visible');
+        }
+
+        // Copy content
+        function copyContent() {
+            navigator.clipboard.writeText($('panelContent').textContent);
+            toast('Kopyalandı');
         }
 
         // Event listeners
-        $('aiSubmit').onclick = analyzeCase;
+        $('sendBtn').onclick = send;
+        $('panelClose').onclick = closePanel;
+        $('overlay').onclick = closePanel;
 
-        $('aiInput').addEventListener('keydown', e => {
+        $('input').addEventListener('keydown', e => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                analyzeCase();
+                send();
             }
         });
 
-        // Quick actions
-        document.querySelectorAll('.quick-action').forEach(el => {
-            el.onclick = () => {
-                $('aiInput').value = el.dataset.q;
-                analyzeCase();
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.onclick = () => {
+                $('input').value = btn.dataset.q;
+                send();
             };
         });
-
-        // Example templates
-        document.querySelectorAll('.template-item.example').forEach(el => {
-            el.onclick = () => {
-                $('aiInput').value = el.dataset.q;
-                $('aiInput').focus();
-            };
-        });
-
-        // Document modal
-        async function openDocModal(id, index) {
-            const c = currentCases[index];
-            $('docTitle').textContent = c?.daire || 'Karar';
-            $('docSubtitle').textContent = `E. ${c?.esasNo || ''} K. ${c?.kararNo || ''}`;
-            $('docMeta').innerHTML = `
-                <div class="doc-meta-item"><label>Mahkeme</label><span>${c?.daire || '-'}</span></div>
-                <div class="doc-meta-item"><label>Tarih</label><span>${c?.tarih || '-'}</span></div>
-                <div class="doc-meta-item"><label>Esas No</label><span>${c?.esasNo || '-'}</span></div>
-                <div class="doc-meta-item"><label>Karar No</label><span>${c?.kararNo || '-'}</span></div>
-            `;
-            $('docContent').textContent = 'Yükleniyor...';
-            $('docModal').classList.add('visible');
-
-            const r = await API.getDocument(id);
-            if (r.success) {
-                $('docContent').textContent = r.content;
-            } else {
-                $('docContent').textContent = 'Yüklenemedi: ' + (r.error?.message || 'Bilinmeyen hata');
-            }
-        }
-
-        $('closeDoc').onclick = () => $('docModal').classList.remove('visible');
-        $('docModal').onclick = e => { if (e.target === $('docModal')) $('docModal').classList.remove('visible'); };
-
-        // Mevzuat modal
-        function showMevzuatModal(title, content) {
-            $('docTitle').textContent = title;
-            $('docSubtitle').textContent = '5237 Sayılı Türk Ceza Kanunu';
-            $('docMeta').innerHTML = `
-                <div class="doc-meta-item"><label>Kanun</label><span>Türk Ceza Kanunu</span></div>
-                <div class="doc-meta-item"><label>Kanun No</label><span>5237</span></div>
-                <div class="doc-meta-item"><label>Kaynak</label><span>mevzuat.gov.tr</span></div>
-                <div class="doc-meta-item"><label>Tür</label><span>Kanun Maddesi</span></div>
-            `;
-            $('docContent').textContent = content || 'İçerik yüklenemedi';
-            $('docModal').classList.add('visible');
-        }
     </script>
 </body>
 </html>
