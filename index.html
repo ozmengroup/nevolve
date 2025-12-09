@@ -864,11 +864,12 @@
                 return content.substring(0, maxLen);
             }
 
+            // === YARGITAY KARARLARI ===
             if (ctx.yargitayKararlari.length > 0) {
                 for (let i = 0; i < Math.min(3, ctx.yargitayKararlari.length); i++) {
                     const doc = await API.getDocument(ctx.yargitayKararlari[i].id);
                     if (doc.success) {
-                        caseContents.push({ ...ctx.yargitayKararlari[i], content: doc.content });
+                        caseContents.push({ ...ctx.yargitayKararlari[i], content: doc.content, kaynak: 'yargitay' });
                     }
                 }
                 if (caseContents.length > 0) {
@@ -880,11 +881,36 @@
                 }
             }
 
+            // === DANIŞTAY KARARLARI === (İdari davalar için)
+            if (ctx.danistayKararlari.length > 0) {
+                for (let i = 0; i < Math.min(3, ctx.danistayKararlari.length); i++) {
+                    const doc = await API.getDanistayDocument(ctx.danistayKararlari[i].id);
+                    if (doc.success) {
+                        caseContents.push({
+                            ...ctx.danistayKararlari[i],
+                            content: doc.content,
+                            kaynak: 'danistay',
+                            daire: ctx.danistayKararlari[i].daire || 'Danıştay'
+                        });
+                    }
+                }
+                const danistayKararlari = caseContents.filter(c => c.kaynak === 'danistay');
+                if (danistayKararlari.length > 0) {
+                    casesContext += '\n\n=== DANIŞTAY KARARLARI ===\n';
+                    danistayKararlari.forEach((c, i) => {
+                        const truncated = smartTruncate(c.content);
+                        casesContext += `\n[${i+1}] ${c.daire || 'Danıştay'} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${truncated}\n`;
+                    });
+                }
+            }
+
+            // === MEVZUAT MADDELERİ === (Dava tipine göre otomatik)
             if (ctx.mevzuatMaddeleri.length > 0) {
                 mevzuatData = ctx.mevzuatMaddeleri;
-                casesContext += '\n\n=== MEVZUAT ===\n';
+                casesContext += '\n\n=== İLGİLİ KANUN MADDELERİ ===\n';
                 ctx.mevzuatMaddeleri.forEach(m => {
-                    casesContext += `TCK ${m.madde}: ${m.content}\n\n`;
+                    const kanunAdi = m.kanunAdi || 'Kanun';
+                    casesContext += `${kanunAdi} m.${m.madde}: ${m.content}\n\n`;
                 });
             }
 
@@ -903,23 +929,25 @@
                 const sections = parseResponse(r.text);
                 $('aiBody').innerHTML = renderResponse(sections);
 
-                // Sources
+                // Sources - Kaynakları göster
                 if (caseContents.length > 0 || mevzuatData.length > 0) {
                     let srcHtml = '';
                     caseContents.forEach((c, i) => {
+                        const kaynakTipi = c.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay';
                         srcHtml += `
-                            <button class="source-btn" onclick="openPanel('yargitay', ${i})">
-                                <div class="source-type">Yargıtay</div>
-                                <div class="source-name">${c.daire}</div>
+                            <button class="source-btn" onclick="openPanel('karar', ${i})">
+                                <div class="source-type">${kaynakTipi}</div>
+                                <div class="source-name">${c.daire || kaynakTipi}</div>
                                 <div class="source-info">E.${c.esasNo} K.${c.kararNo}</div>
                             </button>
                         `;
                     });
                     mevzuatData.forEach((m, i) => {
+                        const kanunAdi = m.kanunAdi || 'Kanun';
                         srcHtml += `
                             <button class="source-btn" onclick="openPanel('mevzuat', ${i})">
                                 <div class="source-type">Mevzuat</div>
-                                <div class="source-name">TCK m.${m.madde}</div>
+                                <div class="source-name">${kanunAdi} m.${m.madde}</div>
                                 <div class="source-info">Kanun Maddesi</div>
                             </button>
                         `;
@@ -938,28 +966,34 @@
         }
 
         function openFirstSource() {
-            if (caseContents.length > 0) openPanel('yargitay', 0);
+            if (caseContents.length > 0) openPanel('karar', 0);
         }
 
         function openPanel(type, index) {
-            if (type === 'yargitay') {
+            if (type === 'karar') {
+                // Yargıtay veya Danıştay kararı
                 const c = caseContents[index];
-                $('panelType').textContent = 'YARGITAY KARARI';
-                $('panelTitle').textContent = c.daire;
+                const kaynakAdi = c.kaynak === 'danistay' ? 'DANIŞTAY KARARI' : 'YARGITAY KARARI';
+                const kaynakKurum = c.kaynak === 'danistay' ? 'Danıştay' : 'Yargıtay';
+                $('panelType').textContent = kaynakAdi;
+                $('panelTitle').textContent = c.daire || kaynakKurum;
                 $('panelMeta').innerHTML = `
                     <div><div class="meta-label">Esas No</div><div class="meta-value">${c.esasNo}</div></div>
                     <div><div class="meta-label">Karar No</div><div class="meta-value">${c.kararNo}</div></div>
                     <div><div class="meta-label">Tarih</div><div class="meta-value">${c.tarih}</div></div>
-                    <div><div class="meta-label">Kaynak</div><div class="meta-value">Yargıtay</div></div>
+                    <div><div class="meta-label">Kaynak</div><div class="meta-value">${kaynakKurum}</div></div>
                 `;
                 $('panelContent').textContent = c.content;
-            } else {
+            } else if (type === 'mevzuat') {
+                // Kanun maddesi
                 const m = mevzuatData[index];
+                const kanunAdi = m.kanunAdi || 'Kanun';
+                const kanunNo = m.kanunKodu || m.kanun_no || '';
                 $('panelType').textContent = 'KANUN MADDESİ';
-                $('panelTitle').textContent = `TCK Madde ${m.madde}`;
+                $('panelTitle').textContent = `${kanunAdi} Madde ${m.madde}`;
                 $('panelMeta').innerHTML = `
-                    <div><div class="meta-label">Kanun</div><div class="meta-value">Türk Ceza Kanunu</div></div>
-                    <div><div class="meta-label">Kanun No</div><div class="meta-value">5237</div></div>
+                    <div><div class="meta-label">Kanun</div><div class="meta-value">${kanunAdi}</div></div>
+                    <div><div class="meta-label">Kanun No</div><div class="meta-value">${kanunNo}</div></div>
                     <div><div class="meta-label">Madde</div><div class="meta-value">${m.madde}</div></div>
                     <div><div class="meta-label">Kaynak</div><div class="meta-value">mevzuat.gov.tr</div></div>
                 `;

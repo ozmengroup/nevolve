@@ -353,36 +353,78 @@ const API = {
         }).filter(Boolean);
     },
 
+    // Kanun kodu mapping - her dava tipi için ilgili kanunlar ve kritik maddeler
+    KANUN_MAP: {
+        ceza: {
+            kaynaklar: ['yargitay'],
+            kanunlar: [
+                { kod: 5237, ad: 'TCK', maddeler: [157, 158, 141, 142, 86, 87, 106, 109] },
+                { kod: 5271, ad: 'CMK', maddeler: [253, 254, 231] }
+            ]
+        },
+        icra: {
+            kaynaklar: ['yargitay'],
+            kanunlar: [
+                { kod: 2004, ad: 'İİK', maddeler: [62, 68, 72, 89, 94, 97] }
+            ]
+        },
+        aile: {
+            kaynaklar: ['yargitay'],
+            kanunlar: [
+                { kod: 4721, ad: 'TMK', maddeler: [161, 166, 169, 175, 182, 185, 186, 336] }
+            ]
+        },
+        is: {
+            kaynaklar: ['yargitay'],
+            kanunlar: [
+                { kod: 4857, ad: 'İş Kanunu', maddeler: [17, 18, 20, 21, 25, 41] },
+                { kod: 7036, ad: 'İş Mahkemeleri K.', maddeler: [3] }
+            ]
+        },
+        idari: {
+            kaynaklar: ['danistay'],  // İdari davalarda Danıştay öncelikli!
+            kanunlar: [
+                { kod: 2577, ad: 'İYUK', maddeler: [7, 10, 11, 12, 13, 20] }
+            ]
+        },
+        miras: {
+            kaynaklar: ['yargitay'],
+            kanunlar: [
+                { kod: 4721, ad: 'TMK', maddeler: [495, 505, 506, 560, 564, 565, 605, 606] }
+            ]
+        }
+    },
+
     // Dava tipi algılama
     detectCaseType(question) {
         const q = question.toLowerCase();
 
         // Ceza Hukuku
         if (q.match(/tck|ceza|suç|hapis|tutuklama|savcı|kovuşturma|soruşturma|müşteki|sanık|mağdur|şikayet|uzlaşma|hagb|dolandırıcılık|hırsızlık|yaralama|tehdit|kasten|taksir|darp/)) {
-            return { type: 'ceza', label: 'Ceza Hukuku', searchPrefix: 'ceza' };
+            return { type: 'ceza', label: 'Ceza Hukuku' };
         }
         // İcra Hukuku
         if (q.match(/icra|haciz|itiraz|ödeme emri|takip|borçlu|alacaklı|kambiyo|senet|çek|iflas|konkordato|rehin|ipotek|kıymet takdiri/)) {
-            return { type: 'icra', label: 'İcra Hukuku', searchPrefix: 'icra' };
+            return { type: 'icra', label: 'İcra Hukuku' };
         }
         // Aile Hukuku
         if (q.match(/boşanma|nafaka|velayet|mal paylaşım|edinilmiş mal|ziynet|çocuk|evlilik|nişan|aile|eş|karı|koca|müşterek/)) {
-            return { type: 'aile', label: 'Aile Hukuku', searchPrefix: 'aile' };
+            return { type: 'aile', label: 'Aile Hukuku' };
         }
         // İş Hukuku
         if (q.match(/işçi|işveren|kıdem|ihbar|fesih|işe iade|fazla mesai|yıllık izin|iş kazası|sgk|sigorta|mobbing|arabulucu|işkur/)) {
-            return { type: 'is', label: 'İş Hukuku', searchPrefix: 'iş' };
+            return { type: 'is', label: 'İş Hukuku' };
         }
         // İdari Hukuku
         if (q.match(/idari|iptal|tam yargı|belediye|imar|ruhsat|kamulaştırma|memur|disiplin|ihale|vergi|danıştay/)) {
-            return { type: 'idari', label: 'İdari Hukuk', searchPrefix: 'idari' };
+            return { type: 'idari', label: 'İdari Hukuk' };
         }
         // Miras Hukuku
         if (q.match(/miras|tereke|veraset|vasiyet|saklı pay|tenkis|reddi miras|mirasçı|muris|intikal/)) {
-            return { type: 'miras', label: 'Miras Hukuku', searchPrefix: 'miras' };
+            return { type: 'miras', label: 'Miras Hukuku' };
         }
 
-        return { type: 'genel', label: 'Genel', searchPrefix: '' };
+        return { type: 'genel', label: 'Genel' };
     },
 
     // Genişletilmiş keyword çıkarma
@@ -412,7 +454,25 @@ const API = {
         return [...new Set(keywords.map(k => k.toLowerCase()))].slice(0, 3);
     },
 
-    // Zenginleştirilmiş context oluştur
+    // Belirli kanun maddesini çek (kanun kodu ile)
+    async getKanunMaddesi(kanunKodu, maddeNo) {
+        const cacheKey = `kanun_${kanunKodu}_${maddeNo}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) return { ...cached, fromCache: true };
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/mevzuat/madde?kanun=${kanunKodu}&madde=${maddeNo}`);
+            const data = await response.json();
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Zenginleştirilmiş context oluştur - DAVA TİPİNE GÖRE AKILLI KAYNAK SEÇİMİ
     async buildEnrichedContext(question) {
         const context = {
             yargitayKararlari: [],
@@ -424,9 +484,7 @@ const API = {
 
         // Dava tipini algıla
         context.caseType = this.detectCaseType(question);
-
-        // TCK maddelerini çıkar
-        const tckMaddeleri = this.extractTCKMadde(question);
+        const caseConfig = this.KANUN_MAP[context.caseType.type];
 
         // Genişletilmiş keyword çıkarma
         const keywords = this.extractKeywords(question);
@@ -437,33 +495,69 @@ const API = {
         // Paralel API çağrıları
         const promises = [];
 
-        // 1. Yargıtay kararları (mevcut)
-        promises.push(
-            this.searchCases(searchQuery).then(r => {
-                if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
-            }).catch(() => {})
-        );
+        // === DAVA TİPİNE GÖRE KAYNAK SEÇİMİ ===
 
-        // 2. İdari dava ise Danıştay kararları
-        if (question.match(/idari|vergi|imar|belediye|kamu|memur/i)) {
+        if (caseConfig) {
+            // 1. Dava tipine göre mahkeme kararları
+            if (caseConfig.kaynaklar.includes('danistay')) {
+                // İdari dava - Danıştay öncelikli
+                promises.push(
+                    this.searchDanistay(searchQuery).then(r => {
+                        if (r.success) context.danistayKararlari = r.decisions.slice(0, 3);
+                    }).catch(() => {})
+                );
+            }
+
+            if (caseConfig.kaynaklar.includes('yargitay')) {
+                // Diğer davalar - Yargıtay
+                promises.push(
+                    this.searchCases(searchQuery).then(r => {
+                        if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
+                    }).catch(() => {})
+                );
+            }
+
+            // 2. Dava tipine göre ilgili kanun maddeleri - OTOMATİK ÇEK
+            for (const kanun of caseConfig.kanunlar) {
+                // Her kanundan en kritik 2-3 maddeyi çek
+                const kritikMaddeler = kanun.maddeler.slice(0, 3);
+                for (const maddeNo of kritikMaddeler) {
+                    promises.push(
+                        this.getKanunMaddesi(kanun.kod, maddeNo).then(r => {
+                            if (r.success) {
+                                context.mevzuatMaddeleri.push({
+                                    ...r,
+                                    kanunAdi: kanun.ad,
+                                    kanunKodu: kanun.kod
+                                });
+                            }
+                        }).catch(() => {})
+                    );
+                }
+            }
+        } else {
+            // Genel dava - hem Yargıtay'a bak
             promises.push(
-                this.searchDanistay(searchQuery).then(r => {
-                    if (r.success) context.danistayKararlari = r.decisions.slice(0, 2);
+                this.searchCases(searchQuery).then(r => {
+                    if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
                 }).catch(() => {})
             );
         }
 
-        // 3. TCK maddeleri varsa mevzuat çek
+        // 3. Soruda açıkça belirtilen kanun maddeleri
+        const tckMaddeleri = this.extractTCKMadde(question);
         for (const madde of tckMaddeleri.slice(0, 2)) {
             promises.push(
-                this.getMevzuatMadde('TCK', madde).then(r => {
-                    if (r.success) context.mevzuatMaddeleri.push(r);
+                this.getKanunMaddesi(5237, madde).then(r => {
+                    if (r.success && !context.mevzuatMaddeleri.find(m => m.madde === madde)) {
+                        context.mevzuatMaddeleri.push({ ...r, kanunAdi: 'TCK', kanunKodu: 5237 });
+                    }
                 }).catch(() => {})
             );
         }
 
         // 4. Anayasal konu varsa AYM kararları
-        if (question.match(/anayasa|temel hak|iptal|ihlal|özgürlük/i)) {
+        if (question.match(/anayasa|temel hak|ihlal|özgürlük|bireysel başvuru/i)) {
             promises.push(
                 this.searchAYM(searchQuery).then(r => {
                     if (r.success) context.aymKararlari = r.decisions.slice(0, 2);
