@@ -1217,13 +1217,17 @@
             if (r.success) {
                 let responseHtml;
 
+                console.log('[DEBUG] AI text uzunluğu:', r.text?.length, 'İlk 200 karakter:', r.text?.substring(0, 200));
+
                 if (isFollowUp) {
                     // Takip sorusu - düz metin göster, format yok
                     responseHtml = `<div class="plain-response">${renderMarkdown(r.text)}</div>`;
                 } else {
                     // İlk soru - tam format
                     const sections = parseResponse(r.text);
+                    console.log('[DEBUG] Parsed sections:', Object.keys(sections), sections);
                     responseHtml = renderResponse(sections);
+                    console.log('[DEBUG] Response HTML uzunluğu:', responseHtml?.length);
 
                     // Kaynakları sadece varsa ve alakalıysa göster
                     if (caseContents.length > 0 || mevzuatData.length > 0) {
