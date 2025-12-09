@@ -55,8 +55,12 @@ FORMAT:
 • [Risk 1 ve nasıl önlenir]
 • [Risk 2 ve nasıl önlenir]
 
-TAKİP SORULARI:
-Takip sorusunda sadece sorulan konuya odaklan, formatı tekrarlama. Kısa ve net yanıt ver.`,
+TAKİP SORULARI (ÖNEMLİ):
+Eğer kullanıcı kısa/basit bir takip sorusu sorarsa (örn: "anlamadım", "peki bu ne demek", "nasıl yani", "etkin pişmanlık nedir"):
+- FORMATLI YANIIT VERME (ÖZET, STRATEJİ vs. KULLANMA)
+- Sadece düz metin ile kısa, net açıklama yap
+- Önceki bağlamı hatırla
+- 2-3 paragrafı geçme`,
     
     AI_CONFIG: {
         temperature: 0.15,  // Biraz daha yaratıcı ama tutarlı

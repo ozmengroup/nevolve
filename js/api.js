@@ -197,7 +197,7 @@ const API = {
         }
     },
 
-    async searchCases(keyword) {
+    async searchCases(keyword, timeout = 10000) {
         // Önbellekten kontrol
         const cacheKey = `search_${keyword}`;
         const cached = this._getCache(cacheKey);
@@ -206,15 +206,25 @@ const API = {
         }
 
         try {
-            const response = await fetch(`${CONFIG.YARGI_API}/search?keyword=${encodeURIComponent(keyword)}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            const response = await fetch(`${CONFIG.YARGI_API}/search?keyword=${encodeURIComponent(keyword)}`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
             const data = await response.json();
 
-            if (data.success) {
+            if (data.success && data.decisions?.length > 0) {
                 this._setCache(cacheKey, data);
             }
             return data;
         } catch (e) {
-            return { success: false, error: this._formatError(e.message) };
+            if (e.name === 'AbortError') {
+                return { success: false, decisions: [], error: 'Yargıtay API timeout' };
+            }
+            return { success: false, decisions: [], error: this._formatError(e.message) };
         }
     },
 
@@ -265,7 +275,7 @@ const API = {
     // ==================== YENİ API'LER ====================
 
     // Danıştay kararları arama
-    async searchDanistay(keyword) {
+    async searchDanistay(keyword, timeout = 10000) {
         const cacheKey = `danistay_${keyword}`;
         const cached = this._getCache(cacheKey);
         if (cached) {
@@ -273,15 +283,30 @@ const API = {
         }
 
         try {
-            const response = await fetch(`${CONFIG.YARGI_API}/danistay?keyword=${encodeURIComponent(keyword)}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            const response = await fetch(`${CONFIG.YARGI_API}/danistay?keyword=${encodeURIComponent(keyword)}`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
             const data = await response.json();
 
-            if (data.success) {
+            // Daire bilgisi eksikse "Danıştay" olarak ata
+            if (data.success && data.decisions) {
+                data.decisions = data.decisions.map(d => ({
+                    ...d,
+                    daire: d.daire || 'Danıştay'
+                }));
                 this._setCache(cacheKey, data);
             }
             return data;
         } catch (e) {
-            return { success: false, error: this._formatError(e.message) };
+            if (e.name === 'AbortError') {
+                return { success: false, decisions: [], error: 'Danıştay API timeout' };
+            }
+            return { success: false, decisions: [], error: this._formatError(e.message) };
         }
     },
 
