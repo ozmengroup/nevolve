@@ -8,17 +8,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg: #FAFAFA;
+            --bg: #F5F5F7;
             --card: #FFFFFF;
             --text: #1D1D1F;
-            --text-secondary: #86868B;
-            --border: #E5E5E7;
-            --accent: #0071E3;
-            --accent-hover: #0077ED;
+            --text-secondary: #6E6E73;
+            --border: #D2D2D7;
+            --accent: #06C;
+            --accent-light: #E8F4FD;
+            --mint: #E3F6F0;
+            --mint-dark: #34C759;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -26,93 +28,87 @@
         }
         
         .container {
-            max-width: 680px;
+            max-width: 720px;
             margin: 0 auto;
-            padding: 60px 24px;
+            padding: 48px 24px;
         }
         
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 48px;
+            margin-bottom: 40px;
         }
         
         .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 600;
             letter-spacing: -0.5px;
             margin-bottom: 4px;
         }
         
-        .logo span {
-            font-weight: 400;
-            color: var(--text-secondary);
-        }
+        .logo span { color: var(--text-secondary); font-weight: 400; }
         
-        .logo-sub {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 8px;
-        }
-        
-        .tagline {
-            font-size: 17px;
-            color: var(--text-secondary);
-            font-weight: 400;
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--mint);
+            color: var(--mint-dark);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
         }
         
         /* Card */
         .card {
             background: var(--card);
-            border-radius: 18px;
-            padding: 32px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
         }
         
-        .card-title {
-            font-size: 13px;
+        .section-label {
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         /* Input */
         .input-field {
             width: 100%;
-            min-height: 120px;
+            min-height: 100px;
             padding: 16px;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             font-family: inherit;
-            font-size: 17px;
+            font-size: 16px;
             line-height: 1.5;
             resize: none;
             background: var(--bg);
             color: var(--text);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
         
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+            box-shadow: 0 0 0 4px var(--accent-light);
+            background: white;
         }
         
-        .input-field::placeholder {
-            color: var(--text-secondary);
-        }
+        .input-field::placeholder { color: var(--text-secondary); }
         
         .input-footer {
             display: flex;
             justify-content: flex-end;
-            margin-top: 16px;
+            margin-top: 14px;
         }
         
-        .submit-btn {
-            padding: 12px 24px;
+        .btn {
+            padding: 12px 28px;
             background: var(--accent);
             color: white;
             border: none;
@@ -121,16 +117,14 @@
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
-        .submit-btn:hover {
-            background: var(--accent-hover);
-        }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-dark {
+            background: var(--text);
         }
         
         /* Tags */
@@ -138,9 +132,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+            margin-top: 16px;
         }
         
         .tag {
@@ -149,16 +141,13 @@
             border: none;
             border-radius: 980px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .tag:hover {
-            background: #E8E8ED;
-            color: var(--text);
-        }
+        .tag:hover { background: var(--accent-light); color: var(--accent); }
         
         /* Response */
         .response {
@@ -166,70 +155,67 @@
             display: none;
         }
         
-        .response.visible {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
+        .response.visible { display: block; animation: fadeIn 0.3s ease; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .response-section {
+        .response-box {
             padding: 20px;
             background: var(--bg);
-            border-radius: 12px;
+            border-radius: 14px;
             margin-bottom: 16px;
         }
         
         .response-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         
         .response-content {
-            font-size: 16px;
-            line-height: 1.7;
+            font-size: 15px;
+            line-height: 1.75;
             color: var(--text);
             white-space: pre-wrap;
         }
         
-        /* Related Cases in Response */
-        .related-cases {
+        .response-content h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 10px 0;
+        }
+        
+        .response-content h3:first-child {
+            margin-top: 0;
+        }
+        
+        /* Cases */
+        .cases-section {
             margin-top: 16px;
             display: none;
         }
         
-        .related-cases.visible {
-            display: block;
-        }
+        .cases-section.visible { display: block; }
         
         .case-card {
             padding: 14px 16px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .case-card:hover {
-            border-color: var(--accent);
-        }
-        
-        .case-card.selected {
-            border-color: var(--accent);
-            background: #F0F7FF;
-        }
+        .case-card:hover { border-color: var(--accent); }
+        .case-card.selected { border-color: var(--accent); background: var(--accent-light); }
         
         .case-header {
             display: flex;
@@ -237,100 +223,66 @@
             margin-bottom: 4px;
         }
         
-        .case-court {
-            font-size: 14px;
-            font-weight: 600;
+        .case-court { font-size: 14px; font-weight: 600; }
+        .case-date { font-size: 12px; color: var(--text-secondary); }
+        .case-info { font-size: 13px; color: var(--text-secondary); }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
         }
         
-        .case-date {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        .case-info {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        /* Search Section */
-        .search-section {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-        
+        /* Search */
         .search-box {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
         
         .search-input {
             flex: 1;
             padding: 14px 18px;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 15px;
             background: var(--bg);
             color: var(--text);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
         
         .search-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+            box-shadow: 0 0 0 4px var(--accent-light);
+            background: white;
         }
         
-        .search-btn {
-            padding: 14px 24px;
-            background: var(--text);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        
-        .search-btn:hover {
-            opacity: 0.85;
-        }
-        
-        /* Results */
         .results-info {
-            margin-top: 16px;
-            font-size: 14px;
+            margin-top: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
         }
         
         .results-list {
-            margin-top: 16px;
+            margin-top: 14px;
             display: none;
         }
         
-        .results-list.visible {
-            display: block;
-        }
+        .results-list.visible { display: block; }
         
         .result-item {
-            padding: 16px;
+            padding: 14px 16px;
             background: var(--bg);
             border-radius: 12px;
             margin-bottom: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
-        .result-item:hover {
-            background: #EBEBED;
-        }
-        
-        .result-item.selected {
-            background: #E3F2FD;
-        }
+        .result-item:hover { background: #EBEBED; }
+        .result-item.selected { background: var(--accent-light); }
         
         .result-header {
             display: flex;
@@ -338,69 +290,51 @@
             margin-bottom: 4px;
         }
         
-        .result-court {
-            font-size: 15px;
-            font-weight: 600;
-        }
-        
-        .result-date {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .result-info {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
+        .result-court { font-size: 14px; font-weight: 600; }
+        .result-date { font-size: 12px; color: var(--text-secondary); }
+        .result-info { font-size: 13px; color: var(--text-secondary); }
         
         /* Document */
         .doc-view {
-            margin-top: 16px;
-            background: var(--bg);
-            border-radius: 12px;
+            margin-top: 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
             overflow: hidden;
             display: none;
         }
         
-        .doc-view.visible {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
+        .doc-view.visible { display: block; animation: fadeIn 0.3s ease; }
         
         .doc-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 18px;
+            padding: 12px 16px;
             background: var(--text);
             color: white;
         }
         
-        .doc-title {
-            font-size: 14px;
-            font-weight: 500;
-        }
+        .doc-title { font-size: 13px; font-weight: 500; }
         
         .doc-close {
             padding: 6px 14px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border: none;
             border-radius: 6px;
             color: white;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
         }
         
-        .doc-close:hover {
-            background: rgba(255,255,255,0.3);
-        }
+        .doc-close:hover { background: rgba(255,255,255,0.25); }
         
         .doc-content {
-            padding: 20px;
-            font-size: 14px;
+            padding: 18px;
+            font-size: 13px;
             line-height: 1.8;
-            max-height: 400px;
+            max-height: 350px;
             overflow-y: auto;
             color: var(--text-secondary);
             white-space: pre-wrap;
@@ -408,7 +342,7 @@
         
         /* Footer */
         .footer {
-            margin-top: 48px;
+            margin-top: 40px;
             text-align: center;
             font-size: 13px;
             color: var(--text-secondary);
@@ -418,10 +352,6 @@
             color: var(--text);
             text-decoration: none;
             font-weight: 500;
-        }
-        
-        .footer a:hover {
-            text-decoration: underline;
         }
         
         /* Loading */
@@ -441,61 +371,59 @@
     <div class="container">
         <header class="header">
             <h1 class="logo">nevolve<span>.ai</span></h1>
-            <p class="logo-sub">is that possible?</p>
-            <p class="tagline">Hukuki strateji asistanı</p>
+            <div class="badge">Eymen Test</div>
         </header>
         
         <div class="card">
-            <div class="card-title">Strateji Sor</div>
+            <div class="section-label">Hukuki Strateji</div>
             <textarea 
                 class="input-field" 
                 id="aiInput" 
-                placeholder="Davanızı anlatın — AI strateji önerisi + ilgili Yargıtay kararları getirecek..."
+                placeholder="Davanızı anlatın..."
             ></textarea>
             <div class="input-footer">
-                <button class="submit-btn" id="aiSubmit">Analiz Et</button>
+                <button class="btn" id="aiSubmit">Analiz Et</button>
             </div>
             
             <div class="tags">
-                <button class="tag" data-q="Boşanma davasında nafaka stratejisi">Nafaka</button>
-                <button class="tag" data-q="TCK 86 yaralama ceza indirimi">Yaralama</button>
-                <button class="tag" data-q="İş kazası tazminat davası">İş Kazası</button>
-                <button class="tag" data-q="Etkin pişmanlık uygulaması">Etkin Pişmanlık</button>
-                <button class="tag" data-q="Kira tahliye davası">Tahliye</button>
+                <button class="tag" data-q="Boşanma davasında nafaka stratejisi nasıl olmalı? Müvekkilim 10 yıllık evli, 2 çocuk var.">Nafaka</button>
+                <button class="tag" data-q="TCK 86 yaralama suçunda ceza indirimi nasıl alınır? Mağdurla uzlaşma sağlandı.">Yaralama</button>
+                <button class="tag" data-q="İş kazası tazminat davasında işverenin sorumluluğu nedir?">İş Kazası</button>
+                <button class="tag" data-q="Etkin pişmanlık uygulaması şartları ve ceza indirimi oranı nedir?">Etkin Pişmanlık</button>
             </div>
             
             <div class="response" id="response">
-                <div class="response-section">
-                    <div class="response-label">✨ AI Strateji</div>
+                <div class="response-box">
+                    <div class="response-label">✨ AI Strateji Analizi</div>
                     <div class="response-content" id="responseContent"></div>
                 </div>
                 
-                <div class="related-cases" id="relatedCases">
+                <div class="cases-section" id="casesSection">
                     <div class="response-label">📋 İlgili Yargıtay Kararları</div>
                     <div id="casesList"></div>
                 </div>
             </div>
             
-            <div class="search-section">
-                <div class="card-title">Karar Ara</div>
-                <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
-                    <button class="search-btn" id="searchBtn">Ara</button>
+            <div class="divider"></div>
+            
+            <div class="section-label">Karar Ara</div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
+                <button class="btn btn-dark" id="searchBtn">Ara</button>
+            </div>
+            <div class="results-info" id="resultsInfo"></div>
+            <div class="results-list" id="resultsList"></div>
+            <div class="doc-view" id="docView">
+                <div class="doc-header">
+                    <span class="doc-title">Karar Metni</span>
+                    <button class="doc-close" id="closeDoc">Kapat</button>
                 </div>
-                <div class="results-info" id="resultsInfo"></div>
-                <div class="results-list" id="resultsList"></div>
-                <div class="doc-view" id="docView">
-                    <div class="doc-header">
-                        <span class="doc-title">Karar Metni</span>
-                        <button class="doc-close" id="closeDoc">Kapat</button>
-                    </div>
-                    <div class="doc-content" id="docContent"></div>
-                </div>
+                <div class="doc-content" id="docContent"></div>
             </div>
         </div>
         
         <footer class="footer">
-            umarım batmamana destek olur — <a href="#">Burhan Şimşek</a>
+            evet bu şirket battı, umarım sen batmazsın =) — <a href="#">Burhan Şimşek</a>
         </footer>
     </div>
     
@@ -504,7 +432,7 @@
     <script>
         const $ = id => document.getElementById(id);
         
-        // AI with integrated search
+        // AI with MCP integration
         $('aiSubmit').onclick = async () => {
             const q = $('aiInput').value.trim();
             if (!q) return;
@@ -512,10 +440,10 @@
             $('aiSubmit').disabled = true;
             $('aiSubmit').textContent = 'Analiz ediliyor...';
             $('response').classList.add('visible');
-            $('responseContent').innerHTML = '<span class="loading">İlgili kararlar aranıyor ve analiz ediliyor</span>';
-            $('relatedCases').classList.remove('visible');
+            $('responseContent').innerHTML = '<span class="loading">Yargıtay kararları taranıyor ve analiz ediliyor</span>';
+            $('casesSection').classList.remove('visible');
             
-            // 1. Önce ilgili kararları ara
+            // 1. İlgili kararları ara
             const keywords = q.split(' ').filter(w => w.length > 3).slice(0, 3).join(' ');
             const searchResult = await API.searchCases(keywords);
             
@@ -525,7 +453,6 @@
             if (searchResult.success && searchResult.decisions.length > 0) {
                 const topCases = searchResult.decisions.slice(0, 5);
                 
-                // Kararları göster
                 casesHtml = topCases.map(d => `
                     <div class="case-card" data-id="${d.id}">
                         <div class="case-header">
@@ -536,23 +463,30 @@
                     </div>
                 `).join('');
                 
-                // AI context için kararları hazırla
-                casesContext = '\n\nİlgili Yargıtay Kararları:\n' + topCases.map(d => 
-                    `- ${d.daire} ${d.esasNo} (${d.tarih})`
+                casesContext = '\n\n## Referans Yargıtay Kararları (bu kararlara atıf yap):\n' + topCases.map(d => 
+                    `- ${d.daire}, ${d.esasNo}, ${d.tarih}`
                 ).join('\n');
             }
             
-            // 2. AI'dan strateji al
+            // 2. AI analizi
             const r = await API.askAI(q + casesContext);
             
-            $('responseContent').textContent = r.success ? r.text : 'Hata: ' + r.error;
+            if (r.success) {
+                // Markdown'u basit HTML'e çevir
+                let html = r.text
+                    .replace(/### (.*)/g, '<h3>$1</h3>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/^- (.*)/gm, '• $1');
+                $('responseContent').innerHTML = html;
+            } else {
+                $('responseContent').textContent = 'Hata: ' + r.error;
+            }
             
             // 3. Kararları göster
             if (casesHtml) {
                 $('casesList').innerHTML = casesHtml;
-                $('relatedCases').classList.add('visible');
+                $('casesSection').classList.add('visible');
                 
-                // Kart tıklamaları
                 $('casesList').querySelectorAll('.case-card').forEach(card => {
                     card.onclick = () => loadDoc(card.dataset.id, 'casesList');
                 });
@@ -602,7 +536,7 @@
         $('searchBtn').onclick = search;
         $('searchInput').onkeydown = e => e.key === 'Enter' && search();
         
-        // Document
+        // Load document
         async function loadDoc(id, listId) {
             const list = $(listId);
             list.querySelectorAll('[data-id]').forEach(i => i.classList.remove('selected'));
