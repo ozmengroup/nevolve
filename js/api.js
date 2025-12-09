@@ -63,6 +63,86 @@ const API = {
         };
     },
 
+    // Conversation history
+    _conversationHistory: [],
+
+    // Conversation'ı sıfırla
+    resetConversation() {
+        this._conversationHistory = [];
+    },
+
+    // Streaming ile AI'a sor
+    async askAIStream(question, onChunk) {
+        // Rate limit kontrolü
+        if (Date.now() < this._rateLimitUntil) {
+            const waitTime = Math.ceil((this._rateLimitUntil - Date.now()) / 1000);
+            return {
+                success: false,
+                error: this._formatError('rate limit'),
+                retryAfter: waitTime
+            };
+        }
+
+        try {
+            // Conversation history'e ekle
+            this._conversationHistory.push({ role: 'user', content: question });
+
+            const messages = [
+                { role: 'system', content: CONFIG.AI_SYSTEM_PROMPT },
+                ...this._conversationHistory.slice(-6) // Son 6 mesaj (3 soru-cevap)
+            ];
+
+            const response = await fetch(CONFIG.WORKER_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages, stream: true })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'API hatası');
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.choices?.[0]?.delta?.content;
+                            if (content) {
+                                fullText += content;
+                                if (onChunk) onChunk(fullText);
+                            }
+                        } catch (e) {
+                            // JSON parse hatası, devam et
+                        }
+                    }
+                }
+            }
+
+            // Assistant cevabını history'e ekle
+            this._conversationHistory.push({ role: 'assistant', content: fullText });
+
+            return { success: true, text: fullText, provider: 'worker-stream' };
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Normal (non-streaming) AI - fallback
     async askAI(question, retryCount = 0) {
         // Rate limit kontrolü
         if (Date.now() < this._rateLimitUntil) {
@@ -75,21 +155,26 @@ const API = {
         }
 
         try {
+            // Conversation history'e ekle
+            this._conversationHistory.push({ role: 'user', content: question });
+
+            const messages = [
+                { role: 'system', content: CONFIG.AI_SYSTEM_PROMPT },
+                ...this._conversationHistory.slice(-6)
+            ];
+
             const response = await fetch(CONFIG.WORKER_API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    messages: [
-                        { role: 'system', content: CONFIG.AI_SYSTEM_PROMPT },
-                        { role: 'user', content: question }
-                    ]
-                })
+                body: JSON.stringify({ messages, stream: false })
             });
 
             const data = await response.json();
 
             if (data.choices?.[0]?.message?.content) {
-                return { success: true, text: data.choices[0].message.content, provider: 'worker' };
+                const text = data.choices[0].message.content;
+                this._conversationHistory.push({ role: 'assistant', content: text });
+                return { success: true, text, provider: 'worker' };
             }
 
             const errorMsg = data.error?.message || 'Bilinmeyen hata';

@@ -729,6 +729,7 @@
             $('input').value = '';
             caseContents = [];
             mevzuatData = [];
+            API.resetConversation(); // Conversation history sıfırla
         }
 
         function formatDate() {
@@ -876,13 +877,19 @@
             return html;
         }
 
-        function showLoading() {
+        function showLoading(text = 'Kaynaklar analiz ediliyor...') {
             return `
                 <div class="loading">
-                    <div class="loading-text">Kaynaklar analiz ediliyor...</div>
+                    <div class="loading-text">${text}</div>
                     <div class="loading-bar"></div>
                 </div>
             `;
+        }
+
+        // Streaming text'i basit şekilde göster
+        function showStreamingText(text) {
+            return `<div class="streaming-response" style="font-size: 14px; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap;">${text}<span class="cursor" style="animation: blink 1s infinite;">|</span></div>
+            <style>@keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }</style>`;
         }
 
         async function send() {
@@ -893,7 +900,7 @@
             $('welcome').style.display = 'none';
             $('conversation').classList.add('visible');
             $('questionText').textContent = q;
-            $('docBody').innerHTML = showLoading();
+            $('docBody').innerHTML = showLoading('Kaynaklar aranıyor...');
             $('sourcesRow').innerHTML = '';
             $('docDate').textContent = formatDate();
             $('input').value = '';
@@ -905,6 +912,9 @@
             if (ctx.caseType && ctx.caseType.type !== 'genel') {
                 $('docTitle').textContent = ctx.caseType.label + ' Analizi';
                 $('docSubtitle').textContent = ctx.caseType.type === 'idari' ? 'Danıştay İçtihadı' : 'Yargıtay İçtihadı';
+            } else {
+                $('docTitle').textContent = 'Hukuki Analiz';
+                $('docSubtitle').textContent = 'Yargıtay İçtihadı';
             }
 
             let casesContext = '';
@@ -978,7 +988,13 @@
             }
             finalPrompt += casesContext;
 
-            const r = await API.askAI(finalPrompt);
+            // Streaming response
+            $('docBody').innerHTML = showStreamingText('');
+
+            const r = await API.askAIStream(finalPrompt, (partialText) => {
+                // Her chunk geldiğinde güncelle
+                $('docBody').innerHTML = showStreamingText(partialText);
+            });
 
             if (r.success) {
                 const sections = parseResponse(r.text);
@@ -995,12 +1011,31 @@
                 });
                 $('sourcesRow').innerHTML = srcHtml;
 
+                // Soru geçmişine kaydet
+                saveToHistory(q, r.text);
+
                 toast('Analiz tamamlandı');
             } else {
                 $('docBody').innerHTML = `<div class="warning"><div class="warning-icon">⚠</div><div class="warning-text">${r.error?.message || 'Bir hata oluştu'}</div></div>`;
             }
 
             $('sendBtn').disabled = false;
+        }
+
+        // Soru geçmişi - localStorage
+        function saveToHistory(question, answer) {
+            const history = JSON.parse(localStorage.getItem('nevolve_history') || '[]');
+            history.unshift({
+                q: question,
+                a: answer.substring(0, 200) + '...',
+                date: new Date().toISOString()
+            });
+            // Son 20 soru tut
+            localStorage.setItem('nevolve_history', JSON.stringify(history.slice(0, 20)));
+        }
+
+        function getHistory() {
+            return JSON.parse(localStorage.getItem('nevolve_history') || '[]');
         }
 
         function openFirstSource() {
