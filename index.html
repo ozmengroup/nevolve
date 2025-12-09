@@ -1122,14 +1122,18 @@
             // Takip sorusu mu kontrol et
             const isFollowUp = hasMessages && isFollowUpQuestion(q);
 
+          try {
+
             // Build context (takip sorusunda kaynak arama)
             const loadingText = messageDiv.querySelector('.loading-text');
             let ctx = { yargitayKararlari: [], danistayKararlari: [], mevzuatMaddeleri: [], caseType: null };
 
             if (!isFollowUp) {
+                if (loadingText) loadingText.textContent = 'Dava tipi belirleniyor...';
                 ctx = await API.buildEnrichedContext(q);
+                console.log('[DEBUG] Context:', ctx.caseType?.label, 'Yargıtay:', ctx.yargitayKararlari.length, 'Mevzuat:', ctx.mevzuatMaddeleri.length);
             }
-            if (loadingText) loadingText.textContent = 'Yanıt hazırlanıyor...';
+            if (loadingText) loadingText.textContent = 'Kararlar alınıyor...';
 
             let parsedKararlar = [];
             caseContents = [];
@@ -1193,7 +1197,8 @@
             finalPrompt += casesContext;
 
             // Streaming
-            responseEl.innerHTML = '<div class="streaming-text"></div>';
+            console.log('[DEBUG] AI çağrısı başlıyor...');
+            responseEl.innerHTML = '<div class="streaming-text"><span class="loading-text">Yanıt bekleniyor...</span></div>';
             const streamingEl = responseEl.querySelector('.streaming-text');
 
             let lastScroll = 0;
@@ -1206,6 +1211,8 @@
                     lastScroll = now;
                 }
             });
+
+            console.log('[DEBUG] AI yanıtı:', r.success ? 'Başarılı' : r.error);
 
             if (r.success) {
                 let responseHtml;
@@ -1249,6 +1256,18 @@
                 bottomInput.addEventListener('input', function() { autoResize(this); });
                 bottomInput.addEventListener('keydown', handleEnterKey);
             }
+
+          } catch (error) {
+            console.error('Send error:', error);
+            responseEl.innerHTML = `
+                <div class="section section-dikkat">
+                    <div class="section-header">
+                        <div class="section-icon">!</div>
+                        <div class="section-title">Hata</div>
+                    </div>
+                    <div class="warning-item">${error.message || 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.'}</div>
+                </div>`;
+          }
 
             $('sendBtn').disabled = false;
             if ($('sendBtnBottom')) $('sendBtnBottom').disabled = false;
