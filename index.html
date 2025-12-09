@@ -8,72 +8,90 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
-                </div>
-                <div class="logo-text">nevolve<span>.ai</span></div>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⚖️</div>
+            <div class="logo-text">nevolve<span>.ai</span></div>
+        </div>
+        <div class="header-right">
+            <div class="area-selector">
+                <button class="area-btn active">Ceza</button>
+                <button class="area-btn">İcra</button>
             </div>
             <div class="status" id="status">Bağlanıyor...</div>
-        </header>
+        </div>
+    </header>
 
+    <div class="container">
         <!-- Navigation -->
         <nav class="nav">
-            <button class="nav-item active" data-section="ai">Strateji</button>
-            <button class="nav-item" data-section="search">Karar Ara</button>
-            <button class="nav-item" data-section="tools">Araçlar</button>
+            <button class="nav-item active" data-section="ai">
+                <span class="nav-icon">✦</span> AI Strateji
+            </button>
+            <button class="nav-item" data-section="search">
+                <span class="nav-icon">🔍</span> Karar Ara
+            </button>
+            <button class="nav-item" data-section="tools">
+                <span class="nav-icon">⚙️</span> Araçlar
+            </button>
         </nav>
 
         <!-- AI Strategy Section -->
         <section class="section active" id="section-ai">
             <div class="section-header">
-                <h1 class="section-title">Hukuki Strateji</h1>
-                <p class="section-desc">Davanızı anlatın, AI destekli strateji önerileri alın</p>
+                <h1 class="section-title">Hukuki Strateji Asistanı</h1>
+                <p class="section-desc">Davanızı anlatın, AI destekli strateji ve emsal kararlar alın</p>
             </div>
             
             <div class="card">
                 <div class="input-container">
-                    <textarea class="input-field" id="aiInput" placeholder="Örn: Boşanma davasında müvekkilim 10 yıllık evli, 2 çocuk var. Nafaka ve velayet stratejisi ne olmalı?"></textarea>
-                    <button class="btn btn-primary btn-submit" id="aiSubmit">Analiz Et</button>
+                    <textarea class="input-field" id="aiInput" placeholder="Örn: Müvekkilim TCK 86/2 kapsamında yaralama suçundan yargılanıyor. Mağdurla uzlaşma sağlandı. Etkin pişmanlık ve iyi hal indirimi için strateji ne olmalı?"></textarea>
+                    <button class="btn btn-primary btn-submit" id="aiSubmit">✦ Analiz Et</button>
                 </div>
                 <div class="tags">
-                    <span class="tag" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">Nafaka</span>
-                    <span class="tag" data-query="İş kazası tazminat davası için emsal kararlar nelerdir?">İş Kazası</span>
-                    <span class="tag" data-query="TCK 86 yaralama suçunda ceza indirimi nasıl alınır?">Ceza İndirimi</span>
-                    <span class="tag" data-query="Kira uyuşmazlığında tahliye stratejisi nedir?">Kira Tahliye</span>
+                    <span class="tag" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">💍 Nafaka Stratejisi</span>
+                    <span class="tag" data-query="İş kazası tazminat davası için emsal Yargıtay kararları">🏭 İş Kazası</span>
+                    <span class="tag" data-query="TCK 86 yaralama suçunda ceza indirimi stratejisi">⚖️ Ceza İndirimi</span>
+                    <span class="tag" data-query="Kira uyuşmazlığında tahliye süreci ve stratejisi">🏠 Kira Tahliye</span>
                 </div>
             </div>
             
             <div class="response" id="aiResponse">
-                <div class="response-header">
-                    <span>✦</span> AI Analizi
+                <!-- AI Summary Box -->
+                <div class="ai-summary">
+                    <div class="ai-summary-header">
+                        <span>✦</span> AI Strateji Özeti
+                    </div>
+                    <div class="ai-summary-content" id="aiContent"></div>
                 </div>
-                <div class="response-content" id="aiContent"></div>
+                
+                <!-- Related Cases -->
+                <div class="card" id="relatedCases" style="display:none;">
+                    <div class="card-header">İlgili Yargıtay Kararları</div>
+                    <div id="relatedCasesList"></div>
+                </div>
             </div>
         </section>
 
         <!-- Search Section -->
         <section class="section" id="section-search">
             <div class="section-header">
-                <h1 class="section-title">Yargıtay Kararları</h1>
+                <h1 class="section-title">Yargıtay Karar Arama</h1>
                 <p class="section-desc">1.9 milyon+ kararda anahtar kelime araması</p>
             </div>
             
             <div class="card">
-                <div class="input-container" style="display:flex;gap:8px;">
-                    <input type="text" class="input-field" id="searchInput" placeholder="Anahtar kelime girin..." style="padding-right:16px;">
-                    <button class="btn btn-primary" id="searchBtn" style="white-space:nowrap;">Ara</button>
+                <div class="input-container" style="display:flex;gap:12px;">
+                    <input type="text" class="input-field" id="searchInput" placeholder="Anahtar kelime girin... (örn: etkin pişmanlık, haksız tahrik)" style="padding-right:20px;">
+                    <button class="btn btn-primary" id="searchBtn" style="white-space:nowrap;">🔍 Ara</button>
                 </div>
                 <div class="tags">
-                    <span class="tag" data-query="boşanma nafaka">boşanma nafaka</span>
-                    <span class="tag" data-query="iş kazası tazminat">iş kazası</span>
-                    <span class="tag" data-query="TCK 86">TCK 86</span>
-                    <span class="tag" data-query="kira tahliye">kira tahliye</span>
+                    <span class="tag" data-query="etkin pişmanlık">Etkin Pişmanlık</span>
+                    <span class="tag" data-query="haksız tahrik">Haksız Tahrik</span>
+                    <span class="tag" data-query="meşru müdafaa">Meşru Müdafaa</span>
+                    <span class="tag" data-query="nafaka artırım">Nafaka Artırım</span>
+                    <span class="tag" data-query="iş kazası tazminat">İş Kazası</span>
                 </div>
             </div>
             
@@ -83,7 +101,7 @@
             
             <div class="card hidden" id="resultsBox">
                 <div class="results-header">
-                    <span class="card-header" style="margin:0;">Sonuçlar</span>
+                    <div class="card-header" style="margin:0;">Arama Sonuçları</div>
                     <span class="results-count" id="resultsCount"></span>
                 </div>
                 <div id="resultsList"></div>
@@ -91,8 +109,11 @@
             
             <div class="doc-view" id="docView">
                 <div class="doc-header">
-                    <span class="doc-title">📄 Karar Metni</span>
-                    <button class="btn btn-secondary" id="closeDoc">Kapat</button>
+                    <span class="doc-title" id="docTitle">📄 Karar Metni</span>
+                    <div class="doc-actions">
+                        <button class="doc-action-btn" onclick="copyDoc()">📋 Kopyala</button>
+                        <button class="doc-action-btn" id="closeDoc">✕ Kapat</button>
+                    </div>
                 </div>
                 <div class="doc-content" id="docContent"></div>
             </div>
@@ -102,47 +123,54 @@
         <section class="section" id="section-tools">
             <div class="section-header">
                 <h1 class="section-title">Hesaplama Araçları</h1>
-                <p class="section-desc">Ceza indirimi ve faiz hesaplamaları</p>
+                <p class="section-desc">Ceza indirimi ve yasal faiz hesaplamaları</p>
             </div>
             
             <!-- Ceza Calculator -->
             <div class="card">
                 <div class="card-header">Ceza İndirimi Hesaplama</div>
                 <div class="slider-container">
-                    <input type="range" class="slider" id="cezaSlider" min="1" max="240" value="24">
+                    <input type="range" class="slider" id="cezaSlider" min="1" max="240" value="36">
                 </div>
                 <div class="slider-value">
-                    <span class="slider-value-num" id="cezaAy">24</span>
+                    <span class="slider-value-num" id="cezaAy">36</span>
                     <span class="slider-value-unit">ay</span>
                 </div>
                 
                 <div class="check-list">
-                    <div class="check-item" data-rate="0.25">
+                    <div class="check-item" data-rate="0.333">
                         <div class="check-item-left">
                             <div class="check-box">✓</div>
-                            <span class="check-item-label">Haksız Tahrik</span>
+                            <span class="check-item-label">Haksız Tahrik (Ağır)</span>
                         </div>
-                        <span class="check-item-rate">-25%</span>
+                        <span class="check-item-rate">1/4 - 3/4</span>
                     </div>
                     <div class="check-item" data-rate="0.166">
                         <div class="check-item-left">
                             <div class="check-box">✓</div>
-                            <span class="check-item-label">İyi Hal (TCK 62)</span>
+                            <span class="check-item-label">İyi Hal İndirimi (TCK 62)</span>
                         </div>
-                        <span class="check-item-rate">-17%</span>
+                        <span class="check-item-rate">1/6</span>
                     </div>
                     <div class="check-item" data-rate="0.5">
                         <div class="check-item-left">
                             <div class="check-box">✓</div>
                             <span class="check-item-label">Etkin Pişmanlık</span>
                         </div>
-                        <span class="check-item-rate">-50%</span>
+                        <span class="check-item-rate">1/2 - 2/3</span>
+                    </div>
+                    <div class="check-item" data-rate="0.166">
+                        <div class="check-item-left">
+                            <div class="check-box">✓</div>
+                            <span class="check-item-label">Teşebbüs (TCK 35)</span>
+                        </div>
+                        <span class="check-item-rate">1/4 - 3/4</span>
                     </div>
                 </div>
                 
                 <div class="tool-result">
-                    <div class="tool-result-value" id="cezaSonuc">24 ay</div>
-                    <div class="tool-result-label" id="cezaLabel">2.0 yıl • HAGB uygulanabilir</div>
+                    <div class="tool-result-value" id="cezaSonuc">36 ay</div>
+                    <div class="tool-result-label" id="cezaLabel">3.0 yıl • Erteleme mümkün değil</div>
                 </div>
             </div>
             
@@ -160,20 +188,21 @@
                     </div>
                     <div class="tool-field-group">
                         <div class="tool-label">Gün Sayısı</div>
-                        <input type="number" class="tool-field" id="gunSayisi" value="180">
+                        <input type="number" class="tool-field" id="gunSayisi" value="365">
                     </div>
                 </div>
                 <div class="tool-result">
-                    <div class="tool-result-value" id="faizSonuc">111.836 ₺</div>
-                    <div class="tool-result-label" id="faizLabel">100.000 ₺ anapara + 11.836 ₺ faiz</div>
+                    <div class="tool-result-value" id="faizSonuc">124.000 ₺</div>
+                    <div class="tool-result-label" id="faizLabel">100.000 ₺ anapara + 24.000 ₺ faiz</div>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
         <footer class="footer">
-            <p>nevolve.ai • Eymen & Merve Hukuk için geliştirildi</p>
-            <p style="margin-top:4px;font-size:11px;">Yargı API + Gemini 2.5 Flash</p>
+            <div class="footer-brand">nevolve.ai</div>
+            <div class="footer-text">Eymen & Merve Hukuk için özel olarak geliştirildi</div>
+            <div class="footer-text" style="margin-top:4px;font-size:11px;">Yargı API + Gemini 2.5 Flash</div>
         </footer>
     </div>
 
