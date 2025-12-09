@@ -353,6 +353,298 @@ const API = {
         }).filter(Boolean);
     },
 
+    // ==================== KARAR PARSE SİSTEMİ ====================
+
+    // Ham karar metnini yapılandırılmış veriye dönüştür
+    parseKarar(rawContent, meta = {}) {
+        if (!rawContent) return null;
+
+        const parsed = {
+            // Meta bilgiler (API'den gelen)
+            daire: meta.daire || this._extractDaire(rawContent),
+            esasNo: meta.esasNo || '',
+            kararNo: meta.kararNo || '',
+            tarih: meta.tarih || '',
+            kaynak: meta.kaynak || 'yargitay',
+
+            // Çıkarılan bilgiler
+            sonuc: this._extractSonuc(rawContent),
+            ceza: this._extractCeza(rawContent),
+            maddeler: this._extractMaddeler(rawContent),
+            sucTuru: this._extractSucTuru(rawContent),
+
+            // Özet bilgiler
+            kararOzeti: this._extractKararOzeti(rawContent),
+            kritikBolum: this._extractKritikBolum(rawContent),
+
+            // Ham içerik (gerekirse)
+            rawLength: rawContent.length
+        };
+
+        return parsed;
+    },
+
+    // Mahkeme sonucunu çıkar
+    _extractSonuc(text) {
+        const t = text.toUpperCase();
+        if (t.includes('ONANMASINA') || t.includes('ONAMA')) return 'ONAMA';
+        if (t.includes('BOZULMASINA') || t.includes('BOZMA')) return 'BOZMA';
+        if (t.includes('BERAAT')) return 'BERAAT';
+        if (t.includes('MAHKUM') || t.includes('CEZALANDIRILMASINA')) return 'MAHKUMIYET';
+        if (t.includes('DÜŞÜRÜLMESINE') || t.includes('DÜŞME')) return 'DÜŞME';
+        if (t.includes('REDDİNE') || t.includes('RED')) return 'RET';
+        if (t.includes('KABULÜNE') || t.includes('KABUL')) return 'KABUL';
+        return 'BELİRSİZ';
+    },
+
+    // Ceza miktarını çıkar
+    _extractCeza(text) {
+        // "X yıl Y ay hapis" formatı
+        const yilAyMatch = text.match(/(\d+)\s*yıl\s*(\d+)?\s*(ay)?\s*(hapis)?/i);
+        if (yilAyMatch) {
+            const yil = yilAyMatch[1];
+            const ay = yilAyMatch[2] || '';
+            return ay ? `${yil} yıl ${ay} ay hapis` : `${yil} yıl hapis`;
+        }
+
+        // Sadece ay
+        const ayMatch = text.match(/(\d+)\s*ay\s*(hapis)?/i);
+        if (ayMatch) return `${ayMatch[1]} ay hapis`;
+
+        // Para cezası
+        const paraMatch = text.match(/(\d+[\d.,]*)\s*(TL|lira)\s*(adli para|para cezası)?/i);
+        if (paraMatch) return `${paraMatch[1]} TL adli para cezası`;
+
+        return null;
+    },
+
+    // İlgili kanun maddelerini çıkar
+    _extractMaddeler(text) {
+        const maddeler = [];
+
+        // TCK maddeleri
+        const tckMatches = text.match(/TCK\.?\s*'?\s*n?[ıi]n\s*(\d+)/gi) || [];
+        const tckDirect = text.match(/TCK\s*(\d+)/gi) || [];
+        [...tckMatches, ...tckDirect].forEach(m => {
+            const num = m.match(/\d+/);
+            if (num) maddeler.push({ kanun: 'TCK', madde: num[0] });
+        });
+
+        // CMK maddeleri
+        const cmkMatches = text.match(/CMK\.?\s*'?\s*n?[ıi]n\s*(\d+)/gi) || [];
+        const cmkDirect = text.match(/CMK\s*(\d+)/gi) || [];
+        [...cmkMatches, ...cmkDirect].forEach(m => {
+            const num = m.match(/\d+/);
+            if (num) maddeler.push({ kanun: 'CMK', madde: num[0] });
+        });
+
+        // İİK maddeleri
+        const iikMatches = text.match(/İİK\.?\s*'?\s*n?[ıi]n\s*(\d+)/gi) || [];
+        iikMatches.forEach(m => {
+            const num = m.match(/\d+/);
+            if (num) maddeler.push({ kanun: 'İİK', madde: num[0] });
+        });
+
+        // TMK maddeleri
+        const tmkMatches = text.match(/TMK\.?\s*'?\s*n?[ıi]n\s*(\d+)/gi) || [];
+        tmkMatches.forEach(m => {
+            const num = m.match(/\d+/);
+            if (num) maddeler.push({ kanun: 'TMK', madde: num[0] });
+        });
+
+        // Tekrarları kaldır
+        const unique = [];
+        const seen = new Set();
+        maddeler.forEach(m => {
+            const key = `${m.kanun}_${m.madde}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                unique.push(m);
+            }
+        });
+
+        return unique.slice(0, 5); // Max 5 madde
+    },
+
+    // Suç türünü çıkar
+    _extractSucTuru(text) {
+        const t = text.toLowerCase();
+
+        const suclar = [
+            { pattern: /dolandırıcılık/, tur: 'Dolandırıcılık' },
+            { pattern: /hırsızlık/, tur: 'Hırsızlık' },
+            { pattern: /yaralama|darp|müessir/, tur: 'Kasten Yaralama' },
+            { pattern: /öldürme|adam öldürme|kasten öldürme/, tur: 'Kasten Öldürme' },
+            { pattern: /taksirle öldürme/, tur: 'Taksirle Öldürme' },
+            { pattern: /tehdit/, tur: 'Tehdit' },
+            { pattern: /hakaret/, tur: 'Hakaret' },
+            { pattern: /cinsel saldırı/, tur: 'Cinsel Saldırı' },
+            { pattern: /cinsel istismar/, tur: 'Cinsel İstismar' },
+            { pattern: /uyuşturucu/, tur: 'Uyuşturucu' },
+            { pattern: /güveni kötüye kullanma/, tur: 'Güveni Kötüye Kullanma' },
+            { pattern: /sahtecilik|sahte/, tur: 'Sahtecilik' },
+            { pattern: /zimmet/, tur: 'Zimmet' },
+            { pattern: /rüşvet/, tur: 'Rüşvet' },
+            { pattern: /boşanma/, tur: 'Boşanma' },
+            { pattern: /nafaka/, tur: 'Nafaka' },
+            { pattern: /velayet/, tur: 'Velayet' },
+            { pattern: /icra/, tur: 'İcra Takibi' },
+            { pattern: /itirazın iptali/, tur: 'İtirazın İptali' },
+            { pattern: /işe iade/, tur: 'İşe İade' },
+            { pattern: /kıdem tazminat/, tur: 'Kıdem Tazminatı' },
+            { pattern: /ihbar tazminat/, tur: 'İhbar Tazminatı' }
+        ];
+
+        for (const suc of suclar) {
+            if (suc.pattern.test(t)) return suc.tur;
+        }
+
+        return null;
+    },
+
+    // Daire bilgisini çıkar
+    _extractDaire(text) {
+        const match = text.match(/(\d+)\.\s*(Ceza|Hukuk)\s*(Dairesi|HD|CD)/i);
+        if (match) {
+            const tip = match[2].toLowerCase().includes('ceza') ? 'CD' : 'HD';
+            return `${match[1]}. ${tip}`;
+        }
+        return null;
+    },
+
+    // Karar özeti çıkar (ilk anlamlı paragraf)
+    _extractKararOzeti(text) {
+        // Çok kısa ise direkt döndür
+        if (text.length < 300) return text;
+
+        // İlk 600 karakter + son cümleye kadar
+        let ozet = text.substring(0, 600);
+        const sonNokta = ozet.lastIndexOf('.');
+        if (sonNokta > 300) {
+            ozet = ozet.substring(0, sonNokta + 1);
+        }
+
+        return ozet.trim();
+    },
+
+    // Kritik bölümü çıkar (SONUÇ, HÜKÜM vs.)
+    _extractKritikBolum(text) {
+        const patterns = [
+            /SONUÇ\s*:[\s\S]{0,800}/i,
+            /HÜKÜM\s*:[\s\S]{0,800}/i,
+            /KARAR\s*:[\s\S]{0,800}/i,
+            /Bu nedenlerle[\s\S]{0,500}/i,
+            /Yukarıda açıklanan nedenlerle[\s\S]{0,500}/i
+        ];
+
+        for (const pattern of patterns) {
+            const match = text.match(pattern);
+            if (match) {
+                return match[0].trim().substring(0, 500);
+            }
+        }
+
+        // Bulunamadıysa son 400 karakter
+        if (text.length > 400) {
+            return '...' + text.substring(text.length - 400).trim();
+        }
+
+        return null;
+    },
+
+    // ==================== AKILLI KAYNAK SEÇİMİ ====================
+
+    // Soruya en alakalı kararı bul
+    findBestMatch(soru, kararlar) {
+        if (!kararlar || kararlar.length === 0) return [];
+
+        const scores = kararlar.map(k => ({
+            karar: k,
+            skor: this._calculateRelevance(soru, k)
+        }));
+
+        // Skora göre sırala ve en iyi 2'yi döndür
+        return scores
+            .sort((a, b) => b.skor - a.skor)
+            .slice(0, 2)
+            .map(s => s.karar);
+    },
+
+    // Alaka skorunu hesapla
+    _calculateRelevance(soru, karar) {
+        let skor = 0;
+        const soruLower = soru.toLowerCase();
+        const soruKelimeler = soruLower.split(/\s+/).filter(k => k.length > 3);
+
+        // Parsed veri varsa onu kullan
+        const metin = (karar.sucTuru || '') + ' ' +
+                      (karar.kararOzeti || '') + ' ' +
+                      (karar.kritikBolum || '') +
+                      (karar.content || '').substring(0, 1000);
+        const metinLower = metin.toLowerCase();
+
+        // Keyword eşleşmesi
+        soruKelimeler.forEach(kelime => {
+            if (metinLower.includes(kelime)) skor += 10;
+        });
+
+        // Suç türü eşleşmesi (yüksek puan)
+        if (karar.sucTuru) {
+            if (soruLower.includes(karar.sucTuru.toLowerCase())) skor += 50;
+        }
+
+        // Sonuç türü bonus
+        if (karar.sonuc === 'ONAMA') skor += 5;  // Yerleşik içtihat
+        if (karar.sonuc === 'BOZMA') skor += 3;  // Değişen içtihat
+
+        // Ceza bilgisi varsa bonus
+        if (karar.ceza) skor += 10;
+
+        // Madde eşleşmesi
+        if (karar.maddeler && karar.maddeler.length > 0) {
+            const sorudakiMaddeler = soru.match(/\d+/g) || [];
+            karar.maddeler.forEach(m => {
+                if (sorudakiMaddeler.includes(m.madde)) skor += 30;
+            });
+        }
+
+        return skor;
+    },
+
+    // Yapılandırılmış context oluştur (AI için optimize)
+    buildStructuredContext(parsedKararlar, mevzuatlar) {
+        let context = '';
+
+        if (parsedKararlar && parsedKararlar.length > 0) {
+            context += '\n=== EMSAL KARARLAR ===\n';
+            parsedKararlar.forEach((k, i) => {
+                context += `\n[${i + 1}] ${k.daire || 'Yargıtay'} E.${k.esasNo} K.${k.kararNo}`;
+                if (k.tarih) context += ` (${k.tarih})`;
+                context += '\n';
+
+                if (k.sucTuru) context += `Konu: ${k.sucTuru}\n`;
+                if (k.sonuc) context += `Sonuç: ${k.sonuc}\n`;
+                if (k.ceza) context += `Ceza: ${k.ceza}\n`;
+                if (k.maddeler && k.maddeler.length > 0) {
+                    context += `Maddeler: ${k.maddeler.map(m => `${m.kanun} ${m.madde}`).join(', ')}\n`;
+                }
+                if (k.kritikBolum) {
+                    context += `Karar: ${k.kritikBolum.substring(0, 400)}\n`;
+                }
+            });
+        }
+
+        if (mevzuatlar && mevzuatlar.length > 0) {
+            context += '\n=== İLGİLİ MEVZUAT ===\n';
+            mevzuatlar.forEach(m => {
+                const kanunAdi = m.kanunAdi || 'Kanun';
+                context += `${kanunAdi} m.${m.madde}: ${(m.content || '').substring(0, 300)}\n`;
+            });
+        }
+
+        return context;
+    },
+
     // Kanun kodu mapping - her dava tipi için en kritik 2 madde
     KANUN_MAP: {
         ceza: {
