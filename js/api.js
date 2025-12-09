@@ -197,6 +197,67 @@ const API = {
         }
     },
 
+    // AI ile dava tipi algılama - çok hızlı, tek satır cevap
+    async detectCaseTypeAI(question) {
+        const cacheKey = `casetype_${question.slice(0, 50)}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) return cached;
+
+        try {
+            const prompt = `Aşağıdaki hukuki soru hangi dava türü? SADECE birini yaz, başka hiçbir şey yazma:
+ceza / is / icra / aile / idari / miras / ticaret / tuketici / genel
+
+Soru: ${question.slice(0, 200)}`;
+
+            const response = await fetch(CONFIG.WORKER_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: prompt }],
+                    stream: false,
+                    max_tokens: 20,  // Çok kısa cevap
+                    temperature: 0   // Deterministik
+                })
+            });
+
+            const data = await response.json();
+            const answer = data.choices?.[0]?.message?.content?.toLowerCase().trim() || '';
+
+            // Cevabı parse et
+            const typeMap = {
+                'ceza': { type: 'ceza', label: 'Ceza Hukuku' },
+                'is': { type: 'is', label: 'İş Hukuku' },
+                'iş': { type: 'is', label: 'İş Hukuku' },
+                'icra': { type: 'icra', label: 'İcra Hukuku' },
+                'aile': { type: 'aile', label: 'Aile Hukuku' },
+                'idari': { type: 'idari', label: 'İdari Hukuk' },
+                'miras': { type: 'miras', label: 'Miras Hukuku' },
+                'ticaret': { type: 'ticaret', label: 'Ticaret Hukuku' },
+                'tuketici': { type: 'tuketici', label: 'Tüketici Hukuku' },
+                'tüketici': { type: 'tuketici', label: 'Tüketici Hukuku' }
+            };
+
+            // Cevaptaki ilk eşleşen tipi bul
+            for (const [key, value] of Object.entries(typeMap)) {
+                if (answer.includes(key)) {
+                    this._setCache(cacheKey, value);
+                    console.log(`[AI] Dava tipi algılandı: ${value.label}`);
+                    return value;
+                }
+            }
+
+            // Eşleşme yoksa genel
+            const result = { type: 'genel', label: 'Genel' };
+            this._setCache(cacheKey, result);
+            return result;
+
+        } catch (e) {
+            console.error('[AI] Dava tipi algılama hatası:', e);
+            // Hata durumunda eski regex yöntemine fallback
+            return this.detectCaseType(question);
+        }
+    },
+
     async searchCases(keyword, timeout = 10000, daire = null) {
         // Önbellekten kontrol
         const cacheKey = `search_${keyword}_${daire || 'all'}`;
@@ -754,6 +815,20 @@ const API = {
             kanunlar: [
                 { kod: 4721, ad: 'TMK', maddeler: [505, 606] }       // saklı pay + reddi miras
             ]
+        },
+        ticaret: {
+            kaynaklar: ['yargitay'],
+            daireler: ['11. Hukuk Dairesi'],
+            kanunlar: [
+                { kod: 6102, ad: 'TTK', maddeler: [18, 124] }        // tacir + ticari işletme
+            ]
+        },
+        tuketici: {
+            kaynaklar: ['yargitay'],
+            daireler: ['3. Hukuk Dairesi', '13. Hukuk Dairesi'],
+            kanunlar: [
+                { kod: 6502, ad: 'TKHK', maddeler: [4, 11] }         // haksız şart + ayıplı mal
+            ]
         }
     },
 
@@ -898,8 +973,8 @@ const API = {
             caseType: null
         };
 
-        // Dava tipini algıla
-        context.caseType = this.detectCaseType(question);
+        // Dava tipini AI ile algıla (daha akıllı, edge case'leri yakalar)
+        context.caseType = await this.detectCaseTypeAI(question);
         const caseConfig = this.KANUN_MAP[context.caseType.type];
 
         // Çoklu arama sorguları oluştur
