@@ -15,7 +15,6 @@
             --text-muted: #A3A3A3;
             --border: #E5E5E5;
             --accent: #525252;
-            --accent-light: #F5F5F5;
         }
         
         body {
@@ -27,12 +26,11 @@
         }
         
         .container {
-            max-width: 680px;
+            max-width: 700px;
             margin: 0 auto;
             padding: 48px 20px;
         }
         
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 32px;
@@ -52,7 +50,6 @@
             color: var(--text-muted);
         }
         
-        /* Card */
         .card {
             background: var(--card);
             border-radius: 16px;
@@ -69,29 +66,33 @@
             margin-bottom: 12px;
         }
         
-        /* Input */
-        .input-field {
+        textarea, input[type="text"] {
             width: 100%;
-            min-height: 80px;
             padding: 12px 14px;
             border: 1px solid var(--border);
             border-radius: 10px;
             font-family: inherit;
             font-size: 14px;
             line-height: 1.5;
-            resize: none;
             background: var(--bg);
             color: var(--text);
             transition: all 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
-        .input-field:focus {
+        textarea {
+            min-height: 80px;
+            resize: none;
+        }
+        
+        textarea:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--accent);
             background: white;
         }
         
-        .input-field::placeholder { color: var(--text-muted); }
+        textarea::placeholder, input::placeholder { color: var(--text-muted); }
         
         .input-footer {
             display: flex;
@@ -114,9 +115,7 @@
         
         .btn:hover { opacity: 0.8; }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-secondary { background: var(--accent); }
         
-        /* Tags */
         .tags {
             display: flex;
             flex-wrap: wrap;
@@ -130,7 +129,7 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.15s;
@@ -138,9 +137,8 @@
         
         .tag:hover { border-color: var(--accent); color: var(--text); }
         
-        /* Response */
         .response {
-            margin-top: 16px;
+            margin-top: 20px;
             display: none;
         }
         
@@ -152,124 +150,124 @@
         }
         
         .response-box {
-            padding: 16px;
+            padding: 20px;
             background: var(--bg);
-            border-radius: 10px;
-            margin-bottom: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
         }
         
         .response-label {
             font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         
         .response-content {
-            font-size: 13px;
-            line-height: 1.7;
+            font-size: 14px;
+            line-height: 1.8;
             color: var(--text);
         }
         
-        .response-content h3 {
-            font-size: 12px;
+        .response-content .section-title {
+            font-size: 13px;
             font-weight: 600;
             color: var(--text);
-            margin: 16px 0 8px 0;
-            padding-bottom: 4px;
-            border-bottom: 1px solid var(--border);
+            margin: 20px 0 12px 0;
+            padding: 8px 12px;
+            background: white;
+            border-left: 3px solid var(--text);
+            border-radius: 0 6px 6px 0;
         }
         
-        .response-content h3:first-child { margin-top: 0; }
+        .response-content .section-title:first-child { margin-top: 0; }
+        
+        .response-content p {
+            margin-bottom: 12px;
+        }
         
         .response-content ul {
-            margin: 6px 0;
-            padding-left: 18px;
+            margin: 12px 0;
+            padding-left: 20px;
         }
         
         .response-content li {
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
         
-        /* Cases */
+        .response-content .case-ref {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #E8E8E8;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px 0;
+        }
+        
         .cases-section {
-            margin-top: 12px;
+            margin-top: 16px;
             display: none;
         }
         
         .cases-section.visible { display: block; }
         
         .case-card {
-            padding: 10px 12px;
+            padding: 14px 16px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 6px;
+            border-radius: 10px;
+            margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.15s;
         }
         
         .case-card:hover { border-color: var(--accent); }
-        .case-card.selected { border-color: var(--text); background: var(--bg); }
+        .case-card.selected { border-color: var(--text); background: #FAFAFA; }
         
         .case-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 2px;
+            align-items: center;
+            margin-bottom: 4px;
         }
         
-        .case-court { font-size: 12px; font-weight: 600; }
+        .case-court { font-size: 13px; font-weight: 600; }
         .case-date { font-size: 11px; color: var(--text-muted); }
-        .case-info { font-size: 11px; color: var(--text-secondary); }
+        .case-info { font-size: 12px; color: var(--text-secondary); }
         
-        /* Divider */
         .divider {
             height: 1px;
             background: var(--border);
-            margin: 18px 0;
+            margin: 24px 0;
         }
         
-        /* Search */
         .search-box {
             display: flex;
             gap: 8px;
         }
         
-        .search-input {
+        .search-box input {
             flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 13px;
-            background: var(--bg);
-            color: var(--text);
-            transition: all 0.15s;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: white;
         }
         
         .results-info {
-            margin-top: 10px;
-            font-size: 11px;
+            margin-top: 12px;
+            font-size: 12px;
             color: var(--text-muted);
         }
         
         .results-list {
-            margin-top: 10px;
+            margin-top: 12px;
             display: none;
         }
         
         .results-list.visible { display: block; }
         
         .result-item {
-            padding: 10px 12px;
+            padding: 12px 14px;
             background: var(--bg);
             border-radius: 8px;
             margin-bottom: 6px;
@@ -286,57 +284,123 @@
             margin-bottom: 2px;
         }
         
-        .result-court { font-size: 12px; font-weight: 600; }
+        .result-court { font-size: 13px; font-weight: 600; }
         .result-date { font-size: 11px; color: var(--text-muted); }
-        .result-info { font-size: 11px; color: var(--text-secondary); }
+        .result-info { font-size: 12px; color: var(--text-secondary); }
         
-        /* Document */
-        .doc-view {
-            margin-top: 10px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
+        /* Document Modal */
+        .doc-modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            padding: 40px 20px;
+            overflow-y: auto;
         }
         
-        .doc-view.visible { display: block; }
+        .doc-modal.visible { display: block; }
+        
+        .doc-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            animation: slideUp 0.2s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         .doc-header {
+            padding: 16px 20px;
+            background: var(--text);
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            background: var(--text);
-            color: white;
         }
         
-        .doc-title { font-size: 11px; font-weight: 500; }
+        .doc-header-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .doc-header-info span {
+            font-size: 12px;
+            opacity: 0.8;
+        }
         
         .doc-close {
-            padding: 4px 10px;
+            padding: 8px 16px;
             background: rgba(255,255,255,0.2);
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             color: white;
             font-family: inherit;
-            font-size: 11px;
+            font-size: 13px;
             cursor: pointer;
         }
         
         .doc-close:hover { background: rgba(255,255,255,0.3); }
         
-        .doc-content {
-            padding: 14px;
-            font-size: 12px;
-            line-height: 1.6;
-            max-height: 280px;
+        .doc-body {
+            padding: 24px;
+            max-height: 60vh;
             overflow-y: auto;
+        }
+        
+        .doc-section {
+            margin-bottom: 20px;
+        }
+        
+        .doc-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .doc-content {
+            font-size: 13px;
+            line-height: 1.8;
             color: var(--text-secondary);
             white-space: pre-wrap;
         }
         
-        /* Footer */
+        .doc-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+        
+        .doc-meta-item {
+            font-size: 12px;
+        }
+        
+        .doc-meta-item label {
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .doc-meta-item span {
+            color: var(--text);
+            font-weight: 500;
+        }
+        
         .footer {
             margin-top: 32px;
             text-align: center;
@@ -349,9 +413,6 @@
             text-decoration: none;
         }
         
-        .footer a:hover { color: var(--text); }
-        
-        /* Loading */
         .loading::after {
             content: '';
             animation: dots 1.5s infinite;
@@ -372,51 +433,40 @@
         </header>
         
         <div class="card">
-            <div class="section-label">Strateji</div>
-            <textarea 
-                class="input-field" 
-                id="aiInput" 
-                placeholder="Davanızı anlatın..."
-            ></textarea>
+            <div class="section-label">Hukuki Strateji</div>
+            <textarea id="aiInput" placeholder="Davanızı detaylı anlatın..."></textarea>
             <div class="input-footer">
                 <button class="btn" id="aiSubmit">Analiz Et</button>
             </div>
             
             <div class="tags">
-                <button class="tag" data-q="Boşanma davasında nafaka stratejisi nasıl olmalı? Müvekkilim 10 yıllık evli, 2 çocuk var.">Nafaka</button>
-                <button class="tag" data-q="TCK 86 yaralama suçunda ceza indirimi nasıl alınır? Mağdurla uzlaşma sağlandı.">Yaralama</button>
-                <button class="tag" data-q="İş kazası tazminat davasında işverenin sorumluluğu nedir?">İş Kazası</button>
-                <button class="tag" data-q="Etkin pişmanlık uygulaması şartları ve ceza indirimi oranı nedir?">Etkin Pişmanlık</button>
+                <button class="tag" data-q="Müvekkilim hakkında TCK 157 dolandırıcılık suçundan dava açıldı. 50.000 TL zarar iddiası var. Etkin pişmanlık ve uzlaşma imkanı var mı? Ceza indirimi nasıl alınır?">Dolandırıcılık TCK 157</button>
+                <button class="tag" data-q="Borçlu aleyhine başlattığımız icra takibinde borçlu itiraz etti. İtirazın iptali davası açacağız. Süreç nasıl işler? Dikkat edilmesi gerekenler neler?">İtirazın İptali</button>
+                <button class="tag" data-q="Müvekkilim TCK 86/2 kasten yaralama suçundan yargılanıyor. Mağdurla uzlaşma sağlandı. HAGB ve ceza indirimi şartları nedir?">Kasten Yaralama TCK 86</button>
+                <button class="tag" data-q="Kambiyo senedine dayalı icra takibinde borçlu zamanaşımı itirazında bulundu. Senet 2019 tarihli. İtiraz geçerli mi?">Kambiyo Zamanaşımı</button>
             </div>
             
             <div class="response" id="response">
                 <div class="response-box">
-                    <div class="response-label">Analiz</div>
+                    <div class="response-label">Hukuki Analiz</div>
                     <div class="response-content" id="responseContent"></div>
                 </div>
                 
                 <div class="cases-section" id="casesSection">
-                    <div class="response-label">Emsal Kararlar</div>
+                    <div class="response-label">Dayanak Emsal Kararlar</div>
                     <div id="casesList"></div>
                 </div>
             </div>
             
             <div class="divider"></div>
             
-            <div class="section-label">Karar Ara</div>
+            <div class="section-label">Yargıtay Karar Ara</div>
             <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime...">
-                <button class="btn btn-secondary" id="searchBtn">Ara</button>
+                <input type="text" id="searchInput" placeholder="Örnek: etkin pişmanlık, itirazın iptali, kambiyo senedi...">
+                <button class="btn" id="searchBtn">Ara</button>
             </div>
             <div class="results-info" id="resultsInfo"></div>
             <div class="results-list" id="resultsList"></div>
-            <div class="doc-view" id="docView">
-                <div class="doc-header">
-                    <span class="doc-title">Karar Metni</span>
-                    <button class="doc-close" id="closeDoc">Kapat</button>
-                </div>
-                <div class="doc-content" id="docContent"></div>
-            </div>
         </div>
         
         <footer class="footer">
@@ -424,10 +474,33 @@
         </footer>
     </div>
     
+    <!-- Document Modal -->
+    <div class="doc-modal" id="docModal">
+        <div class="doc-container">
+            <div class="doc-header">
+                <div class="doc-header-info">
+                    <h3 id="docTitle">Karar</h3>
+                    <span id="docSubtitle"></span>
+                </div>
+                <button class="doc-close" id="closeDoc">Kapat</button>
+            </div>
+            <div class="doc-meta" id="docMeta"></div>
+            <div class="doc-body">
+                <div class="doc-section">
+                    <div class="doc-section-title">Karar Metni</div>
+                    <div class="doc-content" id="docContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script>
         const $ = id => document.getElementById(id);
+        
+        // Store current cases for reference
+        let currentCases = [];
         
         $('aiSubmit').onclick = async () => {
             const q = $('aiInput').value.trim();
@@ -439,57 +512,82 @@
             $('responseContent').innerHTML = '<span class="loading">Emsal kararlar taranıyor</span>';
             $('casesSection').classList.remove('visible');
             
-            const keywords = q.split(' ').filter(w => w.length > 3).slice(0, 3).join(' ');
-            const searchResult = await API.searchCases(keywords);
+            // Daha iyi keyword extraction
+            const keywords = q.match(/TCK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|boşanma|yaralama|dolandırıcılık|hırsızlık|tehdit/gi) || [];
+            const searchQuery = keywords.length > 0 ? keywords.slice(0,2).join(' ') : q.split(' ').filter(w => w.length > 3).slice(0, 2).join(' ');
+            
+            const searchResult = await API.searchCases(searchQuery);
             
             let casesContext = '';
             let casesHtml = '';
+            currentCases = [];
             
             if (searchResult.success && searchResult.decisions.length > 0) {
-                const topCases = searchResult.decisions.slice(0, 3);
+                const topCases = searchResult.decisions.slice(0, 5);
+                currentCases = topCases;
                 
-                $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
+                $('responseContent').innerHTML = '<span class="loading">Karar içerikleri analiz ediliyor</span>';
                 
+                // İlk 3 kararın içeriğini al
                 const caseContents = [];
-                for (let i = 0; i < Math.min(2, topCases.length); i++) {
+                for (let i = 0; i < Math.min(3, topCases.length); i++) {
                     const doc = await API.getDocument(topCases[i].id);
                     if (doc.success) {
                         caseContents.push({
                             ...topCases[i],
-                            content: doc.content.substring(0, 2000)
+                            content: doc.content.substring(0, 3000)
                         });
                     }
                 }
                 
-                casesHtml = topCases.map(d => `
-                    <div class="case-card" data-id="${d.id}">
+                casesHtml = topCases.map((d, i) => `
+                    <div class="case-card" data-id="${d.id}" data-index="${i}">
                         <div class="case-header">
                             <span class="case-court">${d.daire}</span>
                             <span class="case-date">${d.tarih}</span>
                         </div>
-                        <div class="case-info">${d.esasNo} / ${d.kararNo}</div>
+                        <div class="case-info">E. ${d.esasNo} K. ${d.kararNo}</div>
                     </div>
                 `).join('');
                 
                 if (caseContents.length > 0) {
-                    casesContext = '\n\n## Emsal Yargıtay Kararları:\n\n';
+                    casesContext = `
+
+=== BAĞLANACAN EMSAL KARARLAR ===
+Aşağıdaki Yargıtay kararlarını analiz et ve yanıtında MUTLAKA bu kararlara atıf yap:
+
+`;
                     caseContents.forEach((c, i) => {
-                        casesContext += `### Karar ${i+1}: ${c.daire} - ${c.esasNo} (${c.tarih})\n${c.content}\n\n`;
+                        casesContext += `--- KARAR ${i+1} ---
+Mahkeme: ${c.daire}
+Esas No: ${c.esasNo}
+Karar No: ${c.kararNo}
+Tarih: ${c.tarih}
+
+Karar Metni:
+${c.content}
+
+`;
                     });
                 }
             }
             
-            $('responseContent').innerHTML = '<span class="loading">Analiz ediliyor</span>';
+            $('responseContent').innerHTML = '<span class="loading">Hukuki analiz yapılıyor</span>';
             const r = await API.askAI(q + casesContext);
             
             if (r.success) {
                 let html = r.text
-                    .replace(/### (.*)/g, '<h3>$1</h3>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/^- (.*)/gm, '<li>$1</li>')
-                    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-                    .replace(/<\/ul>\s*<ul>/g, '');
-                $('responseContent').innerHTML = html;
+                    .replace(/###\s*(.+)/g, '<div class="section-title">$1</div>')
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/`([^`]+)`/g, '<span class="case-ref">$1</span>')
+                    .replace(/^[\-\*]\s+(.+)/gm, '<li>$1</li>')
+                    .replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>')
+                    .replace(/\n\n/g, '</p><p>')
+                    .replace(/^(.+)$/gm, (match) => {
+                        if (match.startsWith('<')) return match;
+                        return match;
+                    });
+                $('responseContent').innerHTML = '<p>' + html + '</p>';
             } else {
                 $('responseContent').textContent = 'Hata: ' + r.error;
             }
@@ -499,7 +597,7 @@
                 $('casesSection').classList.add('visible');
                 
                 $('casesList').querySelectorAll('.case-card').forEach(card => {
-                    card.onclick = () => loadDoc(card.dataset.id, 'casesList');
+                    card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
                 });
             }
             
@@ -508,9 +606,12 @@
         };
         
         document.querySelectorAll('.tag').forEach(t => {
-            t.onclick = () => $('aiInput').value = t.dataset.q;
+            t.onclick = () => {
+                $('aiInput').value = t.dataset.q;
+            };
         });
         
+        // Search
         const search = async () => {
             const q = $('searchInput').value.trim();
             if (!q) return;
@@ -518,47 +619,57 @@
             $('resultsInfo').textContent = 'Aranıyor...';
             $('resultsList').innerHTML = '';
             $('resultsList').classList.remove('visible');
-            $('docView').classList.remove('visible');
             
             const r = await API.searchCases(q);
-            if (r.success) {
-                $('resultsInfo').textContent = r.total.toLocaleString('tr-TR') + ' sonuç';
-                $('resultsList').innerHTML = r.decisions.map(d => `
-                    <div class="result-item" data-id="${d.id}">
+            if (r.success && r.decisions.length > 0) {
+                currentCases = r.decisions;
+                $('resultsInfo').textContent = r.total.toLocaleString('tr-TR') + ' sonuç bulundu';
+                $('resultsList').innerHTML = r.decisions.map((d, i) => `
+                    <div class="result-item" data-id="${d.id}" data-index="${i}">
                         <div class="result-header">
                             <span class="result-court">${d.daire}</span>
                             <span class="result-date">${d.tarih}</span>
                         </div>
-                        <div class="result-info">${d.esasNo} / ${d.kararNo}</div>
+                        <div class="result-info">E. ${d.esasNo} K. ${d.kararNo}</div>
                     </div>
                 `).join('');
                 $('resultsList').classList.add('visible');
                 
                 $('resultsList').querySelectorAll('.result-item').forEach(item => {
-                    item.onclick = () => loadDoc(item.dataset.id, 'resultsList');
+                    item.onclick = () => openDocModal(item.dataset.id, parseInt(item.dataset.index));
                 });
             } else {
-                $('resultsInfo').textContent = 'Sonuç yok';
+                $('resultsInfo').textContent = 'Sonuç bulunamadı';
             }
         };
         
         $('searchBtn').onclick = search;
-        $('searchInput').onkeydown = e => e.key === 'Enter' && search();
+        $('searchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') search();
+        });
         
-        async function loadDoc(id, listId) {
-            const list = $(listId);
-            list.querySelectorAll('[data-id]').forEach(i => i.classList.remove('selected'));
-            list.querySelector(`[data-id="${id}"]`).classList.add('selected');
+        // Document Modal
+        async function openDocModal(id, index) {
+            const caseInfo = currentCases[index];
+            
+            $('docTitle').textContent = caseInfo?.daire || 'Karar';
+            $('docSubtitle').textContent = `E. ${caseInfo?.esasNo || ''} K. ${caseInfo?.kararNo || ''}`;
+            $('docMeta').innerHTML = `
+                <div class="doc-meta-item"><label>Mahkeme</label><span>${caseInfo?.daire || '-'}</span></div>
+                <div class="doc-meta-item"><label>Karar Tarihi</label><span>${caseInfo?.tarih || '-'}</span></div>
+                <div class="doc-meta-item"><label>Esas No</label><span>${caseInfo?.esasNo || '-'}</span></div>
+                <div class="doc-meta-item"><label>Karar No</label><span>${caseInfo?.kararNo || '-'}</span></div>
+            `;
             $('docContent').textContent = 'Yükleniyor...';
-            $('docView').classList.add('visible');
+            $('docModal').classList.add('visible');
+            
             const r = await API.getDocument(id);
-            $('docContent').textContent = r.success ? r.content : 'Hata';
+            $('docContent').textContent = r.success ? r.content : 'Karar yüklenemedi';
         }
         
-        $('closeDoc').onclick = () => {
-            $('docView').classList.remove('visible');
-            $('resultsList').querySelectorAll('.result-item').forEach(i => i.classList.remove('selected'));
-            $('casesList').querySelectorAll('.case-card').forEach(i => i.classList.remove('selected'));
+        $('closeDoc').onclick = () => $('docModal').classList.remove('visible');
+        $('docModal').onclick = (e) => {
+            if (e.target === $('docModal')) $('docModal').classList.remove('visible');
         };
     </script>
 </body>
