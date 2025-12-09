@@ -728,7 +728,7 @@ const API = {
         is: {
             kaynaklar: ['yargitay'],
             kanunlar: [
-                { kod: 4857, ad: 'İş Kanunu', maddeler: [20, 25] }   // işe iade + haklı fesih
+                { kod: 4857, ad: 'İş Kanunu', maddeler: [18, 20, 21, 25] }   // geçerli fesih + işe iade + feshin sonuçları + haklı fesih
             ]
         },
         idari: {
