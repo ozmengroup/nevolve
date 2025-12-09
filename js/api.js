@@ -769,12 +769,12 @@ const API = {
         if (q.match(/icra|haciz|itiraz|ödeme emri|takip|borçlu|alacaklı|kambiyo|senet|çek|iflas|konkordato|rehin|ipotek|kıymet takdiri/)) {
             return { type: 'icra', label: 'İcra Hukuku' };
         }
-        // Aile Hukuku
-        if (q.match(/boşanma|nafaka|velayet|mal paylaşım|edinilmiş mal|ziynet|çocuk|evlilik|nişan|aile|eş|karı|koca|müşterek/)) {
+        // Aile Hukuku (word boundary ile - "çıkarıldı" içindeki "karı" eşleşmesin)
+        if (q.match(/boşanma|nafaka|velayet|mal paylaşım|edinilmiş mal|ziynet|evlilik|nişan|aile konut|\beş\b|\bkarı\b|\bkoca\b|müşterek konut/)) {
             return { type: 'aile', label: 'Aile Hukuku' };
         }
         // İş Hukuku
-        if (q.match(/işçi|işveren|kıdem|ihbar|fesih|işe iade|fazla mesai|yıllık izin|iş kazası|sgk|sigorta|mobbing|arabulucu|işkur/)) {
+        if (q.match(/işçi|işveren|kıdem|ihbar|fesih|işe iade|fazla mesai|yıllık izin|iş kazası|sgk|sigorta|mobbing|arabulucu|işkur|işten çıkar|performans|iş sözleşme|4857/)) {
             return { type: 'is', label: 'İş Hukuku' };
         }
         // İdari Hukuku
