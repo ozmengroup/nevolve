@@ -400,27 +400,66 @@
         }
 
         .source-card {
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.15s;
             font-size: 12px;
+            min-width: 200px;
+            flex: 1;
+            max-width: 280px;
         }
 
         .source-card:hover {
             border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
         }
+
+        .source-card-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .source-card-type.yargitay { background: #FEE2E2; color: #DC2626; }
+        .source-card-type.mevzuat { background: #DBEAFE; color: #2563EB; }
+        .source-card-type.danistay { background: #FEF3C7; color: #D97706; }
+        .source-card-type.aym { background: #F3E8FF; color: #7C3AED; }
 
         .source-card-title {
             font-weight: 600;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            color: var(--text);
         }
 
         .source-card-info {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .source-card-date {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .source-card-preview {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         /* Input Area */
@@ -737,7 +776,7 @@
             </div>
 
             <div class="sidebar-footer">
-                <a href="#">burhan</a> tarafından geliştirildi
+                nevolve.ai v1.6
             </div>
         </aside>
 
@@ -939,18 +978,18 @@
             $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
 
             let casesContext = '';
+            let caseContents = [];
             currentCases = [];
 
             // Yargıtay kararları
             if (enrichedContext.yargitayKararlari.length > 0) {
                 currentCases = enrichedContext.yargitayKararlari;
-                const caseContents = [];
-                for (let i = 0; i < Math.min(2, currentCases.length); i++) {
+                for (let i = 0; i < Math.min(3, currentCases.length); i++) {
                     const doc = await API.getDocument(currentCases[i].id);
                     if (doc.success) {
                         caseContents.push({
                             ...currentCases[i],
-                            content: doc.content.substring(0, 1500)
+                            content: doc.content.substring(0, 2000)
                         });
                     }
                 }
@@ -1003,20 +1042,53 @@
                 if (sourceCount > 0) {
                     let sourcesHtml = '';
 
+                    // Yargıtay kararları
                     enrichedContext.yargitayKararlari.forEach((d, i) => {
+                        const preview = caseContents[i]?.content?.substring(0, 150) || '';
                         sourcesHtml += `
-                            <div class="source-card" data-id="${d.id}" data-index="${i}">
+                            <div class="source-card" data-id="${d.id}" data-index="${i}" data-type="yargitay">
+                                <div class="source-card-type yargitay">Yargıtay</div>
                                 <div class="source-card-title">${d.daire}</div>
-                                <div class="source-card-info">E.${d.esasNo} K.${d.kararNo}</div>
+                                <div class="source-card-info">E. ${d.esasNo} K. ${d.kararNo}</div>
+                                <div class="source-card-date">${d.tarih}</div>
+                                ${preview ? `<div class="source-card-preview">${preview}...</div>` : ''}
                             </div>
                         `;
                     });
 
-                    enrichedContext.mevzuatMaddeleri.forEach(m => {
+                    // Mevzuat maddeleri
+                    enrichedContext.mevzuatMaddeleri.forEach((m, i) => {
+                        const preview = m.content?.substring(0, 150) || '';
                         sourcesHtml += `
-                            <div class="source-card">
-                                <div class="source-card-title">TCK m.${m.madde}</div>
-                                <div class="source-card-info">Kanun Maddesi</div>
+                            <div class="source-card" data-type="mevzuat" data-content="${encodeURIComponent(m.content || '')}">
+                                <div class="source-card-type mevzuat">Mevzuat</div>
+                                <div class="source-card-title">TCK Madde ${m.madde}</div>
+                                <div class="source-card-info">5237 Sayılı Türk Ceza Kanunu</div>
+                                ${preview ? `<div class="source-card-preview">${preview}...</div>` : ''}
+                            </div>
+                        `;
+                    });
+
+                    // Danıştay kararları
+                    enrichedContext.danistayKararlari.forEach((d, i) => {
+                        sourcesHtml += `
+                            <div class="source-card" data-type="danistay">
+                                <div class="source-card-type danistay">Danıştay</div>
+                                <div class="source-card-title">${d.daire || 'Danıştay'}</div>
+                                <div class="source-card-info">E. ${d.esasNo} K. ${d.kararNo}</div>
+                                <div class="source-card-date">${d.tarih}</div>
+                            </div>
+                        `;
+                    });
+
+                    // AYM kararları
+                    enrichedContext.aymKararlari.forEach((a, i) => {
+                        sourcesHtml += `
+                            <div class="source-card" data-type="aym">
+                                <div class="source-card-type aym">AYM</div>
+                                <div class="source-card-title">${a.esas_karar_no || 'Anayasa Mahkemesi'}</div>
+                                <div class="source-card-info">${a.sonuc || ''}</div>
+                                <div class="source-card-date">${a.tarih}</div>
                             </div>
                         `;
                     });
@@ -1024,9 +1096,18 @@
                     $('sourceCards').innerHTML = sourcesHtml;
                     $('sourcesPanel').style.display = 'block';
 
-                    // Click handlers for source cards
+                    // Click handlers for Yargıtay source cards
                     document.querySelectorAll('.source-card[data-id]').forEach(card => {
                         card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
+                    });
+
+                    // Click handlers for Mevzuat cards
+                    document.querySelectorAll('.source-card[data-type="mevzuat"]').forEach(card => {
+                        card.onclick = () => {
+                            const content = decodeURIComponent(card.dataset.content || '');
+                            const title = card.querySelector('.source-card-title').textContent;
+                            showMevzuatModal(title, content);
+                        };
                     });
                 }
 
@@ -1091,6 +1172,20 @@
 
         $('closeDoc').onclick = () => $('docModal').classList.remove('visible');
         $('docModal').onclick = e => { if (e.target === $('docModal')) $('docModal').classList.remove('visible'); };
+
+        // Mevzuat modal
+        function showMevzuatModal(title, content) {
+            $('docTitle').textContent = title;
+            $('docSubtitle').textContent = '5237 Sayılı Türk Ceza Kanunu';
+            $('docMeta').innerHTML = `
+                <div class="doc-meta-item"><label>Kanun</label><span>Türk Ceza Kanunu</span></div>
+                <div class="doc-meta-item"><label>Kanun No</label><span>5237</span></div>
+                <div class="doc-meta-item"><label>Kaynak</label><span>mevzuat.gov.tr</span></div>
+                <div class="doc-meta-item"><label>Tür</label><span>Kanun Maddesi</span></div>
+            `;
+            $('docContent').textContent = content || 'İçerik yüklenemedi';
+            $('docModal').classList.add('visible');
+        }
     </script>
 </body>
 </html>
