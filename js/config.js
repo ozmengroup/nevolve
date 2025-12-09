@@ -23,5 +23,5 @@ Türkçe yanıt ver.`,
     
     // App Info
     APP_NAME: 'nevolve.ai',
-    APP_VERSION: '1.0.0'
+    APP_VERSION: '1.0.1'
 };
