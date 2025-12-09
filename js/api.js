@@ -797,7 +797,52 @@ const API = {
         }
     },
 
-    // Zenginleştirilmiş context oluştur - DAVA TİPİNE GÖRE AKILLI KAYNAK SEÇİMİ
+    // Çoklu arama sorguları oluştur - farklı açılardan ara
+    generateSearchQueries(question, caseType) {
+        const queries = [];
+        const keywords = this.extractKeywords(question);
+
+        // 1. Ana keyword sorgusu
+        if (keywords.length > 0) {
+            queries.push(keywords.slice(0, 2).join(' '));
+        }
+
+        // 2. Dava tipine göre ek sorgular
+        const typeKeywords = {
+            ceza: ['savunma', 'beraat', 'ceza indirimi', 'etkin pişmanlık'],
+            icra: ['itiraz', 'menfi tespit', 'istirdat'],
+            aile: ['boşanma', 'nafaka', 'velayet'],
+            is: ['işe iade', 'fesih', 'tazminat'],
+            idari: ['iptal davası', 'yürütme durdurma']
+        };
+
+        if (caseType && typeKeywords[caseType]) {
+            const extraKeyword = typeKeywords[caseType].find(k =>
+                question.toLowerCase().includes(k) || keywords.some(kw => k.includes(kw))
+            );
+            if (extraKeyword && !queries.includes(extraKeyword)) {
+                queries.push(extraKeyword);
+            }
+        }
+
+        // 3. Soru içindeki önemli kelimeler
+        const importantWords = question
+            .split(/\s+/)
+            .filter(w => w.length > 5)
+            .filter(w => !['müvekkilim', 'müvekkil', 'avukat', 'dava', 'mahkeme'].includes(w.toLowerCase()))
+            .slice(0, 2);
+
+        if (importantWords.length > 0) {
+            const altQuery = importantWords.join(' ');
+            if (!queries.includes(altQuery)) {
+                queries.push(altQuery);
+            }
+        }
+
+        return queries.slice(0, 3); // Max 3 farklı sorgu
+    },
+
+    // Zenginleştirilmiş context oluştur - ÇOKLU ARAMA STRATEJİSİ
     async buildEnrichedContext(question) {
         const context = {
             yargitayKararlari: [],
@@ -811,38 +856,53 @@ const API = {
         context.caseType = this.detectCaseType(question);
         const caseConfig = this.KANUN_MAP[context.caseType.type];
 
-        // Genişletilmiş keyword çıkarma
-        const keywords = this.extractKeywords(question);
-        const searchQuery = keywords.length > 0
-            ? keywords.slice(0, 2).join(' ')
-            : question.split(' ').filter(w => w.length > 4).slice(0, 3).join(' ');
+        // Çoklu arama sorguları oluştur
+        const searchQueries = this.generateSearchQueries(question, context.caseType.type);
+        const primaryQuery = searchQueries[0] || question.split(' ').filter(w => w.length > 4).slice(0, 3).join(' ');
 
         // Paralel API çağrıları
         const promises = [];
+        const seenIds = new Set(); // Tekrar eden kararları önle
 
-        // === DAVA TİPİNE GÖRE KAYNAK SEÇİMİ ===
+        // === ÇOKLU ARAMA STRATEJİSİ ===
 
         if (caseConfig) {
-            // 1. Dava tipine göre mahkeme kararları
+            // 1. Dava tipine göre mahkeme kararları - birden fazla sorgu ile
             if (caseConfig.kaynaklar.includes('danistay')) {
-                // İdari dava - Danıştay öncelikli
-                promises.push(
-                    this.searchDanistay(searchQuery).then(r => {
-                        if (r.success) context.danistayKararlari = r.decisions.slice(0, 2);
-                    }).catch(() => {})
-                );
+                for (const query of searchQueries.slice(0, 2)) {
+                    promises.push(
+                        this.searchDanistay(query).then(r => {
+                            if (r.success) {
+                                r.decisions.forEach(d => {
+                                    if (!seenIds.has(d.id) && context.danistayKararlari.length < 3) {
+                                        seenIds.add(d.id);
+                                        context.danistayKararlari.push(d);
+                                    }
+                                });
+                            }
+                        }).catch(() => {})
+                    );
+                }
             }
 
             if (caseConfig.kaynaklar.includes('yargitay')) {
-                // Diğer davalar - Yargıtay
-                promises.push(
-                    this.searchCases(searchQuery).then(r => {
-                        if (r.success) context.yargitayKararlari = r.decisions.slice(0, 2);
-                    }).catch(() => {})
-                );
+                for (const query of searchQueries.slice(0, 2)) {
+                    promises.push(
+                        this.searchCases(query).then(r => {
+                            if (r.success) {
+                                r.decisions.forEach(d => {
+                                    if (!seenIds.has(d.id) && context.yargitayKararlari.length < 3) {
+                                        seenIds.add(d.id);
+                                        context.yargitayKararlari.push(d);
+                                    }
+                                });
+                            }
+                        }).catch(() => {})
+                    );
+                }
             }
 
-            // 2. Dava tipine göre ilgili kanun maddeleri - sadece 2 madde/kanun
+            // 2. Dava tipine göre ilgili kanun maddeleri
             for (const kanun of caseConfig.kanunlar) {
                 const kritikMaddeler = kanun.maddeler.slice(0, 2);
                 for (const maddeNo of kritikMaddeler) {
@@ -860,12 +920,21 @@ const API = {
                 }
             }
         } else {
-            // Genel dava - hem Yargıtay'a bak
-            promises.push(
-                this.searchCases(searchQuery).then(r => {
-                    if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
-                }).catch(() => {})
-            );
+            // Genel dava - çoklu sorgu ile Yargıtay'a bak
+            for (const query of searchQueries) {
+                promises.push(
+                    this.searchCases(query).then(r => {
+                        if (r.success) {
+                            r.decisions.forEach(d => {
+                                if (!seenIds.has(d.id) && context.yargitayKararlari.length < 4) {
+                                    seenIds.add(d.id);
+                                    context.yargitayKararlari.push(d);
+                                }
+                            });
+                        }
+                    }).catch(() => {})
+                );
+            }
         }
 
         // 3. Soruda açıkça belirtilen kanun maddeleri
@@ -883,7 +952,7 @@ const API = {
         // 4. Anayasal konu varsa AYM kararları
         if (question.match(/anayasa|temel hak|ihlal|özgürlük|bireysel başvuru/i)) {
             promises.push(
-                this.searchAYM(searchQuery).then(r => {
+                this.searchAYM(primaryQuery).then(r => {
                     if (r.success) context.aymKararlari = r.decisions.slice(0, 2);
                 }).catch(() => {})
             );

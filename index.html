@@ -301,9 +301,9 @@
             line-height: 1.5;
         }
 
-        /* Hemen Yap Section */
-        .section-hemen .section-icon { background: #E8F5EE; color: var(--success); }
-        .section-hemen .section-title { color: var(--success); }
+        /* Strateji Section */
+        .section-strateji .section-icon { background: #E8F5EE; color: var(--success); }
+        .section-strateji .section-title { color: var(--success); }
 
         .action-list {
             display: flex;
@@ -354,17 +354,17 @@
             border-left: 3px solid #F59E0B;
         }
 
-        /* Dikkat Section */
-        .section-dikkat .section-icon { background: #FEF3CD; color: var(--warning); }
-        .section-dikkat .section-title { color: var(--warning); }
+        /* Risk Section */
+        .section-risk .section-icon { background: #FEF3CD; color: var(--warning); }
+        .section-risk .section-title { color: var(--warning); }
 
-        .warning-list {
+        .risk-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        .warning-item {
+        .risk-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
@@ -376,9 +376,35 @@
             color: #92400E;
         }
 
-        .warning-icon {
+        .risk-icon {
             color: #D97706;
             font-weight: bold;
+        }
+
+        /* Ana strateji highlight */
+        .main-strategy {
+            padding: 16px;
+            background: linear-gradient(135deg, #E8F5EE 0%, #F0FDF4 100%);
+            border-radius: 8px;
+            border-left: 3px solid var(--success);
+            margin-bottom: 16px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--success);
+        }
+
+        /* Alternatif strateji */
+        .alt-strategy {
+            padding: 12px 16px;
+            background: var(--bg-alt);
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .alt-strategy strong {
+            color: var(--text);
         }
 
         /* Response actions */
@@ -747,22 +773,22 @@
     <main class="container">
         <!-- Welcome Screen -->
         <div class="welcome" id="welcome">
-            <h1 class="welcome-title">Davanızı Anlatın</h1>
-            <p class="welcome-desc">Yargıtay ve Danıştay içtihatları ile hukuki strateji oluşturun</p>
+            <h1 class="welcome-title">Dava Stratejisi Oluştur</h1>
+            <p class="welcome-desc">Olayı anlat, emsal kararlarla strateji al</p>
 
             <div class="input-section">
                 <div class="input-wrapper">
                     <div class="input-inner">
-                        <textarea id="input" rows="1" placeholder="Hukuki sorunuzu yazın..."></textarea>
-                        <button class="send-btn" id="sendBtn" onclick="send()">Ara</button>
+                        <textarea id="input" rows="1" placeholder="Olayı detaylı anlat: Ne oldu? Müvekkil kim? Ne istiyorsunuz?"></textarea>
+                        <button class="send-btn" id="sendBtn" onclick="send()">Strateji Al</button>
                     </div>
                 </div>
 
                 <div class="suggestions">
-                    <button class="suggestion-btn" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">Dolandırıcılık</button>
-                    <button class="suggestion-btn" data-q="Borçlu icra takibine itiraz etti. 7 gün içinde ne yapmalıyım?">İcra İtirazı</button>
-                    <button class="suggestion-btn" data-q="İdari işleme karşı iptal davası açmak istiyorum. Süre ve prosedür nedir?">İdari Dava</button>
-                    <button class="suggestion-btn" data-q="İşçi haksız yere işten çıkarıldı. İşe iade ve tazminat hakları neler?">İşe İade</button>
+                    <button class="suggestion-btn" data-q="Müvekkilim dolandırıcılık (TCK 157) suçundan yargılanıyor. 50.000 TL zarar var. Mağdur şikayetçi. Müvekkil suçu kabul ediyor. En iyi savunma stratejisi ne?">Dolandırıcılık Savunma</button>
+                    <button class="suggestion-btn" data-q="Borçlu 100.000 TL'lik icra takibine itiraz etti. İtiraz dilekçesinde borcun zamanaşımına uğradığını iddia ediyor. Ne yapmalıyım?">İcra İtirazı Yanıt</button>
+                    <button class="suggestion-btn" data-q="Müvekkilim 5 yıllık işçi, performans düşüklüğü gerekçesiyle işten çıkarıldı. Fesih bildirimi yazılı yapıldı. İşe iade davası açmalı mıyız?">İşe İade Stratejisi</button>
+                    <button class="suggestion-btn" data-q="Belediye müvekkilimin ruhsatsız yapısını yıkacak. İdari işleme karşı dava açmak istiyoruz. Yürütme durdurma alabilir miyiz?">İdari Dava Stratejisi</button>
                 </div>
             </div>
         </div>
@@ -853,38 +879,65 @@
             API.resetConversation();
         }
 
-        // Parse response sections
+        // Parse response sections - Strateji formatı
         function parseResponse(text) {
-            const sections = { ozet: {}, hemen: [], emsal: '', dikkat: [] };
+            const sections = { ozet: {}, strateji: { ana: '', adimlar: [], alternatif: '' }, emsal: '', riskler: [] };
 
-            const ozetMatch = text.match(/ÖZET[\s\S]*?(?=HEMEN|$)/i);
+            // ÖZET
+            const ozetMatch = text.match(/ÖZET[\s\S]*?(?=STRATEJİ|HEMEN|$)/i);
             if (ozetMatch) {
                 const ozetText = ozetMatch[0];
                 const konuMatch = ozetText.match(/Konu[^:]*:\s*([^\n•]+)/i);
-                const sonucMatch = ozetText.match(/Sonuç[^:]*:\s*([^\n•]+)/i);
-                const sureMatch = ozetText.match(/Süre[^:]*:\s*([^\n•]+)/i);
+                const sonucMatch = ozetText.match(/(Olası sonuç|Sonuç)[^:]*:\s*([^\n•]+)/i);
+                const sureMatch = ozetText.match(/(Kritik süre|Süre)[^:]*:\s*([^\n•]+)/i);
                 sections.ozet = {
                     konu: konuMatch ? konuMatch[1].trim() : '',
-                    sonuc: sonucMatch ? sonucMatch[1].trim() : '',
-                    sure: sureMatch ? sureMatch[1].trim() : ''
+                    sonuc: sonucMatch ? sonucMatch[2].trim() : '',
+                    sure: sureMatch ? sureMatch[2].trim() : ''
                 };
             }
 
-            const hemenMatch = text.match(/HEMEN YAP[\s\S]*?(?=EMSAL|DİKKAT|$)/i);
-            if (hemenMatch) {
-                const items = hemenMatch[0].match(/\d+\.\s*[^\n]+/g) || [];
-                sections.hemen = items.map(item => item.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+            // STRATEJİ
+            const stratejiMatch = text.match(/STRATEJİ[\s\S]*?(?=EMSAL|RİSK|$)/i);
+            if (stratejiMatch) {
+                const stratejiText = stratejiMatch[0];
+
+                // Ana strateji
+                const anaMatch = stratejiText.match(/Ana Strateji[^:]*:\s*([^\n]+)/i);
+                if (anaMatch) sections.strateji.ana = anaMatch[1].trim();
+
+                // Adımlar
+                const adimlar = stratejiText.match(/\d+\.\s*[^\n]+/g) || [];
+                sections.strateji.adimlar = adimlar.map(item => {
+                    const cleaned = item.replace(/^\d+\.\s*/, '').trim();
+                    return cleaned;
+                }).filter(Boolean);
+
+                // Alternatif
+                const altMatch = stratejiText.match(/Alternatif[^:]*:\s*([^\n]+)/i);
+                if (altMatch) sections.strateji.alternatif = altMatch[1].trim();
             }
 
-            const emsalMatch = text.match(/EMSAL[\s\S]*?(?=DİKKAT|KAYNAKLAR|$)/i);
+            // Eski format desteği (HEMEN YAP)
+            if (sections.strateji.adimlar.length === 0) {
+                const hemenMatch = text.match(/HEMEN YAP[\s\S]*?(?=EMSAL|DİKKAT|RİSK|$)/i);
+                if (hemenMatch) {
+                    const items = hemenMatch[0].match(/\d+\.\s*[^\n]+/g) || [];
+                    sections.strateji.adimlar = items.map(item => item.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+                }
+            }
+
+            // EMSAL ANALİZİ
+            const emsalMatch = text.match(/EMSAL[\s\S]*?(?=RİSK|DİKKAT|KAYNAKLAR|$)/i);
             if (emsalMatch) {
-                sections.emsal = emsalMatch[0].replace(/^EMSAL\s*\[\d+\]?\s*/i, '').replace(/\n/g, ' ').trim();
+                sections.emsal = emsalMatch[0].replace(/^EMSAL\s*(ANALİZİ)?\s*\[\d+\]?\s*/i, '').trim();
             }
 
-            const dikkatMatch = text.match(/DİKKAT[\s\S]*$/i);
-            if (dikkatMatch) {
-                const items = dikkatMatch[0].match(/[•\-]\s*[^\n]+/g) || [];
-                sections.dikkat = items.map(item => item.replace(/^[•\-]\s*/, '').trim()).filter(Boolean);
+            // RİSKLER veya DİKKAT
+            const riskMatch = text.match(/(RİSK|DİKKAT)[\s\S]*$/i);
+            if (riskMatch) {
+                const items = riskMatch[0].match(/[•\-]\s*[^\n]+/g) || [];
+                sections.riskler = items.map(item => item.replace(/^[•\-]\s*/, '').trim()).filter(Boolean);
             }
 
             return sections;
@@ -903,6 +956,7 @@
         function renderResponse(sections) {
             let html = '';
 
+            // ÖZET
             if (sections.ozet.konu || sections.ozet.sonuc || sections.ozet.sure) {
                 html += `
                     <div class="section section-ozet">
@@ -912,51 +966,56 @@
                         </div>
                         <div class="summary-grid">
                             ${sections.ozet.konu ? `<div class="summary-item"><div class="summary-label">Konu</div><div class="summary-value">${renderMarkdown(sections.ozet.konu)}</div></div>` : ''}
-                            ${sections.ozet.sonuc ? `<div class="summary-item"><div class="summary-label">Sonuç</div><div class="summary-value">${renderMarkdown(sections.ozet.sonuc)}</div></div>` : ''}
-                            ${sections.ozet.sure ? `<div class="summary-item"><div class="summary-label">Süre</div><div class="summary-value">${renderMarkdown(sections.ozet.sure)}</div></div>` : ''}
+                            ${sections.ozet.sonuc ? `<div class="summary-item"><div class="summary-label">Olası Sonuç</div><div class="summary-value">${renderMarkdown(sections.ozet.sonuc)}</div></div>` : ''}
+                            ${sections.ozet.sure ? `<div class="summary-item"><div class="summary-label">Kritik Süre</div><div class="summary-value">${renderMarkdown(sections.ozet.sure)}</div></div>` : ''}
                         </div>
                     </div>`;
             }
 
-            if (sections.hemen.length > 0) {
+            // STRATEJİ
+            if (sections.strateji.ana || sections.strateji.adimlar.length > 0) {
                 html += `
-                    <div class="section section-hemen">
+                    <div class="section section-strateji">
                         <div class="section-header">
-                            <div class="section-icon">H</div>
-                            <div class="section-title">Hemen Yap</div>
+                            <div class="section-icon">S</div>
+                            <div class="section-title">Strateji</div>
                         </div>
+                        ${sections.strateji.ana ? `<div class="main-strategy">${renderMarkdown(sections.strateji.ana)}</div>` : ''}
                         <div class="action-list">
-                            ${sections.hemen.map((item, i) => `
+                            ${sections.strateji.adimlar.map((item, i) => `
                                 <div class="action-item">
                                     <div class="action-num">${i + 1}</div>
                                     <div class="action-text">${renderMarkdown(item)}</div>
                                 </div>`).join('')}
                         </div>
+                        ${sections.strateji.alternatif ? `<div class="alt-strategy"><strong>Plan B:</strong> ${renderMarkdown(sections.strateji.alternatif)}</div>` : ''}
                     </div>`;
             }
 
+            // EMSAL ANALİZİ
             if (sections.emsal) {
                 html += `
                     <div class="section section-emsal">
                         <div class="section-header">
                             <div class="section-icon">E</div>
-                            <div class="section-title">Emsal Karar</div>
+                            <div class="section-title">Emsal Analizi</div>
                         </div>
                         <div class="emsal-text">${renderMarkdown(sections.emsal)}</div>
                     </div>`;
             }
 
-            if (sections.dikkat.length > 0) {
+            // RİSKLER
+            if (sections.riskler.length > 0) {
                 html += `
-                    <div class="section section-dikkat">
+                    <div class="section section-risk">
                         <div class="section-header">
                             <div class="section-icon">!</div>
-                            <div class="section-title">Dikkat</div>
+                            <div class="section-title">Riskler</div>
                         </div>
-                        <div class="warning-list">
-                            ${sections.dikkat.map(item => `
-                                <div class="warning-item">
-                                    <span class="warning-icon">•</span>
+                        <div class="risk-list">
+                            ${sections.riskler.map(item => `
+                                <div class="risk-item">
+                                    <span class="risk-icon">!</span>
                                     <span>${renderMarkdown(item)}</span>
                                 </div>`).join('')}
                         </div>
