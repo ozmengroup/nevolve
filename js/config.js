@@ -1,8 +1,18 @@
 // nevolve.ai Configuration
 const CONFIG = {
     YARGI_API: 'https://yargi-api.onrender.com',
+
+    // Groq API (Primary - 14,400 istek/gün, çok hızlı)
+    GROQ_API: 'https://api.groq.com/openai/v1/chat/completions',
+    GROQ_KEY: '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',
+    GROQ_MODEL: 'llama-3.3-70b-versatile',
+
+    // Gemini API (Fallback)
     GEMINI_API: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
     GEMINI_KEY: 'AIzaSyDL4rz3oNYEW55VxbLisbAsEAL4g3cKG9U',
+
+    // Hangi API kullanılsın? 'groq' veya 'gemini'
+    AI_PROVIDER: 'groq',
     
     AI_SYSTEM_PROMPT: `Sen 25 yıllık deneyimli bir Türk hukuk uzmanısın. Eymen adlı genç avukata detaylı danışmanlık veriyorsun.
 
