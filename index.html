@@ -46,15 +46,16 @@
 
         .logo {
             font-family: 'Playfair Display', Georgia, serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: -0.5px;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.3px;
         }
 
         .logo span {
             font-weight: 400;
             color: var(--text-muted);
+            font-size: 14px;
         }
 
         .tagline {
@@ -249,14 +250,16 @@
         }
 
         .section-icon {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: var(--bg-alt);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
         .section-title {
@@ -268,7 +271,7 @@
         }
 
         /* Özet Section */
-        .section-ozet .section-icon { background: #EEF4FF; }
+        .section-ozet .section-icon { background: #EEF4FF; color: var(--accent); }
         .section-ozet .section-title { color: var(--accent); }
 
         .summary-grid {
@@ -299,7 +302,7 @@
         }
 
         /* Hemen Yap Section */
-        .section-hemen .section-icon { background: #E8F5EE; }
+        .section-hemen .section-icon { background: #E8F5EE; color: var(--success); }
         .section-hemen .section-title { color: var(--success); }
 
         .action-list {
@@ -338,7 +341,7 @@
         }
 
         /* Emsal Section */
-        .section-emsal .section-icon { background: #FFF5EB; }
+        .section-emsal .section-icon { background: #FFF5EB; color: #C05621; }
         .section-emsal .section-title { color: #C05621; }
 
         .emsal-text {
@@ -352,7 +355,7 @@
         }
 
         /* Dikkat Section */
-        .section-dikkat .section-icon { background: #FEF3CD; }
+        .section-dikkat .section-icon { background: #FEF3CD; color: var(--warning); }
         .section-dikkat .section-title { color: var(--warning); }
 
         .warning-list {
@@ -378,10 +381,33 @@
             font-weight: bold;
         }
 
+        /* Response actions */
+        .response-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .response-action-btn {
+            padding: 6px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .response-action-btn:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+
         /* Sources - Minimal */
         .sources-section {
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 24px;
+            padding-top: 20px;
             border-top: 1px solid var(--border);
         }
 
@@ -478,15 +504,22 @@
             margin-top: 40px;
             padding-top: 32px;
             border-top: 1px solid var(--border);
+            margin-bottom: 60px;
         }
 
         .new-question-label {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 500;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        .new-question-section .input-wrapper {
+            border-width: 1px;
+        }
+
+        .new-question-section #inputBottom {
+            font-size: 15px;
         }
 
         /* Footer */
@@ -707,8 +740,7 @@
 
     <header class="header">
         <div class="header-inner">
-            <div class="logo">nevolve<span>.ai</span></div>
-            <div class="tagline">Hukuki Araştırma Asistanı</div>
+            <div class="logo">nevolve <span>Hukuk Asistanı</span></div>
         </div>
     </header>
 
@@ -740,10 +772,10 @@
 
         <!-- Bottom Input (after first message) -->
         <div class="new-question-section" id="bottomInput" style="display: none;">
-            <div class="new-question-label">Takip Sorusu</div>
+            <div class="new-question-label">Devam sorusu</div>
             <div class="input-wrapper">
                 <div class="input-inner">
-                    <textarea id="inputBottom" rows="1" placeholder="Başka bir soru sorun..."></textarea>
+                    <textarea id="inputBottom" rows="1" placeholder="Takip sorusu yazın..."></textarea>
                     <button class="send-btn" id="sendBtnBottom" onclick="send()">Gönder</button>
                 </div>
             </div>
@@ -751,10 +783,7 @@
     </main>
 
     <footer class="footer" id="footer">
-        <p class="footer-text">
-            <a href="https://burhansimsek.space" class="footer-link" target="_blank">nevolve.ai</a> —
-            Yargıtay ve Danıştay içtihatları ile desteklenmektedir
-        </p>
+        <p class="footer-text">Yargıtay ve Danıştay içtihatları ile desteklenmektedir</p>
     </footer>
 
     <!-- Modal -->
@@ -793,6 +822,13 @@
         }
 
         $('input').addEventListener('input', function() { autoResize(this); });
+
+        // XSS koruması
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // Toast
         function toast(msg) {
@@ -975,12 +1011,12 @@
             messageDiv.innerHTML = `
                 <div class="question">
                     <div class="question-label">Soru</div>
-                    <div class="question-text">${q}</div>
+                    <div class="question-text">${escapeHtml(q)}</div>
                 </div>
                 <div class="response" id="currentResponse">
-                    <div class="loading">
+                    <div class="loading" id="loadingIndicator">
                         <div class="loading-spinner"></div>
-                        <span>Kaynaklar aranıyor...</span>
+                        <span class="loading-text">Emsal kararlar aranıyor...</span>
                     </div>
                 </div>
             `;
@@ -990,7 +1026,9 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
             // Build context
+            const loadingText = messageDiv.querySelector('.loading-text');
             const ctx = await API.buildEnrichedContext(q);
+            if (loadingText) loadingText.textContent = 'Yanıt hazırlanıyor...';
 
             let parsedKararlar = [];
             caseContents = [];
@@ -1057,9 +1095,15 @@
             responseEl.innerHTML = '<div class="streaming-text"></div>';
             const streamingEl = responseEl.querySelector('.streaming-text');
 
+            let lastScroll = 0;
             const r = await API.askAIStream(finalPrompt, (partialText) => {
                 streamingEl.innerHTML = partialText + '<span class="streaming-cursor"></span>';
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                // Throttle scroll - her 200ms'de bir
+                const now = Date.now();
+                if (now - lastScroll > 200) {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    lastScroll = now;
+                }
             });
 
             if (r.success) {
@@ -1069,6 +1113,9 @@
                 if (caseContents.length > 0 || mevzuatData.length > 0) {
                     responseHtml += `<div class="sources-section">${renderSources()}</div>`;
                 }
+
+                // Kopyala butonu
+                responseHtml += `<div class="response-actions"><button class="response-action-btn" onclick="copyResponse(this)">Kopyala</button></div>`;
 
                 responseEl.innerHTML = responseHtml;
                 responseEl.removeAttribute('id');
@@ -1084,17 +1131,13 @@
                     </div>`;
             }
 
-            // Show bottom input for follow-up
+            // Show bottom input for follow-up (listener'ı sadece bir kez ekle)
             if (!hasMessages) {
                 hasMessages = true;
                 $('bottomInput').style.display = 'block';
-                $('inputBottom').addEventListener('input', function() { autoResize(this); });
-                $('inputBottom').addEventListener('keydown', e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        send();
-                    }
-                });
+                const bottomInput = $('inputBottom');
+                bottomInput.addEventListener('input', function() { autoResize(this); });
+                bottomInput.addEventListener('keydown', handleEnterKey);
             }
 
             $('sendBtn').disabled = false;
@@ -1139,12 +1182,26 @@
             toast('Kopyalandı');
         }
 
+        function copyResponse(btn) {
+            const response = btn.closest('.response');
+            const text = response.innerText.replace('Kopyala', '').trim();
+            navigator.clipboard.writeText(text);
+            toast('Yanıt kopyalandı');
+        }
+
         // Event listeners
-        $('input').addEventListener('keydown', e => {
+        function handleEnterKey(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 send();
             }
+        }
+
+        $('input').addEventListener('keydown', handleEnterKey);
+
+        // Escape ile modal kapat
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
         });
 
         document.querySelectorAll('.suggestion-btn').forEach(el => {
