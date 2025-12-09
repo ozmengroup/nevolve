@@ -833,6 +833,37 @@
             let casesContext = '';
             caseContents = [];
 
+            // Akıllı karar kesme - SONUÇ kısmını öncelikle al
+            function smartTruncate(content, maxLen = 1800) {
+                if (!content || content.length <= maxLen) return content;
+
+                // SONUÇ veya KARAR kısmını bul
+                const sonucPatterns = [
+                    /SONUÇ\s*:[\s\S]*/i,
+                    /KARAR\s*:[\s\S]*/i,
+                    /Hüküm\s*:[\s\S]*/i,
+                    /BOZULMASINA[\s\S]*/i,
+                    /ONANMASINA[\s\S]*/i
+                ];
+
+                let sonucPart = '';
+                for (const pattern of sonucPatterns) {
+                    const match = content.match(pattern);
+                    if (match) {
+                        sonucPart = match[0].substring(0, 800);
+                        break;
+                    }
+                }
+
+                // Başlangıç kısmı (dava özeti)
+                const baslangic = content.substring(0, maxLen - sonucPart.length - 50);
+
+                if (sonucPart) {
+                    return baslangic + '\n...\n' + sonucPart;
+                }
+                return content.substring(0, maxLen);
+            }
+
             if (ctx.yargitayKararlari.length > 0) {
                 for (let i = 0; i < Math.min(3, ctx.yargitayKararlari.length); i++) {
                     const doc = await API.getDocument(ctx.yargitayKararlari[i].id);
@@ -841,9 +872,10 @@
                     }
                 }
                 if (caseContents.length > 0) {
-                    casesContext += '\n\n=== YARGITAY ===\n';
+                    casesContext += '\n\n=== YARGITAY KARARLARI ===\n';
                     caseContents.forEach((c, i) => {
-                        casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo}:\n${c.content.substring(0, 1500)}\n\n`;
+                        const truncated = smartTruncate(c.content);
+                        casesContext += `\n[${i+1}] ${c.daire} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${truncated}\n`;
                     });
                 }
             }
@@ -858,7 +890,14 @@
 
             $('aiBody').innerHTML = showSkeleton(3);
 
-            const r = await API.askAI(q + casesContext);
+            // Dava tipi bilgisini ekle
+            let finalPrompt = q;
+            if (ctx.caseType && ctx.caseType.type !== 'genel') {
+                finalPrompt = `[${ctx.caseType.label} davası]\n\n${q}`;
+            }
+            finalPrompt += casesContext;
+
+            const r = await API.askAI(finalPrompt);
 
             if (r.success) {
                 const sections = parseResponse(r.text);

@@ -353,21 +353,86 @@ const API = {
         }).filter(Boolean);
     },
 
+    // Dava tipi algılama
+    detectCaseType(question) {
+        const q = question.toLowerCase();
+
+        // Ceza Hukuku
+        if (q.match(/tck|ceza|suç|hapis|tutuklama|savcı|kovuşturma|soruşturma|müşteki|sanık|mağdur|şikayet|uzlaşma|hagb|dolandırıcılık|hırsızlık|yaralama|tehdit|kasten|taksir|darp/)) {
+            return { type: 'ceza', label: 'Ceza Hukuku', searchPrefix: 'ceza' };
+        }
+        // İcra Hukuku
+        if (q.match(/icra|haciz|itiraz|ödeme emri|takip|borçlu|alacaklı|kambiyo|senet|çek|iflas|konkordato|rehin|ipotek|kıymet takdiri/)) {
+            return { type: 'icra', label: 'İcra Hukuku', searchPrefix: 'icra' };
+        }
+        // Aile Hukuku
+        if (q.match(/boşanma|nafaka|velayet|mal paylaşım|edinilmiş mal|ziynet|çocuk|evlilik|nişan|aile|eş|karı|koca|müşterek/)) {
+            return { type: 'aile', label: 'Aile Hukuku', searchPrefix: 'aile' };
+        }
+        // İş Hukuku
+        if (q.match(/işçi|işveren|kıdem|ihbar|fesih|işe iade|fazla mesai|yıllık izin|iş kazası|sgk|sigorta|mobbing|arabulucu|işkur/)) {
+            return { type: 'is', label: 'İş Hukuku', searchPrefix: 'iş' };
+        }
+        // İdari Hukuku
+        if (q.match(/idari|iptal|tam yargı|belediye|imar|ruhsat|kamulaştırma|memur|disiplin|ihale|vergi|danıştay/)) {
+            return { type: 'idari', label: 'İdari Hukuk', searchPrefix: 'idari' };
+        }
+        // Miras Hukuku
+        if (q.match(/miras|tereke|veraset|vasiyet|saklı pay|tenkis|reddi miras|mirasçı|muris|intikal/)) {
+            return { type: 'miras', label: 'Miras Hukuku', searchPrefix: 'miras' };
+        }
+
+        return { type: 'genel', label: 'Genel', searchPrefix: '' };
+    },
+
+    // Genişletilmiş keyword çıkarma
+    extractKeywords(question) {
+        const keywordPatterns = [
+            // Kanun maddeleri
+            /TCK\s*\d+/gi, /CMK\s*\d+/gi, /TMK\s*\d+/gi, /İİK\s*\d+/gi, /HMK\s*\d+/gi,
+            // Ceza terimleri
+            /dolandırıcılık|hırsızlık|yaralama|tehdit|hakaret|iftira|güveni kötüye kullanma|zimmet|rüşvet|kasten öldürme|taksirle öldürme|cinsel saldırı|cinsel istismar|uyuşturucu/gi,
+            // İcra terimleri
+            /icra takip|haciz|ödeme emri|itiraz|kambiyo|senet|çek|ipotek|rehin|iflas|konkordato|tasarrufun iptali/gi,
+            // Aile terimleri
+            /boşanma|nafaka|velayet|mal paylaşım|ziynet|tazminat|çocuk teslimi|kişisel ilişki/gi,
+            // İş terimleri
+            /işe iade|kıdem tazminat|ihbar tazminat|fazla mesai|mobbing|iş kazası|haksız fesih|haklı fesih/gi,
+            // Genel hukuk terimleri
+            /zamanaşımı|hak düşürücü süre|temyiz|istinaf|itiraz|başvuru|dava|mahkeme/gi
+        ];
+
+        let keywords = [];
+        keywordPatterns.forEach(pattern => {
+            const matches = question.match(pattern) || [];
+            keywords = keywords.concat(matches);
+        });
+
+        // Tekrarları kaldır ve ilk 3'ü al
+        return [...new Set(keywords.map(k => k.toLowerCase()))].slice(0, 3);
+    },
+
     // Zenginleştirilmiş context oluştur
     async buildEnrichedContext(question) {
         const context = {
             yargitayKararlari: [],
             danistayKararlari: [],
             mevzuatMaddeleri: [],
-            aymKararlari: []
+            aymKararlari: [],
+            caseType: null
         };
+
+        // Dava tipini algıla
+        context.caseType = this.detectCaseType(question);
 
         // TCK maddelerini çıkar
         const tckMaddeleri = this.extractTCKMadde(question);
 
-        // Anahtar kelimeleri çıkar
-        const keywords = question.match(/TCK \d+|CMK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB|iptal|idari/gi) || [];
-        const searchQuery = keywords.length > 0 ? keywords.slice(0, 2).join(' ') : question.split(' ').filter(w => w.length > 4).slice(0, 2).join(' ');
+        // Genişletilmiş keyword çıkarma
+        const keywords = this.extractKeywords(question);
+        const searchQuery = keywords.length > 0
+            ? keywords.slice(0, 2).join(' ')
+            : question.split(' ').filter(w => w.length > 4).slice(0, 3).join(' ');
 
         // Paralel API çağrıları
         const promises = [];
