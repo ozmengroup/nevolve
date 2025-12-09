@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai</title>
+    <title>nevolve.ai - Hukuki Strateji Asistanı</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         :root {
-            --bg: #F5F5F5;
+            --bg: #F8F9FA;
+            --sidebar-bg: #FFFFFF;
             --card: #FFFFFF;
             --text: #1A1A1A;
-            --text-secondary: #737373;
-            --text-muted: #A3A3A3;
-            --border: #E5E5E5;
-            --accent: #525252;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --border: #E5E7EB;
+            --accent: #3B82F6;
+            --accent-light: #EFF6FF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             background: var(--bg);
@@ -27,268 +32,465 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
-        
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 48px 20px;
+
+        /* Layout */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
         }
-        
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
         .logo {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .sidebar-section {
+            padding: 16px 12px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 8px;
             margin-bottom: 8px;
         }
-        
-        .logo span { color: var(--text-muted); font-weight: 400; }
-        
-        .notice {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid var(--border);
-        }
-        
-        .section-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-        
-        textarea, input[type="text"] {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            background: var(--bg);
-            color: var(--text);
-            transition: all 0.15s;
-            -webkit-appearance: none;
-        }
-        
-        textarea { min-height: 80px; resize: none; }
-        
-        textarea:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: white;
-        }
-        
-        textarea::placeholder, input::placeholder { color: var(--text-muted); }
-        
-        .input-footer {
+
+        .template-list {
             display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 4px;
         }
-        
-        .btn {
-            padding: 8px 18px;
-            background: var(--text);
-            color: white;
-            border: none;
+
+        .template-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
             border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
             font-family: inherit;
+        }
+
+        .template-item:hover {
+            background: var(--accent-light);
+        }
+
+        .template-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .template-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .template-icon.ceza { background: #FEE2E2; }
+        .template-icon.icra { background: #FEF3C7; }
+        .template-icon.idari { background: #DBEAFE; }
+        .template-icon.aile { background: #FCE7F3; }
+
+        .template-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .template-name {
             font-size: 13px;
             font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.15s;
+            color: var(--text);
+            margin-bottom: 2px;
         }
-        
-        .btn:hover { opacity: 0.8; }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-        }
-        
-        .tag {
-            padding: 6px 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: inherit;
+
+        .template-desc {
             font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .sidebar-footer a {
             color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s;
+            text-decoration: none;
         }
-        
-        .tag:hover { border-color: var(--accent); color: var(--text); }
-        
-        .response {
-            margin-top: 20px;
-            display: none;
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        
-        .response.visible { display: block; animation: fadeIn 0.2s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .response-box {
+
+        .main-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .main-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #ECFDF5;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
             padding: 24px;
-            background: var(--bg);
-            border-radius: 12px;
+        }
+
+        .welcome-card {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
             margin-bottom: 16px;
         }
-        
-        .response-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        
-        /* Response Content Styling */
+
+        .welcome-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .quick-action {
+            padding: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+        }
+
+        .quick-action:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .quick-action-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-action-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Response */
+        .response-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .response-container.visible {
+            display: block;
+        }
+
+        .user-message {
+            background: var(--accent);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 16px 16px 4px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            max-width: 80%;
+            margin-left: auto;
+        }
+
+        .ai-response {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .ai-response-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ai-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #8B5CF6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .ai-info {
+            flex: 1;
+        }
+
+        .ai-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ai-source {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
         .response-content {
             font-size: 14px;
-            line-height: 1.9;
+            line-height: 1.8;
             color: var(--text);
         }
-        
+
         .response-content h3 {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text);
-            margin: 28px 0 16px 0;
-            padding: 10px 14px;
-            background: white;
-            border-left: 3px solid var(--text);
-            border-radius: 0 8px 8px 0;
+            color: var(--accent);
+            margin: 24px 0 12px 0;
+            padding: 8px 12px;
+            background: var(--accent-light);
+            border-radius: 8px;
+            display: inline-block;
         }
-        
+
         .response-content h3:first-child { margin-top: 0; }
-        
+
         .response-content p {
-            margin-bottom: 16px;
-            text-align: justify;
-        }
-        
-        .response-content ul, .response-content ol {
-            margin: 16px 0;
-            padding-left: 24px;
-        }
-        
-        .response-content li {
             margin-bottom: 12px;
-            line-height: 1.8;
         }
-        
+
+        .response-content ul, .response-content ol {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .response-content li {
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
         .response-content strong {
             color: var(--text);
             font-weight: 600;
         }
-        
+
         .response-content code {
-            display: inline-block;
-            padding: 2px 8px;
-            background: #E8E8E8;
+            padding: 2px 6px;
+            background: #F3F4F6;
             border-radius: 4px;
             font-family: 'SF Mono', Monaco, monospace;
             font-size: 12px;
         }
-        
-        .cases-section {
+
+        /* Sources Panel */
+        .sources-panel {
             margin-top: 16px;
-            display: none;
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 12px;
         }
-        
-        .cases-section.visible { display: block; }
-        
-        .case-card {
-            padding: 14px 16px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        
-        .case-card:hover { border-color: var(--accent); }
-        .case-card.selected { border-color: var(--text); background: #FAFAFA; }
-        
-        .case-header {
+
+        .sources-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            gap: 6px;
         }
-        
-        .case-court { font-size: 13px; font-weight: 600; }
-        .case-date { font-size: 11px; color: var(--text-muted); }
-        .case-info { font-size: 12px; color: var(--text-secondary); }
-        
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 24px 0;
-        }
-        
-        .search-box {
+
+        .source-cards {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
         }
-        
-        .search-box input { flex: 1; }
-        
-        .results-info {
-            margin-top: 12px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        .results-list {
-            margin-top: 12px;
-            display: none;
-        }
-        
-        .results-list.visible { display: block; }
-        
-        .result-item {
-            padding: 12px 14px;
-            background: var(--bg);
+
+        .source-card {
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            margin-bottom: 6px;
             cursor: pointer;
             transition: all 0.15s;
+            font-size: 12px;
         }
-        
-        .result-item:hover { background: #EBEBEB; }
-        .result-item.selected { background: #E0E0E0; }
-        
-        .result-header {
-            display: flex;
-            justify-content: space-between;
+
+        .source-card:hover {
+            border-color: var(--accent);
+        }
+
+        .source-card-title {
+            font-weight: 600;
             margin-bottom: 2px;
         }
-        
-        .result-court { font-size: 13px; font-weight: 600; }
-        .result-date { font-size: 11px; color: var(--text-muted); }
-        .result-info { font-size: 12px; color: var(--text-secondary); }
-        
+
+        .source-card-info {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 16px 24px;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            transition: all 0.15s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        #aiInput {
+            flex: 1;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            min-height: 24px;
+            max-height: 150px;
+            color: var(--text);
+        }
+
+        #aiInput:focus { outline: none; }
+        #aiInput::placeholder { color: var(--text-muted); }
+
+        .submit-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .submit-btn:hover { background: #2563EB; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .submit-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
         /* Document Modal */
         .doc-modal {
             display: none;
@@ -299,9 +501,9 @@
             padding: 40px 20px;
             overflow-y: auto;
         }
-        
+
         .doc-modal.visible { display: block; }
-        
+
         .doc-container {
             max-width: 720px;
             margin: 0 auto;
@@ -310,12 +512,12 @@
             overflow: hidden;
             animation: slideUp 0.2s ease;
         }
-        
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .doc-header {
             padding: 16px 20px;
             background: var(--text);
@@ -324,15 +526,15 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .doc-header-info h3 {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 4px;
         }
-        
+
         .doc-header-info span { font-size: 12px; opacity: 0.8; }
-        
+
         .doc-close {
             padding: 8px 16px;
             background: rgba(255,255,255,0.2);
@@ -343,22 +545,22 @@
             font-size: 13px;
             cursor: pointer;
         }
-        
+
         .doc-close:hover { background: rgba(255,255,255,0.3); }
-        
+
         .doc-body {
             padding: 24px;
             max-height: 60vh;
             overflow-y: auto;
         }
-        
+
         .doc-content {
             font-size: 13px;
             line-height: 1.9;
             color: var(--text-secondary);
             white-space: pre-wrap;
         }
-        
+
         .doc-meta {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -367,21 +569,34 @@
             background: var(--bg);
             border-top: 1px solid var(--border);
         }
-        
+
         .doc-meta-item { font-size: 12px; }
         .doc-meta-item label { color: var(--text-muted); display: block; margin-bottom: 2px; }
         .doc-meta-item span { color: var(--text); font-weight: 500; }
-        
-        .footer {
-            margin-top: 32px;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            background: var(--text);
+            color: white;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
-        
-        .footer a { color: var(--text-secondary); text-decoration: none; }
-        .footer a:hover { color: var(--text); }
-        
+
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        /* Loading */
         .loading::after {
             content: '';
             animation: dots 1.5s infinite;
@@ -393,36 +608,22 @@
             60%, 100% { content: '...'; }
         }
 
-        /* Error States */
+        /* Error */
         .error-box {
-            padding: 20px;
+            padding: 24px;
             background: #FEF2F2;
             border: 1px solid #FECACA;
             border-radius: 12px;
             text-align: center;
         }
 
-        .error-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .error-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #DC2626;
-            margin-bottom: 6px;
-        }
-
-        .error-detail {
-            font-size: 13px;
-            color: #7F1D1D;
-            margin-bottom: 16px;
-        }
+        .error-icon { font-size: 32px; margin-bottom: 12px; }
+        .error-title { font-size: 15px; font-weight: 600; color: var(--danger); margin-bottom: 6px; }
+        .error-detail { font-size: 13px; color: #7F1D1D; margin-bottom: 16px; }
 
         .error-retry {
             padding: 10px 20px;
-            background: #DC2626;
+            background: var(--danger);
             color: white;
             border: none;
             border-radius: 8px;
@@ -430,108 +631,189 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s;
         }
 
-        .error-retry:hover { background: #B91C1C; }
+        .error-retry:hover { background: #DC2626; }
         .error-retry:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Countdown */
         .countdown {
             display: inline-block;
             padding: 2px 8px;
             background: #FEE2E2;
             border-radius: 4px;
             font-weight: 600;
-            font-variant-numeric: tabular-nums;
         }
 
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            padding: 14px 20px;
-            background: #1A1A1A;
-            color: white;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
+        /* Mobile */
+        @media (max-width: 768px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
 
-        .toast.visible {
-            transform: translateY(0);
-            opacity: 1;
-        }
+            .sidebar {
+                display: none;
+            }
 
-        .toast.success { background: #059669; }
-        .toast.error { background: #DC2626; }
+            .chat-area {
+                padding: 16px;
+            }
 
-        /* Cache indicator */
-        .cache-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            background: #DBEAFE;
-            color: #1D4ED8;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 8px;
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="logo">nevolve<span>.ai</span></h1>
-            <p class="notice">ay sonu şok fatura ile karşılaşmamam için linki paylaşma olur mu =)</p>
-        </header>
-        
-        <div class="card">
-            <div class="section-label">Hukuki Strateji</div>
-            <textarea id="aiInput" placeholder="Davanızı detaylı anlatın..."></textarea>
-            <div class="input-footer">
-                <button class="btn" id="aiSubmit">Analiz Et</button>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">nevolve<span>.ai</span></h1>
             </div>
-            
-            <div class="tags">
-                <button class="tag" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. 50.000 TL zarar iddiası var. Etkin pişmanlık ve uzlaşma mümkün mü?">Dolandırıcılık TCK 157</button>
-                <button class="tag" data-q="Borçlu icra takibine itiraz etti. İtirazın iptali davası açacağız. Süreler ve strateji nasıl olmalı?">İtirazın İptali</button>
-                <button class="tag" data-q="Müvekkilim TCK 86/2 kasten yaralama suçundan yargılanıyor. HAGB ve ceza indirimi şartları nedir?">Kasten Yaralama</button>
-                <button class="tag" data-q="Kambiyo senedine dayalı icra takibinde borçlu zamanaşımı itirazında bulundu. İtiraz geçerli mi?">Kambiyo Zamanaşımı</button>
-            </div>
-            
-            <div class="response" id="response">
-                <div class="response-box">
-                    <div class="response-label">Hukuki Analiz</div>
-                    <div class="response-content" id="responseContent"></div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Hukuk Alanları</div>
+                <div class="template-list">
+                    <button class="template-item" data-category="ceza">
+                        <div class="template-icon ceza">⚖️</div>
+                        <div class="template-info">
+                            <div class="template-name">Ceza Hukuku</div>
+                            <div class="template-desc">TCK, CMK, Yargıtay</div>
+                        </div>
+                    </button>
+                    <button class="template-item" data-category="icra">
+                        <div class="template-icon icra">📋</div>
+                        <div class="template-info">
+                            <div class="template-name">İcra Hukuku</div>
+                            <div class="template-desc">İİK, Takip, İtiraz</div>
+                        </div>
+                    </button>
+                    <button class="template-item" data-category="idari">
+                        <div class="template-icon idari">🏛️</div>
+                        <div class="template-info">
+                            <div class="template-name">İdare Hukuku</div>
+                            <div class="template-desc">Danıştay, İptal</div>
+                        </div>
+                    </button>
+                    <button class="template-item" data-category="aile">
+                        <div class="template-icon aile">👨‍👩‍👧</div>
+                        <div class="template-info">
+                            <div class="template-name">Aile Hukuku</div>
+                            <div class="template-desc">Boşanma, Nafaka</div>
+                        </div>
+                    </button>
                 </div>
-                
-                <div class="cases-section" id="casesSection">
-                    <div class="response-label">Dayanak Emsal Kararlar</div>
-                    <div id="casesList"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Örnek Davalar</div>
+                <div class="template-list" id="exampleList">
+                    <button class="template-item example" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. 50.000 TL zarar iddiası var. Etkin pişmanlık ve uzlaşma mümkün mü?">
+                        <div class="template-info">
+                            <div class="template-name">Dolandırıcılık</div>
+                            <div class="template-desc">TCK 157, Etkin pişmanlık</div>
+                        </div>
+                    </button>
+                    <button class="template-item example" data-q="Borçlu icra takibine itiraz etti. İtirazın iptali davası açacağız. Süreler ve strateji nasıl olmalı?">
+                        <div class="template-info">
+                            <div class="template-name">İtirazın İptali</div>
+                            <div class="template-desc">İcra takibi, İİK</div>
+                        </div>
+                    </button>
+                    <button class="template-item example" data-q="Müvekkilim TCK 86/2 kasten yaralama suçundan yargılanıyor. HAGB ve ceza indirimi şartları nedir?">
+                        <div class="template-info">
+                            <div class="template-name">Kasten Yaralama</div>
+                            <div class="template-desc">TCK 86, HAGB</div>
+                        </div>
+                    </button>
+                    <button class="template-item example" data-q="Kambiyo senedine dayalı icra takibinde borçlu zamanaşımı itirazında bulundu. İtiraz geçerli mi?">
+                        <div class="template-info">
+                            <div class="template-name">Kambiyo Senedi</div>
+                            <div class="template-desc">Zamanaşımı itirazı</div>
+                        </div>
+                    </button>
                 </div>
             </div>
-            
-            <div class="divider"></div>
-            
-            <div class="section-label">Yargıtay Karar Ara</div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Örnek: etkin pişmanlık, itirazın iptali...">
-                <button class="btn" id="searchBtn">Ara</button>
+
+            <div class="sidebar-footer">
+                <a href="#">burhan</a> tarafından geliştirildi
             </div>
-            <div class="results-info" id="resultsInfo"></div>
-            <div class="results-list" id="resultsList"></div>
-        </div>
-        
-        <footer class="footer">
-            evet bu şirket battı, umarım sen batmazsın — <a href="#">Burhan</a>
-        </footer>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h2 class="main-title">Hukuki Strateji Asistanı</h2>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    Aktif
+                </div>
+            </header>
+
+            <div class="chat-area" id="chatArea">
+                <!-- Welcome Screen -->
+                <div class="welcome-card" id="welcomeCard">
+                    <div class="welcome-icon">⚖️</div>
+                    <h2 class="welcome-title">Hoş geldin!</h2>
+                    <p class="welcome-desc">Davanı detaylı anlat, Yargıtay kararları ve mevzuat ile destekli hukuki analiz yapayım.</p>
+
+                    <div class="quick-actions">
+                        <div class="quick-action" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">
+                            <div class="quick-action-title">🔍 Ceza Davası Analizi</div>
+                            <div class="quick-action-desc">TCK kapsamında savunma stratejisi</div>
+                        </div>
+                        <div class="quick-action" data-q="Borçlu icra takibine itiraz etti. Nasıl bir yol izlemeliyim?">
+                            <div class="quick-action-title">📋 İcra Takibi</div>
+                            <div class="quick-action-desc">İtiraz ve takip süreçleri</div>
+                        </div>
+                        <div class="quick-action" data-q="İdari işleme karşı iptal davası açmak istiyorum. Şartlar nedir?">
+                            <div class="quick-action-title">🏛️ İdari Dava</div>
+                            <div class="quick-action-desc">İptal davası prosedürü</div>
+                        </div>
+                        <div class="quick-action" data-q="Boşanma davasında nafaka ve velayet konusunda strateji ne olmalı?">
+                            <div class="quick-action-title">👨‍👩‍👧 Aile Hukuku</div>
+                            <div class="quick-action-desc">Boşanma ve nafaka</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Container -->
+                <div class="response-container" id="responseContainer">
+                    <div class="user-message" id="userMessage"></div>
+
+                    <div class="ai-response">
+                        <div class="ai-response-header">
+                            <div class="ai-avatar">⚖️</div>
+                            <div class="ai-info">
+                                <div class="ai-name">nevolve.ai</div>
+                                <div class="ai-source" id="aiSource">Yargıtay, Mevzuat, Danıştay</div>
+                            </div>
+                        </div>
+                        <div class="response-content" id="responseContent"></div>
+
+                        <div class="sources-panel" id="sourcesPanel" style="display: none;">
+                            <div class="sources-title">📚 Kullanılan Kaynaklar</div>
+                            <div class="source-cards" id="sourceCards"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea id="aiInput" placeholder="Davanızı detaylı anlatın..." rows="1"></textarea>
+                        <button class="submit-btn" id="aiSubmit">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -551,16 +833,15 @@
             </div>
         </div>
     </div>
-    
+
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script>
         const $ = id => document.getElementById(id);
         let currentCases = [];
         let lastQuery = '';
-        let lastCasesContext = '';
 
-        // Toast notification
+        // Toast
         function showToast(message, type = 'info') {
             const toast = $('toast');
             toast.textContent = message;
@@ -568,7 +849,13 @@
             setTimeout(() => toast.classList.remove('visible'), 3000);
         }
 
-        // Hata gösterimi
+        // Auto-resize textarea
+        $('aiInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        // Error display
         function showError(error, onRetry) {
             const isRateLimit = error.type === 'rate_limit';
             let countdownHtml = '';
@@ -590,16 +877,13 @@
 
             $('responseContent').innerHTML = html;
 
-            // Countdown timer
             if (isRateLimit && error.retryAfter > 0) {
                 let remaining = error.retryAfter;
                 const interval = setInterval(() => {
                     remaining--;
                     const countdownEl = $('countdown');
                     const retryBtn = $('retryBtn');
-
                     if (countdownEl) countdownEl.textContent = remaining;
-
                     if (remaining <= 0) {
                         clearInterval(interval);
                         if (retryBtn) {
@@ -610,7 +894,6 @@
                 }, 1000);
             }
 
-            // Retry button
             const retryBtn = $('retryBtn');
             if (retryBtn && onRetry) {
                 retryBtn.onclick = () => {
@@ -644,29 +927,23 @@
 
             lastQuery = q;
             $('aiSubmit').disabled = true;
-            $('aiSubmit').textContent = 'Analiz ediliyor...';
-            $('response').classList.add('visible');
-            $('responseContent').innerHTML = '<span class="loading">Kaynaklar taranıyor (Yargıtay, Mevzuat, Danıştay, AYM)</span>';
-            $('casesSection').classList.remove('visible');
+            $('welcomeCard').style.display = 'none';
+            $('responseContainer').classList.add('visible');
+            $('userMessage').textContent = q;
+            $('responseContent').innerHTML = '<span class="loading">Kaynaklar taranıyor</span>';
+            $('sourcesPanel').style.display = 'none';
 
-            // Zenginleştirilmiş context oluştur (paralel API çağrıları)
+            // Build enriched context
             const enrichedContext = await API.buildEnrichedContext(q);
 
-            // Anahtar kelimeler
-            const keywords = q.match(/TCK \d+|CMK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB|idari|vergi/gi) || [];
-            const searchQuery = keywords.length > 0 ? keywords.slice(0,2).join(' ') : q.split(' ').filter(w => w.length > 4).slice(0, 2).join(' ');
-
-            // Yargıtay kararları için detay çek
             $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
 
             let casesContext = '';
-            let casesHtml = '';
             currentCases = [];
 
             // Yargıtay kararları
             if (enrichedContext.yargitayKararlari.length > 0) {
                 currentCases = enrichedContext.yargitayKararlari;
-
                 const caseContents = [];
                 for (let i = 0; i < Math.min(2, currentCases.length); i++) {
                     const doc = await API.getDocument(currentCases[i].id);
@@ -678,16 +955,6 @@
                     }
                 }
 
-                casesHtml = currentCases.map((d, i) => `
-                    <div class="case-card" data-id="${d.id}" data-index="${i}" data-source="yargitay">
-                        <div class="case-header">
-                            <span class="case-court">${d.daire}</span>
-                            <span class="case-date">${d.tarih}</span>
-                        </div>
-                        <div class="case-info">E. ${d.esasNo} K. ${d.kararNo}</div>
-                    </div>
-                `).join('');
-
                 if (caseContents.length > 0) {
                     casesContext += '\n\n=== YARGITAY EMSAL KARARLARI ===\n';
                     caseContents.forEach((c, i) => {
@@ -696,7 +963,7 @@
                 }
             }
 
-            // Mevzuat maddeleri
+            // Mevzuat
             if (enrichedContext.mevzuatMaddeleri.length > 0) {
                 casesContext += '\n\n=== İLGİLİ KANUN MADDELERİ ===\n';
                 enrichedContext.mevzuatMaddeleri.forEach(m => {
@@ -704,7 +971,7 @@
                 });
             }
 
-            // Danıştay kararları
+            // Danıştay
             if (enrichedContext.danistayKararlari.length > 0) {
                 casesContext += '\n\n=== DANIŞTAY KARARLARI ===\n';
                 enrichedContext.danistayKararlari.forEach((d, i) => {
@@ -712,7 +979,7 @@
                 });
             }
 
-            // AYM kararları
+            // AYM
             if (enrichedContext.aymKararlari.length > 0) {
                 casesContext += '\n\n=== ANAYASA MAHKEMESİ KARARLARI ===\n';
                 enrichedContext.aymKararlari.forEach((a, i) => {
@@ -720,7 +987,6 @@
                 });
             }
 
-            lastCasesContext = casesContext;
             $('responseContent').innerHTML = '<span class="loading">AI analiz yapıyor</span>';
 
             const r = await API.askAI(q + casesContext);
@@ -728,71 +994,80 @@
             if (r.success) {
                 $('responseContent').innerHTML = formatResponse(r.text);
 
-                // Kullanılan kaynak sayısını göster
+                // Show sources
                 const sourceCount = enrichedContext.yargitayKararlari.length +
                                    enrichedContext.mevzuatMaddeleri.length +
                                    enrichedContext.danistayKararlari.length +
                                    enrichedContext.aymKararlari.length;
-                showToast(`Analiz tamamlandı (${sourceCount} kaynak kullanıldı)`, 'success');
+
+                if (sourceCount > 0) {
+                    let sourcesHtml = '';
+
+                    enrichedContext.yargitayKararlari.forEach((d, i) => {
+                        sourcesHtml += `
+                            <div class="source-card" data-id="${d.id}" data-index="${i}">
+                                <div class="source-card-title">${d.daire}</div>
+                                <div class="source-card-info">E.${d.esasNo} K.${d.kararNo}</div>
+                            </div>
+                        `;
+                    });
+
+                    enrichedContext.mevzuatMaddeleri.forEach(m => {
+                        sourcesHtml += `
+                            <div class="source-card">
+                                <div class="source-card-title">TCK m.${m.madde}</div>
+                                <div class="source-card-info">Kanun Maddesi</div>
+                            </div>
+                        `;
+                    });
+
+                    $('sourceCards').innerHTML = sourcesHtml;
+                    $('sourcesPanel').style.display = 'block';
+
+                    // Click handlers for source cards
+                    document.querySelectorAll('.source-card[data-id]').forEach(card => {
+                        card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
+                    });
+                }
+
+                $('aiSource').textContent = `${sourceCount} kaynak kullanıldı`;
+                showToast(`Analiz tamamlandı`, 'success');
             } else {
                 showError(r.error, analyzeCase);
             }
 
-            if (casesHtml) {
-                $('casesList').innerHTML = casesHtml;
-                $('casesSection').classList.add('visible');
-                $('casesList').querySelectorAll('.case-card').forEach(card => {
-                    card.onclick = () => openDocModal(card.dataset.id, parseInt(card.dataset.index));
-                });
-            }
-
             $('aiSubmit').disabled = false;
-            $('aiSubmit').textContent = 'Analiz Et';
+            $('aiInput').value = '';
+            $('aiInput').style.height = 'auto';
         }
 
+        // Event listeners
         $('aiSubmit').onclick = analyzeCase;
 
-        document.querySelectorAll('.tag').forEach(t => {
-            t.onclick = () => $('aiInput').value = t.dataset.q;
+        $('aiInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                analyzeCase();
+            }
         });
 
-        const search = async () => {
-            const q = $('searchInput').value.trim();
-            if (!q) return;
+        // Quick actions
+        document.querySelectorAll('.quick-action').forEach(el => {
+            el.onclick = () => {
+                $('aiInput').value = el.dataset.q;
+                analyzeCase();
+            };
+        });
 
-            $('resultsInfo').textContent = 'Aranıyor...';
-            $('resultsList').innerHTML = '';
-            $('resultsList').classList.remove('visible');
+        // Example templates
+        document.querySelectorAll('.template-item.example').forEach(el => {
+            el.onclick = () => {
+                $('aiInput').value = el.dataset.q;
+                $('aiInput').focus();
+            };
+        });
 
-            const r = await API.searchCases(q);
-
-            if (r.success && r.decisions.length > 0) {
-                currentCases = r.decisions;
-                let infoText = r.total.toLocaleString('tr-TR') + ' sonuç';
-                if (r.fromCache) infoText += ' <span class="cache-badge">ÖNBELLEK</span>';
-                $('resultsInfo').innerHTML = infoText;
-
-                $('resultsList').innerHTML = r.decisions.map((d, i) => `
-                    <div class="result-item" data-id="${d.id}" data-index="${i}">
-                        <div class="result-header">
-                            <span class="result-court">${d.daire}</span>
-                            <span class="result-date">${d.tarih}</span>
-                        </div>
-                        <div class="result-info">E. ${d.esasNo} K. ${d.kararNo}</div>
-                    </div>
-                `).join('');
-                $('resultsList').classList.add('visible');
-                $('resultsList').querySelectorAll('.result-item').forEach(item => {
-                    item.onclick = () => openDocModal(item.dataset.id, parseInt(item.dataset.index));
-                });
-            } else {
-                $('resultsInfo').textContent = 'Sonuç bulunamadı';
-            }
-        };
-
-        $('searchBtn').onclick = search;
-        $('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
-
+        // Document modal
         async function openDocModal(id, index) {
             const c = currentCases[index];
             $('docTitle').textContent = c?.daire || 'Karar';
@@ -805,11 +1080,10 @@
             `;
             $('docContent').textContent = 'Yükleniyor...';
             $('docModal').classList.add('visible');
-            const r = await API.getDocument(id);
 
+            const r = await API.getDocument(id);
             if (r.success) {
                 $('docContent').textContent = r.content;
-                if (r.fromCache) showToast('Önbellekten yüklendi', 'success');
             } else {
                 $('docContent').textContent = 'Yüklenemedi: ' + (r.error?.message || 'Bilinmeyen hata');
             }
@@ -817,14 +1091,6 @@
 
         $('closeDoc').onclick = () => $('docModal').classList.remove('visible');
         $('docModal').onclick = e => { if (e.target === $('docModal')) $('docModal').classList.remove('visible'); };
-
-        // Keyboard shortcut: Enter to analyze
-        $('aiInput').addEventListener('keydown', e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                analyzeCase();
-            }
-        });
     </script>
 </body>
 </html>
