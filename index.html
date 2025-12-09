@@ -3,307 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nevolve.ai - AI Hukuk Asistanı</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #FAFAF8;
-            --card: #FFFFFF;
-            --text: #1A1A1A;
-            --text-secondary: #6B6B6B;
-            --border: #E5E5E3;
-            --accent: #1A1A1A;
-            --accent-light: #F5F5F3;
-            --success: #2E7D32;
-            --success-bg: #E8F5E9;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 24px; }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .logo-text { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
-        .logo-text span { font-weight: 400; color: var(--text-secondary); }
-        .status { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--success-bg); color: var(--success); border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .status::before { content: ''; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
-        .nav { display: flex; gap: 4px; background: var(--accent-light); padding: 4px; border-radius: 14px; margin-bottom: 24px; }
-        .nav-item { flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text-secondary); font-size: 14px; font-weight: 500; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
-        .nav-item.active { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-        .section { display: none; }
-        .section.active { display: block; }
-        .card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
-        .card-header { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-        .ai-input-container { position: relative; }
-        .ai-input { width: 100%; padding: 16px 120px 16px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-family: inherit; resize: none; min-height: 56px; background: var(--bg); }
-        .ai-input:focus { outline: none; border-color: var(--accent); }
-        .ai-submit { position: absolute; right: 8px; bottom: 8px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
-        .ai-submit:disabled { opacity: 0.5; }
-        .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-        .suggestion { padding: 8px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
-        .suggestion:hover { border-color: var(--text); color: var(--text); }
-        .ai-response { margin-top: 20px; padding: 20px; background: var(--bg); border-radius: 12px; display: none; }
-        .ai-response.visible { display: block; }
-        .ai-response-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
-        .ai-response-content { font-size: 15px; line-height: 1.7; white-space: pre-wrap; }
-        .ai-loading { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
-        .ai-loading::before { content: ''; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .search-box { display: flex; gap: 8px; }
-        .search-input { flex: 1; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--bg); }
-        .search-input:focus { outline: none; border-color: var(--accent); }
-        .search-btn { padding: 14px 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; }
-        .result-item { padding: 16px; background: var(--bg); border-radius: 12px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; }
-        .result-item:hover { border-color: var(--border); }
-        .result-item.selected { border-color: var(--accent); }
-        .result-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .result-court { font-size: 14px; font-weight: 600; }
-        .result-date { font-size: 12px; color: var(--text-secondary); }
-        .result-info { font-size: 13px; color: var(--text-secondary); }
-        .doc-view { margin-top: 16px; padding: 20px; background: var(--bg); border-radius: 12px; display: none; }
-        .doc-view.visible { display: block; }
-        .doc-header { display: flex; justify-content: space-between; margin-bottom: 16px; }
-        .doc-title { font-size: 14px; font-weight: 600; }
-        .doc-close { padding: 4px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
-        .doc-content { font-size: 14px; line-height: 1.8; max-height: 400px; overflow-y: auto; white-space: pre-wrap; color: var(--text-secondary); }
-        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .tool-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; text-align: center; }
-        .tool-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; text-align: center; background: var(--bg); }
-        .tool-result { margin-top: 20px; padding: 24px; background: var(--bg); border-radius: 12px; text-align: center; }
-        .tool-result-value { font-size: 36px; font-weight: 600; }
-        .tool-result-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-        .slider { width: 100%; height: 4px; -webkit-appearance: none; background: var(--border); border-radius: 2px; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--accent); border-radius: 50%; cursor: pointer; }
-        .slider-value { text-align: center; margin-top: 12px; }
-        .slider-value-num { font-size: 48px; font-weight: 600; }
-        .slider-value-unit { font-size: 18px; color: var(--text-secondary); }
-        .check-item { display: flex; justify-content: space-between; padding: 14px 16px; background: var(--bg); border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
-        .check-item.active { background: var(--success-bg); }
-        .check-item-left { display: flex; align-items: center; gap: 12px; }
-        .check-box { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: transparent; }
-        .check-item.active .check-box { background: var(--accent); border-color: var(--accent); color: white; }
-        .check-item-rate { font-weight: 600; color: var(--text-secondary); }
-        .check-item.active .check-item-rate { color: var(--success); }
-        .footer { text-align: center; padding: 24px 0; font-size: 12px; color: var(--text-secondary); }
-        .hidden { display: none !important; }
-        .section-title { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-        .section-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; }
-    </style>
+    <title>nevolve.ai - Hukuki Strateji Asistanı</title>
+    <meta name="description" content="Türk avukatları için AI destekli hukuki strateji ve Yargıtay karar arama platformu">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <header class="header">
             <div class="logo">
-                <div class="logo-icon">🚀</div>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
                 <div class="logo-text">nevolve<span>.ai</span></div>
             </div>
-            <div class="status" id="status">Çevrimiçi</div>
+            <div class="status" id="status">Bağlanıyor...</div>
         </header>
+
+        <!-- Navigation -->
         <nav class="nav">
-            <button class="nav-item active" data-section="ai">AI Strateji</button>
+            <button class="nav-item active" data-section="ai">Strateji</button>
             <button class="nav-item" data-section="search">Karar Ara</button>
             <button class="nav-item" data-section="tools">Araçlar</button>
         </nav>
+
+        <!-- AI Strategy Section -->
         <section class="section active" id="section-ai">
-            <h1 class="section-title">Hukuki Strateji Asistanı</h1>
-            <p class="section-desc">Davanızı anlatın, emsal kararlar ve strateji önerileri alın.</p>
+            <div class="section-header">
+                <h1 class="section-title">Hukuki Strateji</h1>
+                <p class="section-desc">Davanızı anlatın, AI destekli strateji önerileri alın</p>
+            </div>
+            
             <div class="card">
-                <div class="ai-input-container">
-                    <textarea class="ai-input" id="aiInput" placeholder="Örn: Boşanma davasında müvekkilim 10 yıllık evli, 2 çocuk var. Kusur oranı ve nafaka stratejisi ne olmalı?"></textarea>
-                    <button class="ai-submit" id="aiSubmit" onclick="askAI()">Analiz Et</button>
+                <div class="input-container">
+                    <textarea class="input-field" id="aiInput" placeholder="Örn: Boşanma davasında müvekkilim 10 yıllık evli, 2 çocuk var. Nafaka ve velayet stratejisi ne olmalı?"></textarea>
+                    <button class="btn btn-primary btn-submit" id="aiSubmit">Analiz Et</button>
                 </div>
-                <div class="suggestions">
-                    <span class="suggestion" onclick="setSuggestion('Boşanma davasında nafaka stratejisi nasıl olmalı?')">Nafaka Stratejisi</span>
-                    <span class="suggestion" onclick="setSuggestion('İş kazası tazminat davası için hangi emsaller güçlü?')">İş Kazası Emsali</span>
-                    <span class="suggestion" onclick="setSuggestion('TCK 86 yaralama suçunda ceza indirimi nasıl alınır?')">Ceza İndirimi</span>
+                <div class="tags">
+                    <span class="tag" data-query="Boşanma davasında nafaka stratejisi nasıl olmalı?">Nafaka</span>
+                    <span class="tag" data-query="İş kazası tazminat davası için emsal kararlar nelerdir?">İş Kazası</span>
+                    <span class="tag" data-query="TCK 86 yaralama suçunda ceza indirimi nasıl alınır?">Ceza İndirimi</span>
+                    <span class="tag" data-query="Kira uyuşmazlığında tahliye stratejisi nedir?">Kira Tahliye</span>
                 </div>
             </div>
-            <div class="ai-response" id="aiResponse">
-                <div class="ai-response-header"><span>🧠</span> AI Analizi</div>
-                <div class="ai-response-content" id="aiContent"></div>
+            
+            <div class="response" id="aiResponse">
+                <div class="response-header">
+                    <span>✦</span> AI Analizi
+                </div>
+                <div class="response-content" id="aiContent"></div>
             </div>
         </section>
+
+        <!-- Search Section -->
         <section class="section" id="section-search">
-            <h1 class="section-title">Yargıtay Kararları</h1>
-            <p class="section-desc">1.9 milyon+ kararda arama yapın.</p>
+            <div class="section-header">
+                <h1 class="section-title">Yargıtay Kararları</h1>
+                <p class="section-desc">1.9 milyon+ kararda anahtar kelime araması</p>
+            </div>
+            
             <div class="card">
-                <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Anahtar kelime girin..." onkeydown="if(event.key==='Enter')searchCases()">
-                    <button class="search-btn" id="searchBtn" onclick="searchCases()">Ara</button>
+                <div class="input-container" style="display:flex;gap:8px;">
+                    <input type="text" class="input-field" id="searchInput" placeholder="Anahtar kelime girin..." style="padding-right:16px;">
+                    <button class="btn btn-primary" id="searchBtn" style="white-space:nowrap;">Ara</button>
                 </div>
-                <div class="suggestions">
-                    <span class="suggestion" onclick="setSearch('bosanma nafaka')">bosanma nafaka</span>
-                    <span class="suggestion" onclick="setSearch('is kazasi tazminat')">iş kazası</span>
-                    <span class="suggestion" onclick="setSearch('TCK 86')">TCK 86</span>
+                <div class="tags">
+                    <span class="tag" data-query="boşanma nafaka">boşanma nafaka</span>
+                    <span class="tag" data-query="iş kazası tazminat">iş kazası</span>
+                    <span class="tag" data-query="TCK 86">TCK 86</span>
+                    <span class="tag" data-query="kira tahliye">kira tahliye</span>
                 </div>
             </div>
-            <div class="card hidden" id="loadingBox"><div class="ai-loading">Yargıtay veritabanı aranıyor...</div></div>
+            
+            <div class="card hidden" id="loadingBox">
+                <div class="loading">Yargıtay veritabanı aranıyor...</div>
+            </div>
+            
             <div class="card hidden" id="resultsBox">
-                <div class="card-header">Sonuçlar <span id="resultsCount" style="float:right;font-weight:400"></span></div>
+                <div class="results-header">
+                    <span class="card-header" style="margin:0;">Sonuçlar</span>
+                    <span class="results-count" id="resultsCount"></span>
+                </div>
                 <div id="resultsList"></div>
             </div>
+            
             <div class="doc-view" id="docView">
-                <div class="doc-header"><span class="doc-title">📄 Karar Metni</span><button class="doc-close" onclick="closeDoc()">Kapat</button></div>
+                <div class="doc-header">
+                    <span class="doc-title">📄 Karar Metni</span>
+                    <button class="btn btn-secondary" id="closeDoc">Kapat</button>
+                </div>
                 <div class="doc-content" id="docContent"></div>
             </div>
         </section>
+
+        <!-- Tools Section -->
         <section class="section" id="section-tools">
-            <h1 class="section-title">Hesaplama Araçları</h1>
-            <p class="section-desc">Ceza ve faiz hesaplamaları.</p>
-            <div class="card">
-                <div class="card-header">Ceza Hesaplama</div>
-                <input type="range" class="slider" id="cezaSlider" min="1" max="240" value="24" oninput="calculateCeza()">
-                <div class="slider-value"><span class="slider-value-num" id="cezaAy">24</span><span class="slider-value-unit"> ay</span></div>
-                <div style="margin-top:16px">
-                    <div class="check-item" data-rate="0.25" onclick="toggleCheck(this)"><div class="check-item-left"><div class="check-box">✓</div><span>Haksız Tahrik</span></div><span class="check-item-rate">-25%</span></div>
-                    <div class="check-item" data-rate="0.166" onclick="toggleCheck(this)"><div class="check-item-left"><div class="check-box">✓</div><span>İyi Hal (TCK 62)</span></div><span class="check-item-rate">-17%</span></div>
-                    <div class="check-item" data-rate="0.5" onclick="toggleCheck(this)"><div class="check-item-left"><div class="check-box">✓</div><span>Etkin Pişmanlık</span></div><span class="check-item-rate">-50%</span></div>
-                </div>
-                <div class="tool-result"><div class="tool-result-value" id="cezaSonuc">24 ay</div><div class="tool-result-label" id="cezaLabel">2.0 yıl • HAGB uygulanabilir</div></div>
+            <div class="section-header">
+                <h1 class="section-title">Hesaplama Araçları</h1>
+                <p class="section-desc">Ceza indirimi ve faiz hesaplamaları</p>
             </div>
+            
+            <!-- Ceza Calculator -->
             <div class="card">
-                <div class="card-header">Faiz Hesaplama</div>
-                <div class="tool-grid">
-                    <div><div class="tool-label">Anapara (₺)</div><input type="number" class="tool-field" id="anapara" value="100000" oninput="calculateFaiz()"></div>
-                    <div><div class="tool-label">Faiz (%)</div><input type="number" class="tool-field" id="faizOran" value="24" oninput="calculateFaiz()"></div>
-                    <div><div class="tool-label">Gün</div><input type="number" class="tool-field" id="gunSayisi" value="180" oninput="calculateFaiz()"></div>
+                <div class="card-header">Ceza İndirimi Hesaplama</div>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="cezaSlider" min="1" max="240" value="24">
                 </div>
-                <div class="tool-result"><div class="tool-result-value" id="faizSonuc">111.836 ₺</div><div class="tool-result-label" id="faizLabel">100.000 ₺ anapara + 11.836 ₺ faiz</div></div>
+                <div class="slider-value">
+                    <span class="slider-value-num" id="cezaAy">24</span>
+                    <span class="slider-value-unit">ay</span>
+                </div>
+                
+                <div class="check-list">
+                    <div class="check-item" data-rate="0.25">
+                        <div class="check-item-left">
+                            <div class="check-box">✓</div>
+                            <span class="check-item-label">Haksız Tahrik</span>
+                        </div>
+                        <span class="check-item-rate">-25%</span>
+                    </div>
+                    <div class="check-item" data-rate="0.166">
+                        <div class="check-item-left">
+                            <div class="check-box">✓</div>
+                            <span class="check-item-label">İyi Hal (TCK 62)</span>
+                        </div>
+                        <span class="check-item-rate">-17%</span>
+                    </div>
+                    <div class="check-item" data-rate="0.5">
+                        <div class="check-item-left">
+                            <div class="check-box">✓</div>
+                            <span class="check-item-label">Etkin Pişmanlık</span>
+                        </div>
+                        <span class="check-item-rate">-50%</span>
+                    </div>
+                </div>
+                
+                <div class="tool-result">
+                    <div class="tool-result-value" id="cezaSonuc">24 ay</div>
+                    <div class="tool-result-label" id="cezaLabel">2.0 yıl • HAGB uygulanabilir</div>
+                </div>
+            </div>
+            
+            <!-- Faiz Calculator -->
+            <div class="card">
+                <div class="card-header">Yasal Faiz Hesaplama</div>
+                <div class="tool-grid">
+                    <div class="tool-field-group">
+                        <div class="tool-label">Anapara (₺)</div>
+                        <input type="number" class="tool-field" id="anapara" value="100000">
+                    </div>
+                    <div class="tool-field-group">
+                        <div class="tool-label">Faiz Oranı (%)</div>
+                        <input type="number" class="tool-field" id="faizOran" value="24">
+                    </div>
+                    <div class="tool-field-group">
+                        <div class="tool-label">Gün Sayısı</div>
+                        <input type="number" class="tool-field" id="gunSayisi" value="180">
+                    </div>
+                </div>
+                <div class="tool-result">
+                    <div class="tool-result-value" id="faizSonuc">111.836 ₺</div>
+                    <div class="tool-result-label" id="faizLabel">100.000 ₺ anapara + 11.836 ₺ faiz</div>
+                </div>
             </div>
         </section>
-        <footer class="footer">nevolve.ai • Yargı API + Gemini AI</footer>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>nevolve.ai • Eymen & Merve Hukuk için geliştirildi</p>
+            <p style="margin-top:4px;font-size:11px;">Yargı API + Gemini 2.5 Flash</p>
+        </footer>
     </div>
-    <script>
-        const API_BASE = 'https://yargi-api.onrender.com';
-        const GEMINI_KEY = 'AIzaSyDL4rz3oNYEW55VxbLisbAsEAL4g3cKG9U';
-        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-        
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                item.classList.add('active');
-                document.getElementById('section-' + item.dataset.section).classList.add('active');
-            });
-        });
-        
-        function setSuggestion(text) { document.getElementById('aiInput').value = text; }
-        
-        async function askAI() {
-            const input = document.getElementById('aiInput').value.trim();
-            if (!input) return;
-            const btn = document.getElementById('aiSubmit');
-            const response = document.getElementById('aiResponse');
-            const content = document.getElementById('aiContent');
-            btn.disabled = true;
-            btn.textContent = 'Analiz ediliyor...';
-            response.classList.add('visible');
-            content.innerHTML = '<div class="ai-loading">Yapay zeka analiz ediyor...</div>';
-            
-            const systemPrompt = 'Sen Türk hukuku uzmanı bir avukat asistanısın. Stratejik, pratik ve emsal odaklı yanıtlar ver. Türkçe yanıt ver.';
-            
-            try {
-                const res = await fetch(GEMINI_URL + '?key=' + GEMINI_KEY, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt + '\n\nSoru: ' + input }] }],
-                        generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
-                    })
-                });
-                const data = await res.json();
-                if (data.candidates?.[0]) {
-                    content.textContent = data.candidates[0].content.parts[0].text;
-                } else {
-                    content.textContent = 'API Hatası: ' + (data.error?.message || 'Bilinmeyen hata');
-                }
-            } catch (e) {
-                content.textContent = 'Hata: ' + e.message;
-            }
-            btn.disabled = false;
-            btn.textContent = 'Analiz Et';
-        }
-        
-        function setSearch(text) { document.getElementById('searchInput').value = text; }
-        
-        async function searchCases() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-            document.getElementById('loadingBox').classList.remove('hidden');
-            document.getElementById('resultsBox').classList.add('hidden');
-            document.getElementById('docView').classList.remove('visible');
-            try {
-                const res = await fetch(API_BASE + '/search?keyword=' + encodeURIComponent(query));
-                const data = await res.json();
-                document.getElementById('loadingBox').classList.add('hidden');
-                if (data.success) {
-                    document.getElementById('resultsCount').textContent = data.total.toLocaleString('tr-TR') + ' sonuç';
-                    const list = document.getElementById('resultsList');
-                    list.innerHTML = '';
-                    data.decisions.forEach(d => {
-                        const div = document.createElement('div');
-                        div.className = 'result-item';
-                        div.dataset.id = d.id;
-                        div.innerHTML = '<div class="result-header"><span class="result-court">' + d.daire + '</span><span class="result-date">' + d.tarih + '</span></div><div class="result-info">Esas: ' + d.esasNo + ' • Karar: ' + d.kararNo + '</div>';
-                        div.onclick = () => loadDocument(d.id);
-                        list.appendChild(div);
-                    });
-                    document.getElementById('resultsBox').classList.remove('hidden');
-                }
-            } catch (e) {
-                document.getElementById('loadingBox').classList.add('hidden');
-                alert('Hata: ' + e.message);
-            }
-        }
-        
-        async function loadDocument(id) {
-            document.querySelectorAll('.result-item').forEach(r => r.classList.remove('selected'));
-            document.querySelector('[data-id="' + id + '"]').classList.add('selected');
-            document.getElementById('docContent').textContent = 'Yükleniyor...';
-            document.getElementById('docView').classList.add('visible');
-            try {
-                const res = await fetch(API_BASE + '/document?id=' + id);
-                const data = await res.json();
-                document.getElementById('docContent').textContent = data.success ? data.content : 'Hata';
-            } catch (e) {
-                document.getElementById('docContent').textContent = 'Hata: ' + e.message;
-            }
-        }
-        
-        function closeDoc() {
-            document.getElementById('docView').classList.remove('visible');
-            document.querySelectorAll('.result-item').forEach(r => r.classList.remove('selected'));
-        }
-        
-        function toggleCheck(el) { el.classList.toggle('active'); calculateCeza(); }
-        
-        function calculateCeza() {
-            let ceza = parseInt(document.getElementById('cezaSlider').value);
-            document.getElementById('cezaAy').textContent = ceza;
-            let sonuc = ceza;
-            document.querySelectorAll('.check-item.active').forEach(item => { sonuc *= (1 - parseFloat(item.dataset.rate)); });
-            sonuc = Math.round(sonuc * 10) / 10;
-            document.getElementById('cezaSonuc').textContent = sonuc.toFixed(1) + ' ay';
-            document.getElementById('cezaLabel').textContent = (sonuc / 12).toFixed(1) + ' yıl' + (sonuc <= 24 ? ' • HAGB uygulanabilir' : '');
-        }
-        
-        function calculateFaiz() {
-            const ana = parseInt(document.getElementById('anapara').value) || 0;
-            const oran = parseFloat(document.getElementById('faizOran').value) || 0;
-            const gun = parseInt(document.getElementById('gunSayisi').value) || 0;
-            const faiz = Math.round(ana * (oran / 100) * (gun / 365));
-            document.getElementById('faizSonuc').textContent = (ana + faiz).toLocaleString('tr-TR') + ' ₺';
-            document.getElementById('faizLabel').textContent = ana.toLocaleString('tr-TR') + ' ₺ anapara + ' + faiz.toLocaleString('tr-TR') + ' ₺ faiz';
-        }
-        
-        calculateCeza();
-        calculateFaiz();
-        fetch(API_BASE).then(r => r.ok && (document.getElementById('status').textContent = 'Çevrimiçi')).catch(() => {});
-    </script>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
