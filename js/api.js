@@ -106,6 +106,7 @@ const API = {
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let fullText = '';
+            let chunkCount = 0;
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -113,6 +114,12 @@ const API = {
 
                 const chunk = decoder.decode(value);
                 const lines = chunk.split('\n');
+                chunkCount++;
+
+                // İlk chunk'ı logla - format kontrolü için
+                if (chunkCount === 1) {
+                    console.log('[API] İlk chunk (ham):', chunk.substring(0, 300));
+                }
 
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
@@ -132,6 +139,8 @@ const API = {
                     }
                 }
             }
+
+            console.log('[API] Stream tamamlandı. Chunk sayısı:', chunkCount, 'Text uzunluğu:', fullText.length);
 
             // Assistant cevabını history'e ekle
             this._conversationHistory.push({ role: 'assistant', content: fullText });
