@@ -177,5 +177,178 @@ const API = {
     // Önbelleği temizle
     clearCache() {
         this._cache.clear();
+    },
+
+    // ==================== YENİ API'LER ====================
+
+    // Danıştay kararları arama
+    async searchDanistay(keyword) {
+        const cacheKey = `danistay_${keyword}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) {
+            return { ...cached, fromCache: true };
+        }
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/danistay?keyword=${encodeURIComponent(keyword)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Danıştay karar içeriği
+    async getDanistayDocument(id) {
+        const cacheKey = `danistay_doc_${id}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) {
+            return { ...cached, fromCache: true };
+        }
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/danistay/document?id=${id}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Mevzuat/Kanun arama (TCK, CMK vb.)
+    async getMevzuat(kanunKodu) {
+        const cacheKey = `mevzuat_${kanunKodu}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) {
+            return { ...cached, fromCache: true };
+        }
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/mevzuat?query=${encodeURIComponent(kanunKodu)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Belirli bir kanun maddesi getir
+    async getMevzuatMadde(kanun, maddeNo) {
+        const cacheKey = `madde_${kanun}_${maddeNo}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) {
+            return { ...cached, fromCache: true };
+        }
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/mevzuat/madde?kanun=${encodeURIComponent(kanun)}&madde=${maddeNo}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // Anayasa Mahkemesi kararları arama
+    async searchAYM(keyword) {
+        const cacheKey = `aym_${keyword}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) {
+            return { ...cached, fromCache: true };
+        }
+
+        try {
+            const response = await fetch(`${CONFIG.YARGI_API}/aym?keyword=${encodeURIComponent(keyword)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this._setCache(cacheKey, data);
+            }
+            return data;
+        } catch (e) {
+            return { success: false, error: this._formatError(e.message) };
+        }
+    },
+
+    // TCK maddesi çıkarma yardımcı fonksiyonu
+    extractTCKMadde(text) {
+        const matches = text.match(/TCK\s*(\d+)/gi) || [];
+        return matches.map(m => {
+            const num = m.match(/\d+/);
+            return num ? num[0] : null;
+        }).filter(Boolean);
+    },
+
+    // Zenginleştirilmiş context oluştur
+    async buildEnrichedContext(question) {
+        const context = {
+            yargitayKararlari: [],
+            danistayKararlari: [],
+            mevzuatMaddeleri: [],
+            aymKararlari: []
+        };
+
+        // TCK maddelerini çıkar
+        const tckMaddeleri = this.extractTCKMadde(question);
+
+        // Anahtar kelimeleri çıkar
+        const keywords = question.match(/TCK \d+|CMK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB|iptal|idari/gi) || [];
+        const searchQuery = keywords.length > 0 ? keywords.slice(0, 2).join(' ') : question.split(' ').filter(w => w.length > 4).slice(0, 2).join(' ');
+
+        // Paralel API çağrıları
+        const promises = [];
+
+        // 1. Yargıtay kararları (mevcut)
+        promises.push(
+            this.searchCases(searchQuery).then(r => {
+                if (r.success) context.yargitayKararlari = r.decisions.slice(0, 3);
+            }).catch(() => {})
+        );
+
+        // 2. İdari dava ise Danıştay kararları
+        if (question.match(/idari|vergi|imar|belediye|kamu|memur/i)) {
+            promises.push(
+                this.searchDanistay(searchQuery).then(r => {
+                    if (r.success) context.danistayKararlari = r.decisions.slice(0, 2);
+                }).catch(() => {})
+            );
+        }
+
+        // 3. TCK maddeleri varsa mevzuat çek
+        for (const madde of tckMaddeleri.slice(0, 2)) {
+            promises.push(
+                this.getMevzuatMadde('TCK', madde).then(r => {
+                    if (r.success) context.mevzuatMaddeleri.push(r);
+                }).catch(() => {})
+            );
+        }
+
+        // 4. Anayasal konu varsa AYM kararları
+        if (question.match(/anayasa|temel hak|iptal|ihlal|özgürlük/i)) {
+            promises.push(
+                this.searchAYM(searchQuery).then(r => {
+                    if (r.success) context.aymKararlari = r.decisions.slice(0, 2);
+                }).catch(() => {})
+            );
+        }
+
+        await Promise.all(promises);
+        return context;
     }
 };

@@ -646,41 +646,40 @@
             $('aiSubmit').disabled = true;
             $('aiSubmit').textContent = 'Analiz ediliyor...';
             $('response').classList.add('visible');
-            $('responseContent').innerHTML = '<span class="loading">Emsal kararlar taranıyor</span>';
+            $('responseContent').innerHTML = '<span class="loading">Kaynaklar taranıyor (Yargıtay, Mevzuat, Danıştay, AYM)</span>';
             $('casesSection').classList.remove('visible');
 
-            const keywords = q.match(/TCK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB/gi) || [];
+            // Zenginleştirilmiş context oluştur (paralel API çağrıları)
+            const enrichedContext = await API.buildEnrichedContext(q);
+
+            // Anahtar kelimeler
+            const keywords = q.match(/TCK \d+|CMK \d+|icra|itiraz|uzlaşma|pişmanlık|kambiyo|senet|nafaka|yaralama|dolandırıcılık|hırsızlık|tehdit|HAGB|idari|vergi/gi) || [];
             const searchQuery = keywords.length > 0 ? keywords.slice(0,2).join(' ') : q.split(' ').filter(w => w.length > 4).slice(0, 2).join(' ');
 
-            const searchResult = await API.searchCases(searchQuery);
-
-            if (searchResult.fromCache) {
-                showToast('Önbellekten yüklendi', 'success');
-            }
+            // Yargıtay kararları için detay çek
+            $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
 
             let casesContext = '';
             let casesHtml = '';
             currentCases = [];
 
-            if (searchResult.success && searchResult.decisions.length > 0) {
-                const topCases = searchResult.decisions.slice(0, 5);
-                currentCases = topCases;
-
-                $('responseContent').innerHTML = '<span class="loading">Karar içerikleri okunuyor</span>';
+            // Yargıtay kararları
+            if (enrichedContext.yargitayKararlari.length > 0) {
+                currentCases = enrichedContext.yargitayKararlari;
 
                 const caseContents = [];
-                for (let i = 0; i < Math.min(2, topCases.length); i++) {
-                    const doc = await API.getDocument(topCases[i].id);
+                for (let i = 0; i < Math.min(2, currentCases.length); i++) {
+                    const doc = await API.getDocument(currentCases[i].id);
                     if (doc.success) {
                         caseContents.push({
-                            ...topCases[i],
+                            ...currentCases[i],
                             content: doc.content.substring(0, 1500)
                         });
                     }
                 }
 
-                casesHtml = topCases.map((d, i) => `
-                    <div class="case-card" data-id="${d.id}" data-index="${i}">
+                casesHtml = currentCases.map((d, i) => `
+                    <div class="case-card" data-id="${d.id}" data-index="${i}" data-source="yargitay">
                         <div class="case-header">
                             <span class="case-court">${d.daire}</span>
                             <span class="case-date">${d.tarih}</span>
@@ -690,11 +689,35 @@
                 `).join('');
 
                 if (caseContents.length > 0) {
-                    casesContext = '\n\nEmsal Kararlar:\n';
+                    casesContext += '\n\n=== YARGITAY EMSAL KARARLARI ===\n';
                     caseContents.forEach((c, i) => {
                         casesContext += `${i+1}. ${c.daire} E.${c.esasNo} K.${c.kararNo} (${c.tarih}):\n${c.content}\n\n`;
                     });
                 }
+            }
+
+            // Mevzuat maddeleri
+            if (enrichedContext.mevzuatMaddeleri.length > 0) {
+                casesContext += '\n\n=== İLGİLİ KANUN MADDELERİ ===\n';
+                enrichedContext.mevzuatMaddeleri.forEach(m => {
+                    casesContext += `TCK Madde ${m.madde}: ${m.content}\n\n`;
+                });
+            }
+
+            // Danıştay kararları
+            if (enrichedContext.danistayKararlari.length > 0) {
+                casesContext += '\n\n=== DANIŞTAY KARARLARI ===\n';
+                enrichedContext.danistayKararlari.forEach((d, i) => {
+                    casesContext += `${i+1}. ${d.daire} E.${d.esasNo} K.${d.kararNo} (${d.tarih})\n`;
+                });
+            }
+
+            // AYM kararları
+            if (enrichedContext.aymKararlari.length > 0) {
+                casesContext += '\n\n=== ANAYASA MAHKEMESİ KARARLARI ===\n';
+                enrichedContext.aymKararlari.forEach((a, i) => {
+                    casesContext += `${i+1}. ${a.esas_karar_no} (${a.tarih}) - ${a.sonuc}\n`;
+                });
             }
 
             lastCasesContext = casesContext;
@@ -704,7 +727,13 @@
 
             if (r.success) {
                 $('responseContent').innerHTML = formatResponse(r.text);
-                showToast('Analiz tamamlandı', 'success');
+
+                // Kullanılan kaynak sayısını göster
+                const sourceCount = enrichedContext.yargitayKararlari.length +
+                                   enrichedContext.mevzuatMaddeleri.length +
+                                   enrichedContext.danistayKararlari.length +
+                                   enrichedContext.aymKararlari.length;
+                showToast(`Analiz tamamlandı (${sourceCount} kaynak kullanıldı)`, 'success');
             } else {
                 showError(r.error, analyzeCase);
             }
