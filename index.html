@@ -86,21 +86,27 @@
         .welcome-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
         .welcome-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; }
 
-        .quick-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .quick-btns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 500px;
+        }
 
         .quick-btn {
-            padding: 12px 18px;
+            padding: 14px 12px;
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.15s;
+            text-align: center;
         }
 
-        .quick-btn:hover { border-color: var(--text); }
+        .quick-btn:hover { border-color: var(--text); background: var(--bg); }
 
         /* Messages */
         .messages { display: none; flex-direction: column; gap: 16px; }
@@ -302,6 +308,24 @@
         .source-name { font-weight: 600; color: var(--text); margin-bottom: 2px; }
         .source-info { font-size: 10px; color: var(--text-secondary); }
 
+        /* Copy Button */
+        .copy-response-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .copy-response-btn:hover { border-color: var(--text); color: var(--text); }
+
         /* Input */
         .input-area {
             padding: 16px 24px 24px;
@@ -469,7 +493,47 @@
 
         .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* Loading */
+        /* Loading - Skeleton */
+        .skeleton { padding: 20px; }
+        .skeleton-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .skeleton-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--border);
+        }
+        .skeleton-title {
+            height: 14px;
+            width: 80px;
+            border-radius: 4px;
+            background: var(--border);
+        }
+        .skeleton-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .skeleton-line {
+            height: 12px;
+            background: linear-gradient(90deg, var(--border) 25%, #f0f0f0 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .skeleton-line:last-child { margin-bottom: 0; }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
         .loading-text::after { content: ''; animation: dots 1.5s infinite; }
         @keyframes dots {
             0%, 20% { content: '.'; }
@@ -482,8 +546,7 @@
             .chat { padding: 16px; }
             .ozet-cards { grid-template-columns: repeat(2, 1fr); }
             .panel { width: 100%; right: -100%; }
-            .quick-btns { flex-direction: column; }
-            .quick-btn { width: 100%; }
+            .quick-btns { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -501,8 +564,11 @@
                 <p class="welcome-desc">Davanı anlat, strateji oluşturalım.</p>
                 <div class="quick-btns">
                     <button class="quick-btn" data-q="Müvekkilim TCK 157 dolandırıcılık suçundan yargılanıyor. Savunma stratejisi ne olmalı?">🔍 Ceza Davası</button>
-                    <button class="quick-btn" data-q="Borçlu icra takibine itiraz etti. Nasıl bir yol izlemeliyim?">📋 İcra Takibi</button>
-                    <button class="quick-btn" data-q="İdari işleme karşı iptal davası açmak istiyorum.">🏛️ İdari Dava</button>
+                    <button class="quick-btn" data-q="Borçlu icra takibine itiraz etti. 7 gün içinde ne yapmalıyım?">📋 İcra Takibi</button>
+                    <button class="quick-btn" data-q="İdari işleme karşı iptal davası açmak istiyorum. Süre ve prosedür nedir?">🏛️ İdari Dava</button>
+                    <button class="quick-btn" data-q="Boşanma davasında mal paylaşımı ve nafaka hesaplama nasıl yapılır?">👨‍👩‍👧 Aile Hukuku</button>
+                    <button class="quick-btn" data-q="İşçi haksız yere işten çıkarıldı. İşe iade ve tazminat hakları neler?">💼 İş Hukuku</button>
+                    <button class="quick-btn" data-q="Miras paylaşımında anlaşmazlık var. Saklı pay ve tenkis davası nedir?">🏠 Miras Hukuku</button>
                 </div>
             </div>
 
@@ -517,6 +583,15 @@
                     <div class="sources" id="sources" style="display:none; padding: 16px 20px;">
                         <div class="sources-title">Kaynaklar</div>
                         <div class="sources-list" id="sourcesList"></div>
+                    </div>
+                    <div class="ai-actions" id="aiActions" style="display:none; padding: 12px 20px; border-top: 1px solid var(--border);">
+                        <button class="copy-response-btn" onclick="copyResponse()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+                            </svg>
+                            Kopyala
+                        </button>
                     </div>
                 </div>
             </div>
@@ -715,6 +790,28 @@
             return html;
         }
 
+        function showSkeleton(step = 1) {
+            const steps = ['Kaynaklar aranıyor', 'Emsal kararlar okunuyor', 'Analiz hazırlanıyor'];
+            return `
+                <div class="skeleton">
+                    <div class="skeleton-header">
+                        <div class="skeleton-avatar"></div>
+                        <div class="skeleton-title"></div>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;" class="loading-text">${steps[step - 1]}</p>
+                    <div class="skeleton-card">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+            `;
+        }
+
         async function send() {
             const q = $('input').value.trim();
             if (!q) return;
@@ -723,14 +820,15 @@
             $('welcome').style.display = 'none';
             $('messages').classList.add('visible');
             $('userMsg').textContent = q;
-            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Analiz ediliyor</p>';
+            $('aiBody').innerHTML = showSkeleton(1);
             $('sources').style.display = 'none';
+            $('aiActions').style.display = 'none';
             $('input').value = '';
             $('input').style.height = 'auto';
 
             const ctx = await API.buildEnrichedContext(q);
 
-            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Kaynaklar okunuyor</p>';
+            $('aiBody').innerHTML = showSkeleton(2);
 
             let casesContext = '';
             caseContents = [];
@@ -758,7 +856,7 @@
                 });
             }
 
-            $('aiBody').innerHTML = '<p class="loading-text" style="color: var(--text-muted); padding: 20px;">Yanıt hazırlanıyor</p>';
+            $('aiBody').innerHTML = showSkeleton(3);
 
             const r = await API.askAI(q + casesContext);
 
@@ -791,6 +889,7 @@
                     $('sources').style.display = 'block';
                 }
 
+                $('aiActions').style.display = 'block';
                 toast('Analiz tamamlandı');
             } else {
                 $('aiBody').innerHTML = `<p style="color: #DC2626; padding: 20px;">Hata: ${r.error?.message || 'Bilinmeyen hata'}</p>`;
@@ -839,6 +938,12 @@
         function copyPanel() {
             navigator.clipboard.writeText($('panelContent').textContent);
             toast('Kopyalandı');
+        }
+
+        function copyResponse() {
+            const text = $('aiBody').innerText;
+            navigator.clipboard.writeText(text);
+            toast('Yanıt kopyalandı');
         }
 
         $('sendBtn').onclick = send;
