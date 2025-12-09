@@ -187,103 +187,131 @@
 
         .doc-body { padding: 32px; }
 
-        /* Document Sections */
-        .doc-section { margin-bottom: 32px; }
+        /* Document Sections - RENKLİ KARTLAR */
+        .doc-section {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
         .doc-section:last-child { margin-bottom: 0; }
 
-        .doc-section-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
+        .doc-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 18px;
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.5px;
         }
 
-        /* Summary Grid */
+        .doc-section-body { padding: 18px; }
+
+        /* ÖZET - Mavi */
+        .section-ozet { background: #F0F9FF; }
+        .section-ozet .doc-section-header { background: #E0F2FE; color: #0369A1; }
+
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 14px;
         }
 
-        .summary-item { }
-        .summary-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .summary-value { font-size: 16px; font-weight: 600; color: var(--text); }
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #BAE6FD;
+        }
 
-        /* Action List */
-        .action-list { }
+        .summary-card-icon { font-size: 22px; margin-bottom: 8px; }
+        .summary-card-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .summary-card-value { font-size: 15px; font-weight: 700; color: var(--text); }
+
+        /* EYLEM PLANI - Yeşil */
+        .section-hemen { background: #F0FDF4; }
+        .section-hemen .doc-section-header { background: #DCFCE7; color: #15803D; }
+
+        .action-list { display: flex; flex-direction: column; gap: 12px; }
 
         .action-item {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
+            gap: 14px;
+            padding: 14px 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #BBF7D0;
         }
 
-        .action-item:last-child { border-bottom: none; }
-
         .action-num {
-            width: 28px;
-            height: 28px;
-            background: var(--text);
+            width: 26px;
+            height: 26px;
+            background: #22C55E;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             flex-shrink: 0;
         }
 
         .action-text {
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.5;
             color: var(--text);
-            padding-top: 4px;
         }
 
-        /* Precedent Card */
+        /* EMSAL - Turuncu */
+        .section-emsal { background: #FFF7ED; }
+        .section-emsal .doc-section-header { background: #FFEDD5; color: #C2410C; }
+
         .precedent {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #FED7AA;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .precedent:hover { border-color: var(--text); }
-
-        .precedent-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .precedent-court {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .precedent-arrow { color: var(--text-muted); font-size: 14px; }
+        .precedent:hover { border-color: #F97316; }
 
         .precedent-text {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 17px;
-            font-style: italic;
+            font-size: 14px;
             line-height: 1.6;
             color: var(--text-secondary);
+            flex: 1;
         }
 
-        /* Warning */
+        .precedent-arrow { font-size: 18px; color: var(--text-muted); margin-left: 14px; }
+
+        /* DİKKAT - Sarı */
+        .section-dikkat { background: #FEFCE8; }
+        .section-dikkat .doc-section-header { background: #FEF9C3; color: #A16207; }
+
         .warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #FDE047;
+        }
+
+        .warning-icon { font-size: 16px; flex-shrink: 0; }
+        .warning-text { font-size: 14px; line-height: 1.5; color: #92400E; }
+
+        /* Eski warning stili kaldırıldı, yeni yukarıda */
+        .warning-standalone {
             display: flex;
             align-items: flex-start;
             gap: 12px;
@@ -763,64 +791,84 @@
         function renderDocument(sections) {
             let html = '';
 
-            // ÖZET Section
+            // ÖZET Section - MAVİ
             if (sections.ozet.konu || sections.ozet.sonuc || sections.ozet.sure) {
                 html += `
-                    <div class="doc-section">
-                        <div class="doc-section-title">Özet</div>
-                        <div class="summary-grid">
-                            ${sections.ozet.konu ? `<div class="summary-item"><div class="summary-label">Konu</div><div class="summary-value">${renderMarkdown(sections.ozet.konu)}</div></div>` : ''}
-                            ${sections.ozet.sonuc ? `<div class="summary-item"><div class="summary-label">Sonuç</div><div class="summary-value">${renderMarkdown(sections.ozet.sonuc)}</div></div>` : ''}
-                            ${sections.ozet.sure ? `<div class="summary-item"><div class="summary-label">Süre</div><div class="summary-value">${renderMarkdown(sections.ozet.sure)}</div></div>` : ''}
+                    <div class="doc-section section-ozet">
+                        <div class="doc-section-header">📊 Özet</div>
+                        <div class="doc-section-body">
+                            <div class="summary-grid">
+                                ${sections.ozet.konu ? `
+                                    <div class="summary-card">
+                                        <div class="summary-card-icon">📋</div>
+                                        <div class="summary-card-label">Konu</div>
+                                        <div class="summary-card-value">${renderMarkdown(sections.ozet.konu)}</div>
+                                    </div>` : ''}
+                                ${sections.ozet.sonuc ? `
+                                    <div class="summary-card">
+                                        <div class="summary-card-icon">⚖️</div>
+                                        <div class="summary-card-label">Sonuç</div>
+                                        <div class="summary-card-value">${renderMarkdown(sections.ozet.sonuc)}</div>
+                                    </div>` : ''}
+                                ${sections.ozet.sure ? `
+                                    <div class="summary-card">
+                                        <div class="summary-card-icon">⏱️</div>
+                                        <div class="summary-card-label">Süre</div>
+                                        <div class="summary-card-value">${renderMarkdown(sections.ozet.sure)}</div>
+                                    </div>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
-            // HEMEN YAP Section
+            // HEMEN YAP Section - YEŞİL
             if (sections.hemen.length > 0) {
                 html += `
-                    <div class="doc-section">
-                        <div class="doc-section-title">Eylem Planı</div>
-                        <div class="action-list">
-                            ${sections.hemen.map((item, i) => `
-                                <div class="action-item">
-                                    <div class="action-num">${i + 1}</div>
-                                    <div class="action-text">${renderMarkdown(item)}</div>
+                    <div class="doc-section section-hemen">
+                        <div class="doc-section-header">✅ Hemen Yap</div>
+                        <div class="doc-section-body">
+                            <div class="action-list">
+                                ${sections.hemen.map((item, i) => `
+                                    <div class="action-item">
+                                        <div class="action-num">${i + 1}</div>
+                                        <div class="action-text">${renderMarkdown(item)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // EMSAL Section - TURUNCU
+            if (sections.emsal) {
+                html += `
+                    <div class="doc-section section-emsal">
+                        <div class="doc-section-header">📕 Emsal Karar</div>
+                        <div class="doc-section-body">
+                            <div class="precedent" onclick="openFirstSource()">
+                                <div class="precedent-text">${renderMarkdown(sections.emsal)}</div>
+                                <div class="precedent-arrow">→</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // DİKKAT Section - SARI
+            if (sections.dikkat.length > 0) {
+                html += `
+                    <div class="doc-section section-dikkat">
+                        <div class="doc-section-header">⚠️ Dikkat</div>
+                        <div class="doc-section-body">
+                            ${sections.dikkat.map(item => `
+                                <div class="warning">
+                                    <div class="warning-icon">•</div>
+                                    <div class="warning-text">${renderMarkdown(item)}</div>
                                 </div>
                             `).join('')}
                         </div>
-                    </div>
-                `;
-            }
-
-            // EMSAL Section
-            if (sections.emsal) {
-                html += `
-                    <div class="doc-section">
-                        <div class="doc-section-title">Emsal Karar</div>
-                        <div class="precedent" onclick="openFirstSource()">
-                            <div class="precedent-header">
-                                <div class="precedent-court">${caseContents[0]?.daire || 'Yargıtay'}</div>
-                                <div class="precedent-arrow">→</div>
-                            </div>
-                            <div class="precedent-text">"${renderMarkdown(sections.emsal)}"</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // DİKKAT Section
-            if (sections.dikkat.length > 0) {
-                html += `
-                    <div class="doc-section">
-                        <div class="doc-section-title">Önemli Uyarı</div>
-                        ${sections.dikkat.map(item => `
-                            <div class="warning">
-                                <div class="warning-icon">⚠</div>
-                                <div class="warning-text">${renderMarkdown(item)}</div>
-                            </div>
-                        `).join('')}
                     </div>
                 `;
             }
