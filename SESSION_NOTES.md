@@ -1,9 +1,9 @@
 # nevolve.ai - Oturum Notları
-> Son güncelleme: 10 Aralık 2024 (Oturum 3)
+> Son güncelleme: 10 Aralık 2024 (Oturum 4)
 
 ---
 
-## Proje Durumu: v4.2.1
+## Proje Durumu: v4.3.0
 
 **Site URL:** https://burhansimsek.space/isthatpossible/
 **Repo:** github.com/ozmengroup/nevolve
@@ -11,102 +11,91 @@
 
 ---
 
-## Son Oturum (10 Aralık - Oturum 3)
+## Son Oturum (10 Aralık - Oturum 4)
 
-### Kritik Sorun: Yanlış Daire Kararları
+### Yapılanlar
+
+**1. Multi-Model Mimari Eklendi (Groq + Gemini)**
+```
+Groq API (100K token/gün)
+├── Dava tipi algılama (~100 token)
+└── Ana yanıt (~800 token)
+
+Gemini API (ayrı limit)
+└── Karar özetleme (~4000 → ~200 token)
+```
+
+**2. Gemini Özetleme Fonksiyonu (api.js:278)**
+```javascript
+async summarizeKararWithGemini(kararContent, meta = {})
+// Karar metnini alıp yapılandırılmış özet döndürür:
+// SONUÇ, KONU, GEREKÇE, EMSAL DEĞERİ
+```
+
+**3. Token Optimizasyonu**
+- Eski: ~5000 token/sorgu
+- Yeni: ~1250 token/sorgu (Gemini özetleriyle)
+- **%75 tasarruf**
+
+### Test Sonuçları
+
+✅ **Çalışan:**
+- Dava tipi algılama: İş Hukuku doğru tespit edildi
+- Doğru daire: 9. Hukuk Dairesi kararları geldi
+- Mevzuat: İş Kanunu m.18, m.20 bulundu
+- Fallback: Gemini 429 verdiğinde sistem çalışmaya devam etti
+
+❌ **Sorunlar:**
+- Groq rate limit: 100K token/gün doldu
+- Gemini 429: gemini-2.0-flash rate limit (gemini-1.5-flash'a geçildi)
+- CORS hatası: Yargıtay document API'sinde
+
+---
+
+## Kritik Limitler
+
+| API | Limit | Durum |
+|-----|-------|-------|
+| Groq | 100K token/gün | DOLDU (UTC 00:00'da sıfırlanır) |
+| Gemini 1.5 Flash | 1500 istek/gün | Aktif |
+| Yargıtay API | Sınırsız | CORS sorunu var |
+
+---
+
+## Yarın Yapılacaklar
+
+### Öncelikli
+1. [ ] Groq limit yenilendikten sonra test
+2. [ ] Token optimizasyonu (system prompt kısaltma)
+3. [ ] CORS proxy çözümü (Yargıtay document API)
+
+### Token Optimizasyon Planı
+```
+Mevcut: ~3000 token/sorgu → ~33 sorgu/gün
+Hedef:  ~1000 token/sorgu → ~100 sorgu/gün
+
+Yapılacaklar:
+- System prompt: 600 → 300 token
+- History: 6 → 4 mesaj
+- Gemini özetleri aktif tutulacak
+```
+
+### Alternatif Çözümler (Backlog)
+- [ ] OpenRouter entegrasyonu (birden fazla model)
+- [ ] Cloudflare Workers AI (ücretsiz tier)
+- [ ] Groq paid tier ($0.05/1M token)
+
+---
+
+## Önceki Oturum Notları (Oturum 3)
+
+### Kritik Sorun: Yanlış Daire Kararları (ÇÖZÜLDÜ ✅)
 **Sorun:** İş davası sorulduğunda 11. Ceza Dairesi, 12. Hukuk Dairesi kararları geliyordu
 
-**Kök Neden Analizi:**
-- Yargıtay API `daire` parametresini destekliyor ama tam filtrelemiyor
-- "kıdem tazminatı", "ihbar tazminatı" aramaları hiç 9. Hukuk Dairesi döndürmüyor
-- **Kritik Bulgu:** "4857" (İş Kanunu numarası) araması %100 9. HD döndürüyor!
-
-**Test Sonuçları:**
-```
-"4857"      → %100 9. Hukuk Dairesi ✅
-"işçi"      → %60 9. Hukuk Dairesi
-"işveren"   → %50 9. Hukuk Dairesi
-"kıdem tazminatı" → %0 9. HD ❌
-"işe iade"  → %0 9. HD ❌
-```
-
-### Yapılan İyileştirmeler (api.js)
-
-**1. Daire Eşleştirmesi Eklendi:**
-```javascript
-KANUN_MAP: {
-    ceza: { daireler: ['Ceza Dairesi', 'Ceza Genel Kurulu'], ... },
-    icra: { daireler: ['12. Hukuk Dairesi'], ... },
-    aile: { daireler: ['2. Hukuk Dairesi'], ... },
-    is: { daireler: ['9. Hukuk Dairesi'], ... },
-    idari: { daireler: [], ... },  // Danıştay
-    miras: { daireler: ['1. Hukuk Dairesi', '14. Hukuk Dairesi'], ... }
-}
-```
-
-**2. searchCases() Fonksiyonu Güncellendi:**
-- `daire` parametresi eklendi
-- Client-side filtreleme eklendi (API'nin eksik filtresi için)
-
-**3. Arama Stratejisi Değiştirildi:**
-```javascript
-// ESKİ (çalışmıyordu):
-is: ['işe iade', 'fesih', 'tazminat']
-
-// YENİ (kanun numaraları öncelikli):
-is: ['4857', 'işçi', 'işveren', 'fesih']  // 4857 = İş Kanunu
-ceza: ['5237', 'TCK', 'savunma', 'beraat']  // 5237 = TCK
-icra: ['2004', 'İİK', 'itiraz', 'menfi tespit']  // 2004 = İİK
-```
-
-**4. Kanun Numarası Önceliği:**
-- İş davası algılandığında önce "4857" ile aranıyor
-- Bu sayede %100 doğru daire (9. HD) geliyor
-
----
-
-## Puppeteer MCP Durumu
-**Sorun:** `detached Frame` hatası devam ediyor
-**Gerekli:** Claude Code yeniden başlatılması
-
----
-
-## Devam Edilecek İşler
-
-### Hemen Yapılacak
-1. [x] API kaynak analizi tamamlandı
-2. [x] Daire filtreleme eklendi
-3. [ ] GitHub'a push et (deploy)
-4. [ ] Siteyi test et
-5. [ ] Puppeteer MCP'yi düzelt (Claude Code restart)
-
-### Backlog
-- [ ] Dark mode
-- [ ] PDF export
-- [ ] Arama geçmişi
-
----
-
-## API Bulguları (Test Sonuçları)
-
-### Çalışan Aramalar (Doğru Daire)
-| Arama | 9. HD Oranı |
-|-------|-------------|
-| 4857 | %100 |
-| işçi | %60 |
-| işveren | %50 |
-| fesih | %70 (daire filtresiyle) |
-| dolandırıcılık | %100 Ceza Dairesi |
-
-### Çalışmayan Aramalar
-| Arama | Sorun |
-|-------|-------|
-| kıdem tazminatı | %0 9. HD |
-| ihbar tazminatı | %0 9. HD |
-| işe iade | %0 9. HD |
-| iş sözleşmesi | %0 9. HD |
-
-**Sonuç:** Kanun numaraları (4857, 5237, 2004) en güvenilir arama terimleri
+**Çözüm:**
+- Kanun numarası öncelikli arama (4857 = İş Kanunu)
+- Client-side daire filtreleme
+- AI-based dava tipi algılama
 
 ---
 
@@ -115,23 +104,31 @@ icra: ['2004', 'İİK', 'itiraz', 'menfi tespit']  // 2004 = İİK
 ### Dosya Yapısı
 ```
 /nevolve
-├── index.html      # Ana uygulama
+├── index.html          # Ana uygulama
 ├── js/
-│   ├── config.js   # System prompt, AI ayarları
-│   └── api.js      # API + Daire filtreleme sistemi (v4.2.1)
+│   ├── config.js       # System prompt, API keys, AI ayarları
+│   └── api.js          # API + Daire filtreleme + Gemini özetleme
 └── SESSION_NOTES.md
 ```
 
 ### Önemli Fonksiyonlar (api.js)
+- `summarizeKararWithGemini()` - Gemini ile karar özetleme (YENİ)
 - `searchCases(keyword, timeout, daire)` - Daire filtreli arama
-- `generateSearchQueries(question, caseType)` - Kanun numarası öncelikli sorgular
-- `detectCaseType(question)` - Dava tipi algılama
+- `detectCaseTypeAI()` - AI ile dava tipi algılama
 - `buildEnrichedContext(question)` - Akıllı kaynak toplama
+- `buildStructuredContext()` - Gemini özetlerini kullanır
+
+### API Endpoints
+```
+Groq:    https://nevolve-api.burhan-simsek.workers.dev
+Gemini:  https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash
+Yargıtay: https://yargi-api.onrender.com
+```
 
 ---
 
 ## Yeni Oturumda Devam Etmek İçin
 
 ```
-"SESSION_NOTES.md oku. GitHub'a push edip siteyi test edelim."
+"SESSION_NOTES.md oku. Groq limiti yenilendi, token optimizasyonu yapalım."
 ```
