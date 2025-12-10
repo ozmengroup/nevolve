@@ -1138,43 +1138,59 @@
             let parsedKararlar = [];
             caseContents = [];
 
-            // Yargıtay
+            // Yargıtay - Gemini ile özetleme
             if (ctx.yargitayKararlari.length > 0) {
+                if (loadingText) loadingText.textContent = 'Kararlar özetleniyor...';
+
                 for (let i = 0; i < Math.min(2, ctx.yargitayKararlari.length); i++) {
                     const doc = await API.getDocument(ctx.yargitayKararlari[i].id);
                     if (doc.success) {
-                        const parsed = API.parseKarar(doc.content, {
+                        // Gemini ile özetle (Groq limitini korur)
+                        const summarized = await API.summarizeKararWithGemini(doc.content, {
                             daire: ctx.yargitayKararlari[i].daire,
                             esasNo: ctx.yargitayKararlari[i].esasNo,
                             kararNo: ctx.yargitayKararlari[i].kararNo,
                             tarih: ctx.yargitayKararlari[i].tarih,
                             kaynak: 'yargitay'
                         });
-                        if (parsed) {
-                            parsed.content = doc.content;
-                            parsedKararlar.push(parsed);
-                            caseContents.push({ ...ctx.yargitayKararlari[i], content: doc.content, kaynak: 'yargitay', parsed });
+
+                        if (summarized) {
+                            parsedKararlar.push(summarized);
+                            caseContents.push({
+                                ...ctx.yargitayKararlari[i],
+                                content: summarized.raw || doc.content,  // Modal için orijinal
+                                ozet: summarized.ozet,  // AI için özet
+                                kaynak: 'yargitay',
+                                parsed: summarized
+                            });
                         }
                     }
                 }
             }
 
-            // Danıştay
+            // Danıştay - Gemini ile özetleme
             if (ctx.danistayKararlari.length > 0) {
                 for (let i = 0; i < Math.min(2, ctx.danistayKararlari.length); i++) {
                     const doc = await API.getDanistayDocument(ctx.danistayKararlari[i].id);
                     if (doc.success) {
-                        const parsed = API.parseKarar(doc.content, {
+                        const summarized = await API.summarizeKararWithGemini(doc.content, {
                             daire: ctx.danistayKararlari[i].daire || 'Danıştay',
                             esasNo: ctx.danistayKararlari[i].esasNo,
                             kararNo: ctx.danistayKararlari[i].kararNo,
                             tarih: ctx.danistayKararlari[i].tarih,
                             kaynak: 'danistay'
                         });
-                        if (parsed) {
-                            parsed.content = doc.content;
-                            parsedKararlar.push(parsed);
-                            caseContents.push({ ...ctx.danistayKararlari[i], content: doc.content, kaynak: 'danistay', daire: ctx.danistayKararlari[i].daire || 'Danıştay', parsed });
+
+                        if (summarized) {
+                            parsedKararlar.push(summarized);
+                            caseContents.push({
+                                ...ctx.danistayKararlari[i],
+                                content: summarized.raw || doc.content,
+                                ozet: summarized.ozet,
+                                kaynak: 'danistay',
+                                daire: ctx.danistayKararlari[i].daire || 'Danıştay',
+                                parsed: summarized
+                            });
                         }
                     }
                 }

@@ -274,6 +274,64 @@ Soru: ${question.slice(0, 200)}`;
         }
     },
 
+    // Gemini ile karar özetleme - Groq limitini korur
+    async summarizeKararWithGemini(kararContent, meta = {}) {
+        const cacheKey = `summary_${meta.esasNo || kararContent.slice(0, 50)}`;
+        const cached = this._getCache(cacheKey);
+        if (cached) return cached;
+
+        try {
+            const prompt = `Bu Yargıtay kararını avukat için özetle. SADECE şu formatta yaz, başka bir şey ekleme:
+
+SONUÇ: [ONAMA/BOZMA/RED/KISMEN KABUL - tek kelime]
+KONU: [Dava konusu - 1 cümle, max 100 karakter]
+GEREKÇE: [Mahkemenin ana gerekçesi - 1-2 cümle, max 150 karakter]
+EMSAL DEĞERİ: [Bu karar avukata ne söylüyor - 1 cümle]
+
+KARAR METNİ:
+${kararContent.slice(0, 4000)}`;
+
+            const response = await fetch(`${CONFIG.GEMINI_API}?key=${CONFIG.GEMINI_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 200
+                    }
+                })
+            });
+
+            const data = await response.json();
+            const summary = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+            if (summary) {
+                // Özeti parse et
+                const result = {
+                    daire: meta.daire || '',
+                    esasNo: meta.esasNo || '',
+                    kararNo: meta.kararNo || '',
+                    tarih: meta.tarih || '',
+                    ozet: summary.trim(),
+                    raw: kararContent // Orijinali sakla (modal için)
+                };
+
+                console.log(`[Gemini] Karar özetlendi: ${meta.esasNo}`);
+                this._setCache(cacheKey, result);
+                return result;
+            }
+
+            // Gemini başarısız olursa ham içerik dön
+            return { ...meta, ozet: kararContent.slice(0, 500), raw: kararContent };
+
+        } catch (e) {
+            console.error('[Gemini] Özetleme hatası:', e);
+            // Fallback: İlk 500 karakter
+            return { ...meta, ozet: kararContent.slice(0, 500), raw: kararContent };
+        }
+    },
+
     async searchCases(keyword, timeout = 10000, daire = null) {
         // Önbellekten kontrol
         const cacheKey = `search_${keyword}_${daire || 'all'}`;
@@ -756,17 +814,23 @@ Soru: ${question.slice(0, 200)}`;
                 if (k.tarih) context += `, Tarih: ${k.tarih}`;
                 context += '\n';
 
-                if (k.sucTuru) context += `    Konu: ${k.sucTuru}\n`;
-                if (k.sonuc) context += `    Mahkeme Kararı: ${k.sonuc}\n`;
-                if (k.ceza) context += `    Verilen Ceza: ${k.ceza}\n`;
-                if (k.maddeler && k.maddeler.length > 0) {
-                    context += `    Uygulanan Maddeler: ${k.maddeler.map(m => `${m.kanun} m.${m.madde}`).join(', ')}\n`;
-                }
-                if (k.kritikBolum) {
-                    context += `    Gerekçe: ${k.kritikBolum.substring(0, 500)}\n`;
-                }
-                if (k.kararOzeti && k.kararOzeti.length > 100) {
-                    context += `    Özet: ${k.kararOzeti.substring(0, 400)}\n`;
+                // Gemini özeti varsa onu kullan (çok daha kısa ve öz)
+                if (k.ozet) {
+                    context += `${k.ozet}\n`;
+                } else {
+                    // Fallback: Eski parse sistemi
+                    if (k.sucTuru) context += `    Konu: ${k.sucTuru}\n`;
+                    if (k.sonuc) context += `    Mahkeme Kararı: ${k.sonuc}\n`;
+                    if (k.ceza) context += `    Verilen Ceza: ${k.ceza}\n`;
+                    if (k.maddeler && k.maddeler.length > 0) {
+                        context += `    Uygulanan Maddeler: ${k.maddeler.map(m => `${m.kanun} m.${m.madde}`).join(', ')}\n`;
+                    }
+                    if (k.kritikBolum) {
+                        context += `    Gerekçe: ${k.kritikBolum.substring(0, 500)}\n`;
+                    }
+                    if (k.kararOzeti && k.kararOzeti.length > 100) {
+                        context += `    Özet: ${k.kararOzeti.substring(0, 400)}\n`;
+                    }
                 }
             });
         }
