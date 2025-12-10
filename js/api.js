@@ -1059,6 +1059,7 @@ ${kararContent.slice(0, 4000)}`;
 
         // Çoklu arama sorguları oluştur
         const searchQueries = this.generateSearchQueries(question, context.caseType.type);
+        console.log('[Context] Search queries:', searchQueries);
         const primaryQuery = searchQueries[0] || question.split(' ').filter(w => w.length > 4).slice(0, 3).join(' ');
 
         // Paralel API çağrıları
@@ -1089,10 +1090,12 @@ ${kararContent.slice(0, 4000)}`;
             if (caseConfig.kaynaklar.includes('yargitay')) {
                 // Dava tipine uygun daire varsa filtrele
                 const daire = caseConfig.daireler?.[0] || null;
+                console.log('[Context] Yargıtay araması başlıyor, daire:', daire);
 
                 for (const query of searchQueries.slice(0, 2)) {
                     promises.push(
                         this.searchCases(query, 10000, daire).then(r => {
+                            console.log('[Context] Yargıtay arama sonucu:', query, r.success, r.decisions?.length || 0);
                             if (r.success) {
                                 r.decisions.forEach(d => {
                                     // Daire filtresi ile gelen sonuçları kontrol et
@@ -1102,10 +1105,11 @@ ${kararContent.slice(0, 4000)}`;
                                     if (!seenIds.has(d.id) && context.yargitayKararlari.length < 3 && isRelevantDaire) {
                                         seenIds.add(d.id);
                                         context.yargitayKararlari.push(d);
+                                        console.log('[Context] Karar eklendi:', d.daire, d.esasNo);
                                     }
                                 });
                             }
-                        }).catch(() => {})
+                        }).catch(e => { console.error('[Search] Yargıtay arama hatası:', e); })
                     );
                 }
             }
