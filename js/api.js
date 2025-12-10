@@ -1053,8 +1053,10 @@ ${kararContent.slice(0, 4000)}`;
             caseType: null
         };
 
-        // Dava tipini AI ile algıla (daha akıllı, edge case'leri yakalar)
-        context.caseType = await this.detectCaseTypeAI(question);
+        // Dava tipini regex ile algıla (AI rate limit sorunu geçici çözüm)
+        // TODO: Rate limit düzelince detectCaseTypeAI'a geri dön
+        context.caseType = this.detectCaseType(question);
+        console.log('[Context] Dava tipi (regex):', context.caseType.label);
         const caseConfig = this.KANUN_MAP[context.caseType.type];
 
         // Çoklu arama sorguları oluştur
