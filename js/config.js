@@ -6,7 +6,8 @@ const CONFIG = {
     WORKER_API: 'https://nevolve-api.burhan-simsek.workers.dev',
 
     // Gemini API (Karar özetleme için - ayrı limit)
-    GEMINI_API: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    // gemini-1.5-flash daha yüksek rate limit'e sahip
+    GEMINI_API: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
     GEMINI_KEY: 'AIzaSyDL4rz3oNYEW55VxbLisbAsEAL4g3cKG9U',
     
     AI_SYSTEM_PROMPT: `Sen deneyimli bir ceza/hukuk avukatı gibi düşünen strateji asistanısın. Amacın avukata dava kazandıracak somut yol haritası çizmek.
